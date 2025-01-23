@@ -38,20 +38,17 @@ export async function POST(
     const {id} = await params
     const body: any = await req.json()
 
-    await prisma.chatMessage.create({
-        data: {
-            content: body.content,
-            role: body.role,
-            chatRoomId: id
-        }
-    });
-
-    await prisma.chatRoom.update({
-        where: {id},
-        data: {updatedAt: new Date()}
+    const messages = await prisma.$transaction(async (prisma) => {
+        await prisma.chatMessage.create({data: {content: body.content, role: body.role, chatRoomId: id}});
+        await prisma.chatRoom.update({where: {id}, data: {updatedAt: new Date()}})
+        return prisma.chatMessage.findMany({
+            where: {chatRoomId: id},
+            orderBy: {createdAt: 'asc'}
+        })
     })
 
     // api call stream
+    // TODO: Select LLM provider based on settings (OpenAI, Claude, etc.)
     const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
         method: 'POST',
         headers: {
@@ -60,16 +57,15 @@ export async function POST(
         },
         body: JSON.stringify({
             "model": "gpt-4o-mini",
-            "messages": [
-                {
-                    "role": "user",
-                    "content": body.content
-                }
-            ],
+            "messages": messages.map((message) => ({
+                role: message.role.toLowerCase(),
+                content: message.content
+            })),
             "stream": true
         })
     })
 
+    // Stream the response
     const reader = response.body?.getReader();
     const decoder = new TextDecoder();
     const encoder = new TextEncoder();
