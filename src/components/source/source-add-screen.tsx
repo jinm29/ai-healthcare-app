@@ -4,7 +4,6 @@ import React, {useState} from 'react';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Activity, FileText, Loader2, Plus, Save, Trash2, User} from 'lucide-react';
 import {Button} from "@/components/ui/button";
-import {Input} from "@/components/ui/input";
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,} from "@/components/ui/dialog";
 
 // Source type definitions
@@ -18,13 +17,13 @@ const SourceType = {
 const personalInfoFields = [
     { key: 'name', label: 'Name', type: 'text' },
     { key: 'birthDate', label: 'Birth Date', type: 'date' },
-    { 
+    {
         key: 'height',
         label: 'Height',
         type: 'compound',
         fields: [
             { key: 'value', type: 'number', placeholder: 'Height' },
-            { 
+            {
                 key: 'unit',
                 type: 'select',
                 options: [
@@ -35,13 +34,13 @@ const personalInfoFields = [
             }
         ]
     },
-    { 
+    {
         key: 'weight',
         label: 'Weight',
         type: 'compound',
         fields: [
             { key: 'value', type: 'number', placeholder: 'Weight' },
-            { 
+            {
                 key: 'unit',
                 type: 'select',
                 options: [
@@ -52,7 +51,7 @@ const personalInfoFields = [
             }
         ]
     },
-    { 
+    {
         key: 'bloodType',
         label: 'Blood Type',
         type: 'select',

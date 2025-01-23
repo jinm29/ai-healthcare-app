@@ -16,7 +16,9 @@ import {AssistantModeListResponse} from "@/app/api/assistant-modes/route";
 import {ChatRole} from "@prisma/client";
 
 export default function Page() {
-    const {id} = useParams();
+    const {id} = useParams<{
+        id: string
+    }>();
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const [inputText, setInputText] = useState('');
@@ -111,7 +113,7 @@ export default function Page() {
             </div>
 
             <div className="flex-1 flex overflow-hidden">
-                <ChatSideBar isLeftSidebarOpen={isLeftSidebarOpen}/>
+                <ChatSideBar chatRoomId={id} isLeftSidebarOpen={isLeftSidebarOpen}/>
 
                 <div className="flex-1 flex flex-col bg-white min-w-0">
                     <div className="flex-1 overflow-y-auto p-2 space-y-2">

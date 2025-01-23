@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState } from "react";
+import React, {useState} from "react";
 import useSWR from "swr";
 import {ChatRoomListResponse} from "@/app/api/chat-rooms/route";
 import {Button} from "@/components/ui/button";
-import {FileText, MessageCircle, Files} from "lucide-react";
+import {Files, FileText, MessageCircle} from "lucide-react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 
@@ -20,9 +20,13 @@ interface SourceResponse {
 
 interface ChatSideBarProps {
     isLeftSidebarOpen: boolean;
+    chatRoomId: string;
 }
 
-export default function ChatSideBar({ isLeftSidebarOpen }: ChatSideBarProps) {
+export default function ChatSideBar({
+                                        chatRoomId,
+                                        isLeftSidebarOpen
+                                    }: ChatSideBarProps) {
     const router = useRouter()
     const [, setJsonViewerOpen] = useState(false);
     const [, setIsSourceManagerOpen] = useState(false);
@@ -37,7 +41,6 @@ export default function ChatSideBar({ isLeftSidebarOpen }: ChatSideBarProps) {
         (url: string) => fetch(url).then(res => res.json())
     )
 
-    const currentConversation = '1'
     const chatRooms = chatRoomData?.chatRooms
     const sources = sourceData?.sources || []
 
@@ -111,7 +114,7 @@ export default function ChatSideBar({ isLeftSidebarOpen }: ChatSideBarProps) {
                         <Link
                             key={chatRoom.id}
                             className={`block w-full text-left p-2.5 rounded-md text-sm hover:bg-gray-100 transition-colors
-                                ${currentConversation === chatRoom.id ? 'bg-gray-100' : ''}`}
+                                ${chatRoomId === chatRoom.id ? 'bg-gray-100' : ''}`}
                             href={`/chat/${chatRoom.id}`}
                         >
                             <div className="font-medium truncate">{chatRoom.name}</div>
@@ -124,10 +127,10 @@ export default function ChatSideBar({ isLeftSidebarOpen }: ChatSideBarProps) {
         {!isLeftSidebarOpen && (
             <div className="flex flex-col items-center pt-4 gap-4">
                 <Button variant="ghost" size="icon">
-                    <Files className="h-4 w-4" />
+                    <Files className="h-4 w-4"/>
                 </Button>
                 <Button variant="ghost" size="icon">
-                    <MessageCircle className="h-4 w-4" />
+                    <MessageCircle className="h-4 w-4"/>
                 </Button>
             </div>
         )}
