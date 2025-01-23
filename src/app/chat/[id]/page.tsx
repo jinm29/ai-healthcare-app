@@ -4,16 +4,15 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Menu, Send, Settings} from 'lucide-react';
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
-import {Textarea} from "@/components/ui/textarea";
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import ChatSideBar from "@/components/chat/chat-side-bar";
 import ChatMessage from "@/components/chat/chat-message";
 import useSWR from "swr";
 import {useParams} from "next/navigation";
 import {ChatMessageListResponse} from "@/app/api/chat-rooms/[id]/messages/route";
-import {AssistantModeListResponse} from "@/app/api/assistant-modes/route";
 import {ChatRole} from "@prisma/client";
+import ChatSettingSideBar from "@/components/chat/chat-setting-side-bar";
 
 export default function Page() {
     const {id} = useParams<{
@@ -22,9 +21,6 @@ export default function Page() {
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const [inputText, setInputText] = useState('');
-    const [settings, setSettings] = useState({model: 'gpt4', apiKey: ''});
-    const [selectedMode, setSelectedMode] = useState<string>();
-    const [systemPrompt, setSystemPrompt] = useState<string>();
     const [sources] = useState([]);
     const [isJsonViewerOpen, setIsJsonViewerOpen] = useState(false);
     const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
@@ -36,12 +32,6 @@ export default function Page() {
     });
     const messages = useMemo(() => data?.chatMessages || [], [data]);
 
-    const {data: assistantModesData} = useSWR<AssistantModeListResponse>('/api/assistant-modes', async (url: string) => {
-        const response = await fetch(url);
-        return response.json();
-    })
-    const ConsultingModes = useMemo(() => assistantModesData?.assistantModes || [], [assistantModesData]);
-
     useEffect(() => {
         if (messagesEndRef.current) {
             messagesEndRef.current.scrollIntoView({behavior: 'smooth'});
@@ -50,8 +40,6 @@ export default function Page() {
 
     const handleSendMessage = async () => {
         if (!inputText.trim()) return;
-        const selectedModeData = ConsultingModes.find(m => m.id === selectedMode);
-        if (!selectedModeData) return;
 
         const oldMessages = [...messages, {
             id: new Date().toISOString(),
@@ -142,66 +130,7 @@ export default function Page() {
                     </div>
                 </div>
 
-                <div className={`border-l bg-gray-50 flex flex-col transition-all duration-300 ease-in-out
-          ${isRightSidebarOpen ? 'w-80' : 'w-0'} relative`}>
-                    <div className={`absolute inset-0 ${isRightSidebarOpen ? 'opacity-100' : 'opacity-0'}
-            transition-opacity duration-300 overflow-y-auto`}>
-                        <div className="p-4 space-y-4">
-                            <div className="space-y-4">
-                                <h4 className="text-sm font-medium">Model Settings</h4>
-                                <div className="space-y-2">
-                                    <Select value={settings.model}
-                                            onValueChange={(value) => setSettings({...settings, model: value})}>
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select model"/>
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="gpt4">GPT-4</SelectItem>
-                                            <SelectItem value="claude3">Claude 3</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <Input
-                                        type="password"
-                                        placeholder="Enter API key"
-                                        value={settings.apiKey}
-                                        onChange={(e) => setSettings({...settings, apiKey: e.target.value})}
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">System Prompt</label>
-                                <Textarea
-                                    value={systemPrompt}
-                                    onChange={(e) => setSystemPrompt(e.target.value)}
-                                    rows={6}
-                                    className="resize-none"
-                                />
-                            </div>
-
-                            <div className="space-y-3">
-                                <h4 className="text-sm font-medium">Assistant Mode</h4>
-                                <div className="space-y-2">
-                                    {ConsultingModes.map((mode) => (
-                                        <button
-                                            key={mode.id}
-                                            className={`w-full p-3 rounded-lg text-left border transition-colors
-                        ${selectedMode === mode.id ? 'bg-white border-gray-300' :
-                                                'border-transparent hover:bg-gray-100'}`}
-                                            onClick={() => {
-                                                setSelectedMode(mode.id);
-                                                setSystemPrompt(mode.systemPrompt);
-                                            }}
-                                        >
-                                            <div className="text-sm font-medium">{mode.name}</div>
-                                            <div className="text-xs text-gray-500">{mode.description}</div>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <ChatSettingSideBar chatRoomId={id} isRightSidebarOpen={isRightSidebarOpen}/>
             </div>
 
             <Dialog open={isJsonViewerOpen} onOpenChange={setIsJsonViewerOpen}>
