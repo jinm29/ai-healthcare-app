@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Menu, Send, Settings} from 'lucide-react';
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
@@ -12,51 +12,7 @@ import ChatMessage from "@/components/chat/chat-message";
 import useSWR from "swr";
 import {useParams} from "next/navigation";
 import {ChatMessageListResponse} from "@/app/api/chat-rooms/[id]/messages/route";
-
-const ConsultingModes = [
-    {
-        id: 'functional',
-        name: 'Functional Medicine',
-        description: 'Holistic approach',
-        systemPrompt: 'You are a functional medicine practitioner focusing on root causes of health issues. Analyze patient data comprehensively.'
-    },
-    {
-        id: 'familymed',
-        name: 'Family Medicine',
-        description: 'General healthcare',
-        systemPrompt: 'You are a family medicine physician providing comprehensive primary care. Focus on preventive care and managing various health conditions.'
-    },
-    {
-        id: 'orthopedic',
-        name: 'Orthopedic Specialist',
-        description: 'Musculoskeletal expert',
-        systemPrompt: 'You are an orthopedic specialist. Focus on musculoskeletal conditions, joint issues, and physical symptoms.'
-    },
-    {
-        id: 'nutritionist',
-        name: 'Clinical Nutritionist',
-        description: 'Diet and nutrition expert',
-        systemPrompt: 'You are a clinical nutritionist specializing in dietary interventions and nutritional therapy. Provide evidence-based nutrition advice and meal planning guidance.'
-    },
-    {
-        id: 'fitness',
-        name: 'Exercise Specialist',
-        description: 'Fitness and rehabilitation',
-        systemPrompt: 'You are a certified exercise specialist and rehabilitation coach. Provide guidance on exercise programs, physical rehabilitation, and injury prevention.'
-    },
-    {
-        id: 'internal',
-        name: 'Internal Medicine',
-        description: 'Complex conditions',
-        systemPrompt: 'You are an internal medicine physician specializing in complex medical conditions. Focus on diagnosis and treatment of adult diseases.'
-    },
-    {
-        id: 'rootcause',
-        name: 'Root Cause Analysis',
-        description: 'Comprehensive analysis',
-        systemPrompt: 'You are a medical expert specializing in root cause analysis. Identify underlying factors and connections between symptoms.'
-    },
-];
+import {AssistantModeListResponse} from "@/app/api/assistant-modes/route";
 
 export default function Page() {
     const {id} = useParams();
@@ -64,8 +20,8 @@ export default function Page() {
 
     const [inputText, setInputText] = useState('');
     const [settings, setSettings] = useState({model: 'gpt4', apiKey: ''});
-    const [selectedMode, setSelectedMode] = useState(ConsultingModes[0].id);
-    const [systemPrompt, setSystemPrompt] = useState(ConsultingModes[0].systemPrompt);
+    const [selectedMode, setSelectedMode] = useState<string>();
+    const [systemPrompt, setSystemPrompt] = useState<string>();
     const [sources] = useState([]);
     const [isJsonViewerOpen, setIsJsonViewerOpen] = useState(false);
     const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
@@ -75,7 +31,13 @@ export default function Page() {
         const response = await fetch(url);
         return response.json();
     });
-    const messages = data?.chatMessages || [];
+    const messages = useMemo(() => data?.chatMessages || [], [data]);
+
+    const {data: assistantModesData} = useSWR<AssistantModeListResponse>('/api/assistant-modes', async (url: string) => {
+        const response = await fetch(url);
+        return response.json();
+    })
+    const ConsultingModes = useMemo(() => assistantModesData?.assistantModes || [], [assistantModesData]);
 
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -148,7 +110,7 @@ export default function Page() {
             </div>
 
             <div className="flex-1 flex overflow-hidden">
-                <ChatSideBar isLeftSidebarOpen={isLeftSidebarOpen} />
+                <ChatSideBar isLeftSidebarOpen={isLeftSidebarOpen}/>
 
                 <div className="flex-1 flex flex-col bg-white min-w-0">
                     <div className="flex-1 overflow-y-auto p-2 space-y-2">
