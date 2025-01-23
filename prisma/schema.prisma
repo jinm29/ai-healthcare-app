@@ -8,12 +8,14 @@ datasource db {
 }
 
 model ChatRoom {
-  id        String   @id @default(cuid())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String   @id @default(cuid())
+  name            String
+  assistantModeId String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
-  chatMessages ChatMessage[]
+  assistantMode AssistantMode @relation(fields: [assistantModeId], references: [id])
+  chatMessages  ChatMessage[]
 }
 
 model ChatMessage {
@@ -34,6 +36,8 @@ model AssistantMode {
   systemPrompt String
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+
+  chatRoom ChatRoom[]
 }
 
 enum ChatRole {
