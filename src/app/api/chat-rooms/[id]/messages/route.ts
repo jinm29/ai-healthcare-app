@@ -16,6 +16,11 @@ export interface ChatMessageListResponse {
     chatMessages: ChatMessage[]
 }
 
+export interface ChatMessageCreateRequest {
+    content: string,
+    role: 'USER' | 'ASSISTANT'
+}
+
 export async function GET(
     req: NextRequest,
     {params}: { params: Promise<{ id: string }> }
@@ -36,15 +41,23 @@ export async function POST(
     }
 ) {
     const {id} = await params
-    const body: any = await req.json()
+    const body: ChatMessageCreateRequest = await req.json()
 
-    const messages = await prisma.$transaction(async (prisma) => {
+    const {assistantMode, chatMessages} = await prisma.$transaction(async (prisma) => {
         await prisma.chatMessage.create({data: {content: body.content, role: body.role, chatRoomId: id}});
-        await prisma.chatRoom.update({where: {id}, data: {updatedAt: new Date()}})
-        return prisma.chatMessage.findMany({
+        const {assistantMode} = await prisma.chatRoom.update({
+            where: {id},
+            data: {updatedAt: new Date()},
+            select: {assistantMode: {select: {systemPrompt: true}}}
+        })
+        const chatMessages = await prisma.chatMessage.findMany({
             where: {chatRoomId: id},
             orderBy: {createdAt: 'asc'}
         })
+        return {
+            chatMessages,
+            assistantMode
+        }
     })
 
     // api call stream
@@ -57,10 +70,13 @@ export async function POST(
         },
         body: JSON.stringify({
             "model": "gpt-4o-mini",
-            "messages": messages.map((message) => ({
-                role: message.role.toLowerCase(),
-                content: message.content
-            })),
+            "messages": [
+                {"role": "system", "content": assistantMode.systemPrompt},
+                ...chatMessages.map((message) => ({
+                    role: message.role.toLowerCase(),
+                    content: message.content
+                }))
+            ],
             "stream": true
         })
     })
