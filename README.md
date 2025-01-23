@@ -6,7 +6,8 @@
 
 ## 🌟 Overview
 
-OpenHealth helps you **take charge of your health data**. By leveraging AI and your personal health information, OpenHealth provides a private and locally-run assistant that helps you better understand and manage your health.
+OpenHealth helps you **take charge of your health data**. By leveraging AI and your personal health information,
+OpenHealth provides a private and locally-run assistant that helps you better understand and manage your health.
 
 ---
 
@@ -21,9 +22,9 @@ OpenHealth helps you **take charge of your health data**. By leveraging AI and y
 ## 📥 Supporting Data Sources & Language Models
 
 | **Data Sources You Can Add**  | **Supported Language Models** |
-| ----------------------------- | ----------------------------- |
-| Blood Test Results            | LLaMA, DeepSeek-V3            |
-| Health Checkup Data           | GPT, Claude, Gemini           |
+|-------------------------------|-------------------------------|
+| Blood Test Results            | LLaMA,DeepSeek-V3             |
+| Health Checkup Data           | GPT,Claude,Gemini             |
 | Personal Physical Information |                               |
 | Family History                |                               |
 | Symptoms                      |                               |
@@ -33,7 +34,7 @@ OpenHealth helps you **take charge of your health data**. By leveraging AI and y
 ## 🤔 Why We Built OpenHealth
 
 - 💡 **Your health is your responsibility.**
-- ✅ True health management combines **your data** + **intelligence**, turning insights into actionable plans.
+- ✅ True health management combines **your data** + **intelligence**, turning insights into actionable plans.
 - 🧠 AI acts as an unbiased tool to guide and support you in managing your long-term health effectively.
 
 ---
@@ -44,7 +45,7 @@ OpenHealth helps you **take charge of your health data**. By leveraging AI and y
 Health Data Input  -->  Data Parsing Module  -->  Structured Data File  -->  GPT Integration
 ```
 
----
+## Getting Started
 
 ## ⚙️ How to Run OpenHealth
 
@@ -53,8 +54,8 @@ This project is built using Node.js. Follow the steps below to set up and run Op
 1. **Clone the Repository:**
 
    ```bash
-   git clone https://github.com/your-repo/openhealth.git
-   cd openhealth
+   git clone https://github.com/OpenHealthForAll/open-health.git
+   cd open-health
    ```
 
 2. **Install Dependencies:**
@@ -66,7 +67,7 @@ This project is built using Node.js. Follow the steps below to set up and run Op
 3. **Start the Application:**
 
    ```bash
-   npm run dev
+   npm run dev
    ```
 
 4. **Access OpenHealth:**
