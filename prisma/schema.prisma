@@ -27,6 +27,15 @@ model ChatMessage {
   chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id])
 }
 
+model AssistantMode {
+  id           String   @id @default(cuid())
+  name         String
+  description  String
+  systemPrompt String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
 enum ChatRole {
   USER
   ASSISTANT
