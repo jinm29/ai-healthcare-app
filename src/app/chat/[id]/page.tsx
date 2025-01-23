@@ -13,6 +13,7 @@ import useSWR from "swr";
 import {useParams} from "next/navigation";
 import {ChatMessageListResponse} from "@/app/api/chat-rooms/[id]/messages/route";
 import {AssistantModeListResponse} from "@/app/api/assistant-modes/route";
+import {ChatRole} from "@prisma/client";
 
 export default function Page() {
     const {id} = useParams();
@@ -53,7 +54,7 @@ export default function Page() {
         const oldMessages = [...messages, {
             id: new Date().toISOString(),
             content: inputText,
-            role: 'USER' as any,
+            role: 'USER' as ChatRole,
             createdAt: new Date(),
         }];
         await mutate({chatMessages: oldMessages}, {revalidate: false});

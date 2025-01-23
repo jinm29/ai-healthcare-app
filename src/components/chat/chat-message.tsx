@@ -1,11 +1,8 @@
 import React from "react";
+import type {ChatMessage as ChatMessageType} from "@/app/api/chat-rooms/[id]/messages/route";
 
 interface ChatMessageProps {
-    message: {
-        id: string,
-        content: string,
-        role: 'USER' | 'ASSISTANT'
-    }
+    message: ChatMessageType
 }
 
 export default function ChatMessage(
