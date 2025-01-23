@@ -112,12 +112,17 @@ export async function POST(
                 }
 
                 // Save to prisma after the stream is done
-                await prisma.chatMessage.create({
-                    data: {
-                        content: messageContent,
-                        role: 'ASSISTANT',
-                        chatRoomId: id
-                    }
+                await prisma.$transaction(async (prisma) => {
+                    await prisma.chatMessage.create({
+                        data: {
+                            content: messageContent,
+                            role: 'ASSISTANT',
+                            chatRoomId: id
+                        }
+                    });
+                    await prisma.chatRoom.update({
+                        where: {id}, data: {updatedAt: new Date(), name: messageContent}
+                    })
                 });
                 controller.close();
             }
