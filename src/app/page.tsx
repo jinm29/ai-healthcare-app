@@ -17,10 +17,34 @@ const ConsultingModes = [
         systemPrompt: 'You are a functional medicine practitioner focusing on root causes of health issues. Analyze patient data comprehensively.'
     },
     {
+        id: 'familymed',
+        name: 'Family Medicine',
+        description: 'General healthcare',
+        systemPrompt: 'You are a family medicine physician providing comprehensive primary care. Focus on preventive care and managing various health conditions.'
+    },
+    {
         id: 'orthopedic',
         name: 'Orthopedic Specialist',
         description: 'Musculoskeletal expert',
         systemPrompt: 'You are an orthopedic specialist. Focus on musculoskeletal conditions, joint issues, and physical symptoms.'
+    },
+    {
+        id: 'nutritionist',
+        name: 'Clinical Nutritionist',
+        description: 'Diet and nutrition expert',
+        systemPrompt: 'You are a clinical nutritionist specializing in dietary interventions and nutritional therapy. Provide evidence-based nutrition advice and meal planning guidance.'
+    },
+    {
+        id: 'fitness',
+        name: 'Exercise Specialist',
+        description: 'Fitness and rehabilitation',
+        systemPrompt: 'You are a certified exercise specialist and rehabilitation coach. Provide guidance on exercise programs, physical rehabilitation, and injury prevention.'
+    },
+    {
+        id: 'internal',
+        name: 'Internal Medicine',
+        description: 'Complex conditions',
+        systemPrompt: 'You are an internal medicine physician specializing in complex medical conditions. Focus on diagnosis and treatment of adult diseases.'
     },
     {
         id: 'rootcause',
@@ -30,9 +54,14 @@ const ConsultingModes = [
     },
 ];
 
+interface Message {
+    role: 'user' | 'assistant';
+    content: string;
+}
+
 export default function Page() {
     const [currentConversation, setCurrentConversation] = useState(1);
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState<Message[]>([]);
     const [inputText, setInputText] = useState('');
     const [settings, setSettings] = useState({model: 'gpt4', apiKey: ''});
     const [selectedMode, setSelectedMode] = useState(ConsultingModes[0].id);
@@ -43,7 +72,7 @@ export default function Page() {
     const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
     const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true);
 
-    const Message = ({message}) => (
+    const Message = ({message}: { message: Message }) => (
         <div className={`flex gap-2 ${message.role === 'assistant' ? 'bg-gray-50' : ''} p-2 rounded`}>
             {message.role === 'assistant' && (
                 <div className="shrink-0 mt-1">
@@ -60,13 +89,15 @@ export default function Page() {
         </div>
     );
 
-
     const handleSendMessage = () => {
         if (!inputText.trim()) return;
+        const selectedModeData = ConsultingModes.find(m => m.id === selectedMode);
+        if (!selectedModeData) return;
+        
         setMessages([
             ...messages,
             {role: 'user', content: inputText},
-            {role: 'assistant', content: `Analyzing as ${ConsultingModes.find(m => m.id === selectedMode).name}...`}
+            {role: 'assistant', content: `Analyzing as ${selectedModeData.name}...`}
         ]);
         setInputText('');
     };
@@ -120,37 +151,6 @@ export default function Page() {
                     <div className={`absolute inset-0 ${isRightSidebarOpen ? 'opacity-100' : 'opacity-0'}
             transition-opacity duration-300 overflow-y-auto`}>
                         <div className="p-4 space-y-4">
-                            <div className="space-y-2">
-                                <label className="text-sm font-medium">System Prompt</label>
-                                <Textarea
-                                    value={systemPrompt}
-                                    onChange={(e) => setSystemPrompt(e.target.value)}
-                                    rows={6}
-                                    className="resize-none"
-                                />
-                            </div>
-
-                            <div className="space-y-3">
-                                <h4 className="text-sm font-medium">Consulting Mode</h4>
-                                <div className="space-y-2">
-                                    {ConsultingModes.map((mode) => (
-                                        <button
-                                            key={mode.id}
-                                            className={`w-full p-3 rounded-lg text-left border transition-colors
-                        ${selectedMode === mode.id ? 'bg-white border-gray-300' :
-                                                'border-transparent hover:bg-gray-100'}`}
-                                            onClick={() => {
-                                                setSelectedMode(mode.id);
-                                                setSystemPrompt(mode.systemPrompt);
-                                            }}
-                                        >
-                                            <div className="text-sm font-medium">{mode.name}</div>
-                                            <div className="text-xs text-gray-500">{mode.description}</div>
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
                             <div className="space-y-4">
                                 <h4 className="text-sm font-medium">Model Settings</h4>
                                 <div className="space-y-2">
@@ -170,6 +170,37 @@ export default function Page() {
                                         value={settings.apiKey}
                                         onChange={(e) => setSettings({...settings, apiKey: e.target.value})}
                                     />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-sm font-medium">System Prompt</label>
+                                <Textarea
+                                    value={systemPrompt}
+                                    onChange={(e) => setSystemPrompt(e.target.value)}
+                                    rows={6}
+                                    className="resize-none"
+                                />
+                            </div>
+
+                            <div className="space-y-3">
+                                <h4 className="text-sm font-medium">Assistant Mode</h4>
+                                <div className="space-y-2">
+                                    {ConsultingModes.map((mode) => (
+                                        <button
+                                            key={mode.id}
+                                            className={`w-full p-3 rounded-lg text-left border transition-colors
+                        ${selectedMode === mode.id ? 'bg-white border-gray-300' :
+                                                'border-transparent hover:bg-gray-100'}`}
+                                            onClick={() => {
+                                                setSelectedMode(mode.id);
+                                                setSystemPrompt(mode.systemPrompt);
+                                            }}
+                                        >
+                                            <div className="text-sm font-medium">{mode.name}</div>
+                                            <div className="text-xs text-gray-500">{mode.description}</div>
+                                        </button>
+                                    ))}
                                 </div>
                             </div>
                         </div>
