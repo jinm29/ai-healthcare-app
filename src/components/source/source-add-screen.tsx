@@ -18,9 +18,55 @@ const SourceType = {
 const personalInfoFields = [
     { key: 'name', label: 'Name', type: 'text' },
     { key: 'birthDate', label: 'Birth Date', type: 'date' },
-    { key: 'height', label: 'Height (cm)', type: 'number' },
-    { key: 'weight', label: 'Weight (kg)', type: 'number' },
-    { key: 'bloodType', label: 'Blood Type', type: 'text' },
+    { 
+        key: 'height',
+        label: 'Height',
+        type: 'compound',
+        fields: [
+            { key: 'value', type: 'number', placeholder: 'Height' },
+            { 
+                key: 'unit',
+                type: 'select',
+                options: [
+                    { value: 'cm', label: 'cm' },
+                    { value: 'ft', label: 'ft' }
+                ],
+                defaultValue: 'cm'
+            }
+        ]
+    },
+    { 
+        key: 'weight',
+        label: 'Weight',
+        type: 'compound',
+        fields: [
+            { key: 'value', type: 'number', placeholder: 'Weight' },
+            { 
+                key: 'unit',
+                type: 'select',
+                options: [
+                    { value: 'kg', label: 'kg' },
+                    { value: 'lbs', label: 'lbs' }
+                ],
+                defaultValue: 'kg'
+            }
+        ]
+    },
+    { 
+        key: 'bloodType',
+        label: 'Blood Type',
+        type: 'select',
+        options: [
+            { value: 'A+', label: 'A+' },
+            { value: 'A-', label: 'A-' },
+            { value: 'B+', label: 'B+' },
+            { value: 'B-', label: 'B-' },
+            { value: 'O+', label: 'O+' },
+            { value: 'O-', label: 'O-' },
+            { value: 'AB+', label: 'AB+' },
+            { value: 'AB-', label: 'AB-' }
+        ]
+    },
     { key: 'familyHistory', label: 'Family History', type: 'textarea' }
 ];
 
@@ -43,9 +89,63 @@ const DynamicForm = ({ fields, data, onChange }) => {
                             value={data[field.key] || ''}
                             onChange={(e) => onChange(field.key, e.target.value)}
                         />
+                    ) : field.type === 'select' ? (
+                        <select
+                            className="w-full p-2 border rounded"
+                            value={data[field.key] || field.defaultValue || ''}
+                            onChange={(e) => onChange(field.key, e.target.value)}
+                        >
+                            <option value="">Select...</option>
+                            {field.options.map(option => (
+                                <option key={option.value} value={option.value}>
+                                    {option.label}
+                                </option>
+                            ))}
+                        </select>
+                    ) : field.type === 'compound' ? (
+                        <div className="flex gap-2">
+                            {field.fields.map((subField) => (
+                                <div key={subField.key} className="flex-1">
+                                    {subField.type === 'select' ? (
+                                        <select
+                                            className="w-full p-2 border rounded"
+                                            value={data[field.key]?.[subField.key] || subField.defaultValue || ''}
+                                            onChange={(e) => {
+                                                const currentValue = data[field.key] || {};
+                                                onChange(field.key, {
+                                                    ...currentValue,
+                                                    [subField.key]: e.target.value
+                                                });
+                                            }}
+                                        >
+                                            {subField.options.map(option => (
+                                                <option key={option.value} value={option.value}>
+                                                    {option.label}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        <input
+                                            type={subField.type}
+                                            placeholder={subField.placeholder}
+                                            className="w-full p-2 border rounded"
+                                            value={data[field.key]?.[subField.key] || ''}
+                                            onChange={(e) => {
+                                                const currentValue = data[field.key] || {};
+                                                onChange(field.key, {
+                                                    ...currentValue,
+                                                    [subField.key]: e.target.value
+                                                });
+                                            }}
+                                        />
+                                    )}
+                                </div>
+                            ))}
+                        </div>
                     ) : (
-                        <Input
+                        <input
                             type={field.type}
+                            className="w-full p-2 border rounded"
                             value={data[field.key] || ''}
                             onChange={(e) => onChange(field.key, e.target.value)}
                         />
@@ -75,9 +175,9 @@ const JSONEditor = ({ data, onSave, isEditable = false }) => {
                 <div className="flex justify-between items-center mb-2">
                     <h3 className="text-sm font-medium">Extracted Data</h3>
                 </div>
-                <pre className="text-sm overflow-auto bg-gray-100 p-4 rounded h-full">
-          {JSON.stringify(data, null, 2)}
-        </pre>
+                <pre className="text-sm font-mono bg-muted/30 p-4 rounded h-full whitespace-pre overflow-auto">
+                    {JSON.stringify(data, null, 2)}
+                </pre>
             </div>
         );
     }
@@ -88,11 +188,11 @@ const JSONEditor = ({ data, onSave, isEditable = false }) => {
                 <h3 className="text-sm font-medium">Extracted Data</h3>
                 <Button size="sm" onClick={handleSave}>
                     <Save className="w-4 h-4 mr-2" />
-                    Save
+                    Update
                 </Button>
             </div>
             <textarea
-                className="flex-1 font-mono text-sm p-2 border rounded-md"
+                className="flex-1 font-mono text-sm p-4 border rounded-md whitespace-pre"
                 value={editableData}
                 onChange={(e) => setEditableData(e.target.value)}
             />
@@ -168,25 +268,29 @@ const SourceItem = ({ source, isSelected, onClick, onDelete }) => {
     const getSourceIcon = (type) => {
         switch (type) {
             case SourceType.FILE:
-                return <FileText className="w-4 h-4" />;
+                return <FileText className="h-5 w-5" />;
             case SourceType.PERSONAL_INFO:
-                return <User className="w-4 h-4" />;
+                return <User className="h-5 w-5" />;
             case SourceType.SYMPTOMS:
-                return <Activity className="w-4 h-4" />;
+                return <Activity className="h-5 w-5" />;
             default:
-                return <FileText className="w-4 h-4" />;
+                return <FileText className="h-5 w-5" />;
         }
     };
 
     return (
         <div
-            className={`flex items-center justify-between p-2 rounded cursor-pointer hover:bg-gray-50
-        ${isSelected ? 'bg-gray-100' : ''}`}
+            className={`flex items-center justify-between p-2 rounded cursor-pointer transition-all
+                ${isSelected 
+                    ? 'text-primary text-base font-semibold bg-primary/5' 
+                    : 'text-sm hover:bg-gray-50'}`}
             onClick={onClick}
         >
             <div className="flex items-center gap-2 flex-1 min-w-0">
-                {getSourceIcon(source.type)}
-                <span className="text-sm truncate">{source.name}</span>
+                <div className="flex-shrink-0">
+                    {getSourceIcon(source.type)}
+                </div>
+                <span className="truncate">{source.name}</span>
             </div>
             {(source.type === SourceType.FILE || source.type === SourceType.SYMPTOMS) && (
                 source.status === 'parsing' ? (
@@ -195,7 +299,7 @@ const SourceItem = ({ source, isSelected, onClick, onDelete }) => {
                         size="icon"
                         disabled
                     >
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="h-5 w-5 animate-spin" />
                     </Button>
                 ) : (
                     <Button
@@ -206,7 +310,7 @@ const SourceItem = ({ source, isSelected, onClick, onDelete }) => {
                             onDelete(source.id);
                         }}
                     >
-                        <Trash2 className="w-4 h-4 text-gray-500" />
+                        <Trash2 className="h-5 w-5" />
                     </Button>
                 )
             )}
@@ -237,11 +341,10 @@ const SourcePreview = ({ source, formData, setFormData }) => {
     };
 
     return (
-        <div className="h-full flex flex-col gap-4">
+        <div className="flex flex-col gap-4 h-full">
             {/* Source Preview */}
-            <div className="flex-1">
-                <div className="bg-white p-4 rounded-lg border h-full">
-                    <h3 className="text-sm font-medium mb-4">Source</h3>
+            <div className="h-[40%] min-h-[300px]">
+                <div className="bg-white h-full overflow-y-auto">
                     {(source.type === SourceType.PERSONAL_INFO || source.type === SourceType.SYMPTOMS) ? (
                         <DynamicForm
                             fields={getFields()}
@@ -265,7 +368,7 @@ const SourcePreview = ({ source, formData, setFormData }) => {
             </div>
 
             {/* Extracted Data */}
-            <div className="h-48">
+            <div className="flex-1">
                 <div className="bg-white p-4 rounded-lg border h-full">
                     <JSONEditor
                         data={formData}
@@ -288,12 +391,41 @@ const SourceManager = () => {
         }
     ]);
     const [selectedSource, setSelectedSource] = useState(sources[0]);
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState({
+        // Example JSON data
+        personalInfo: {
+            name: "John Doe",
+            age: 30,
+            medicalHistory: {
+                conditions: [
+                    {
+                        name: "Hypertension",
+                        diagnosedDate: "2020-03-15",
+                        medications: ["Lisinopril", "Amlodipine"]
+                    }
+                ],
+                allergies: ["Penicillin"],
+                surgeries: [
+                    {
+                        procedure: "Appendectomy",
+                        date: "2015-06-20",
+                        hospital: "General Hospital"
+                    }
+                ]
+            },
+            vitals: {
+                bloodPressure: "120/80",
+                heartRate: 72,
+                temperature: 98.6
+            }
+        }
+    });
 
     const handleFileUpload = (e) => {
         const files = Array.from(e.target.files);
-        const newSources = files.map(file => ({
-            id: 'file_' + Date.now(),
+        const timestamp = Date.now();
+        const newSources = files.map((file, index) => ({
+            id: `file_${timestamp}_${index}`,  // 각 파일마다 고유한 ID 생성
             type: SourceType.FILE,
             name: file.name,
             file: file,
@@ -336,14 +468,14 @@ const SourceManager = () => {
     };
 
     return (
-        <div className="w-full h-screen p-4 flex gap-4">
+        <div className="w-full h-screen flex gap-4 p-4">
             {/* Source List */}
-            <div className="w-1/3">
-                <Card className="h-full">
-                    <CardHeader>
+            <div className="w-1/3 min-w-[300px] h-full">
+                <Card className="h-full flex flex-col">
+                    <CardHeader className="flex-shrink-0">
                         <CardTitle>Sources</CardTitle>
                     </CardHeader>
-                    <CardContent className="space-y-4">
+                    <CardContent className="flex-1 overflow-y-auto space-y-4">
                         <AddSourceDialog
                             onFileUpload={handleFileUpload}
                             onAddSymptoms={handleAddSymptoms}
@@ -368,12 +500,12 @@ const SourceManager = () => {
             </div>
 
             {/* Preview Area */}
-            <div className="w-2/3">
-                <Card className="h-full">
-                    <CardHeader>
+            <div className="w-2/3 flex-1 h-full">
+                <Card className="h-full flex flex-col">
+                    <CardHeader className="flex-shrink-0">
                         <CardTitle>{selectedSource?.name || 'Select a source'}</CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className="flex-1 overflow-y-auto">
                         {selectedSource ? (
                             <SourcePreview
                                 source={selectedSource}
