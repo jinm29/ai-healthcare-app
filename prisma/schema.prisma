@@ -12,4 +12,22 @@ model ChatRoom {
   name      String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  chatMessages ChatMessage[]
+}
+
+model ChatMessage {
+  id         String   @id @default(cuid())
+  content    String
+  chatRoomId String
+  role       ChatRole
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id])
+}
+
+enum ChatRole {
+  USER
+  ASSISTANT
 }

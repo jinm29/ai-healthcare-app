@@ -9,6 +9,9 @@ import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/c
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import ChatSideBar from "@/components/chat/chat-side-bar";
 import ChatMessage from "@/components/chat/chat-message";
+import useSWR from "swr";
+import {useParams} from "next/navigation";
+import {ChatMessageListResponse} from "@/app/api/chat-rooms/[id]/messages/route";
 
 const ConsultingModes = [
     {
@@ -55,34 +58,38 @@ const ConsultingModes = [
     },
 ];
 
-interface Message {
-    role: 'user' | 'assistant';
-    content: string;
-}
-
 export default function Page() {
-    const [currentConversation, setCurrentConversation] = useState(1);
-    const [messages, setMessages] = useState<Message[]>([]);
+    const {id} = useParams()
+
     const [inputText, setInputText] = useState('');
     const [settings, setSettings] = useState({model: 'gpt4', apiKey: ''});
     const [selectedMode, setSelectedMode] = useState(ConsultingModes[0].id);
     const [systemPrompt, setSystemPrompt] = useState(ConsultingModes[0].systemPrompt);
     const [sources, setSources] = useState([]);
-    const [isSourceManagerOpen, setIsSourceManagerOpen] = useState(false);
     const [isJsonViewerOpen, setIsJsonViewerOpen] = useState(false);
     const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
     const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true);
 
-    const handleSendMessage = () => {
+    const {data, mutate} = useSWR<ChatMessageListResponse>(`/api/chat-rooms/${id}/messages`, async (url: string) => {
+        const response = await fetch(url);
+        return response.json();
+    })
+    const messages = data?.chatMessages || []
+
+    const handleSendMessage = async () => {
         if (!inputText.trim()) return;
         const selectedModeData = ConsultingModes.find(m => m.id === selectedMode);
         if (!selectedModeData) return;
 
-        setMessages([
-            ...messages,
-            {role: 'user', content: inputText},
-            {role: 'assistant', content: `Analyzing as ${selectedModeData.name}...`}
-        ]);
+        await fetch(`/api/chat-rooms/${id}/messages`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                content: inputText,
+                role: 'USER'
+            })
+        });
+        await mutate();
         setInputText('');
     };
 
