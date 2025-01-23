@@ -1,3 +1,5 @@
+'use client';
+
 import React from "react";
 import useSWR from "swr";
 import {ChatRoomListResponse} from "@/app/api/chat-rooms/route";
