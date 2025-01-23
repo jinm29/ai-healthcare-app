@@ -1,20 +1,32 @@
-import React from "react";
+import React, { useState } from "react";
 import useSWR from "swr";
 import {ChatRoomListResponse} from "@/app/api/chat-rooms/route";
 import {Button} from "@/components/ui/button";
-import {FileText, Plus} from "lucide-react";
+import {FileText, MessageCircle, Files} from "lucide-react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 
+interface Source {
+    id: string;
+    name: string;
+    tokens: number;
+}
+
+interface SourceResponse {
+    sources: Source[];
+}
+
 export default function ChatSideBar() {
     const router = useRouter()
+    const [isJsonViewerOpen, setJsonViewerOpen] = useState(false);
+    const [isSourceManagerOpen, setIsSourceManagerOpen] = useState(false);
 
     const {data: chatRoomData, mutate: chatRoomMutate} = useSWR<ChatRoomListResponse>(
         '/api/chat-rooms',
         (url: string) => fetch(url).then(res => res.json())
     )
 
-    const {data: sourceData, mutate: sourceMutate} = useSWR<ChatRoomListResponse>(
+    const {data: sourceData, mutate: sourceMutate} = useSWR<SourceResponse>(
         '/api/sources',
         (url: string) => fetch(url).then(res => res.json())
     )
@@ -22,7 +34,7 @@ export default function ChatSideBar() {
     const currentConversation = '1'
     const chatRooms = chatRoomData?.chatRooms
     const isLeftSidebarOpen = true
-    const sources = []
+    const sources = sourceData?.sources || []
 
     const handleStartNewChat = async () => {
         await fetch('/api/chat-rooms', {method: 'POST'})
@@ -39,54 +51,53 @@ export default function ChatSideBar() {
         <div className={`absolute inset-0 ${isLeftSidebarOpen ? 'opacity-100' : 'opacity-0'} 
             transition-opacity duration-300 overflow-hidden flex flex-col`}>
             <div className="border-b bg-white">
-                <div className="p-4 space-y-4">
+                <div className="p-4 space-y-3">
                     {sources.length > 0 ? (
                         <>
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
-                                    <h3 className="text-sm font-medium">Sources</h3>
+                                    <h3 className="text-sm font-medium tracking-tight">Sources</h3>
                                     <div className="flex gap-3 text-xs text-gray-500">
                                         <span>{sources.length} files</span>
                                         <span>{sources.reduce((sum, source) => sum + (source.tokens || 0), 0).toLocaleString()} tokens</span>
                                     </div>
                                 </div>
-                                <Button size="sm" variant="outline" onClick={() => setJsonViewerOpen(true)}
-                                        className="h-7">
-                                    <FileText className="w-3 h-3 mr-1"/>
-                                    JSON
+                                <Button size="sm" variant="ghost" onClick={() => setJsonViewerOpen(true)}
+                                        className="h-7 hover:bg-gray-100">
+                                    <FileText className="w-3 h-3"/>
                                 </Button>
                             </div>
                             <Button
-                                className="w-full"
+                                className="w-full justify-start"
                                 variant="outline"
                                 onClick={() => setIsSourceManagerOpen(true)}
                             >
+                                <Files className="w-3 h-3 mr-2"/>
                                 Manage Sources
                             </Button>
                         </>
                     ) : (
                         <Button
-                            className="w-full bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 border-2 border-dashed border-blue-200"
-                            variant="ghost"
+                            className="w-full justify-start"
+                            variant="outline"
                             onClick={() => {
                                 router.push('/source/add')
                             }}
                         >
-                            <Plus className="w-4 h-4 mr-2"/>
-                            Add Source
+                            <Files className="w-3 h-3 mr-2"/>
+                            Manage Sources
                         </Button>
                     )}
                 </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
                 <Button
                     variant="outline"
-                    size="sm"
-                    className="w-full mb-4"
+                    className="w-full justify-start"
                     onClick={handleStartNewChat}
                 >
-                    <Plus className="w-3 h-3 mr-2"/>
+                    <MessageCircle className="w-3 h-3 mr-2"/>
                     New Chat
                 </Button>
 
@@ -94,12 +105,12 @@ export default function ChatSideBar() {
                     {chatRooms?.map((chatRoom) => (
                         <Link
                             key={chatRoom.id}
-                            className={`w-full text-left p-2 rounded text-sm hover:bg-gray-100
-                      ${currentConversation === chatRoom.id ? 'bg-gray-100' : ''}`}
+                            className={`block w-full text-left p-2.5 rounded-md text-sm hover:bg-gray-100 transition-colors
+                                ${currentConversation === chatRoom.id ? 'bg-gray-100' : ''}`}
                             href={`/chat/${chatRoom.id}`}
                         >
-                            <div className="font-medium">{chatRoom.name}</div>
-                            <div className="text-xs text-gray-500">{chatRoom.createdAt.toLocaleString()}</div>
+                            <div className="font-medium truncate">{chatRoom.name}</div>
+                            <div className="text-xs text-gray-500 mt-0.5">{chatRoom.createdAt.toLocaleString()}</div>
                         </Link>
                     ))}
                 </div>
