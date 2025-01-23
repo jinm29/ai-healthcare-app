@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-    title: "Open Health",
-    description: "Open Health",
+    title: "OpenHealth",
+    description: "OpenHealth",
 };
 
 export default function RootLayout({
