@@ -81,7 +81,15 @@ export default function Page() {
         const selectedModeData = ConsultingModes.find(m => m.id === selectedMode);
         if (!selectedModeData) return;
 
-        await fetch(`/api/chat-rooms/${id}/messages`, {
+        const oldMessages = [...messages, {
+            id: new Date().toISOString(),
+            content: inputText,
+            role: 'USER' as any,
+            createdAt: new Date(),
+        }]
+        await mutate({chatMessages: oldMessages}, {revalidate: false})
+
+        const response = await fetch(`/api/chat-rooms/${id}/messages`, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -89,8 +97,32 @@ export default function Page() {
                 role: 'USER'
             })
         });
-        await mutate();
-        setInputText('');
+
+        // Read as a stream
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+        if (reader) {
+            let done = false;
+            while (!done) {
+                const {value, done: isDone} = await reader.read();
+                done = isDone;
+
+                const streamMessage = decoder.decode(value, {stream: !done})
+                await mutate({
+                    chatMessages: [
+                        ...oldMessages,
+                        {
+                            id: new Date().toISOString(),
+                            content: streamMessage,
+                            role: 'ASSISTANT',
+                            createdAt: new Date(),
+                        }
+                    ]
+                }, {revalidate: false})
+            }
+            setInputText('');
+            await mutate();
+        }
     };
 
     return (
