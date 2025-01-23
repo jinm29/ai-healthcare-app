@@ -177,13 +177,6 @@ export default function Page() {
                 </div>
             </div>
 
-            <Dialog open={isSourceManagerOpen} onOpenChange={setIsSourceManagerOpen}>
-                <DialogContent className="max-w-4xl h-screen">
-                    <DialogHeader><DialogTitle>Source Manager</DialogTitle></DialogHeader>
-                    <div className="flex-1 overflow-y-auto p-4">Source Manager Content</div>
-                </DialogContent>
-            </Dialog>
-
             <Dialog open={isJsonViewerOpen} onOpenChange={setIsJsonViewerOpen}>
                 <DialogContent className="max-w-2xl max-h-[80vh]">
                     <DialogHeader><DialogTitle>Source Data</DialogTitle></DialogHeader>

@@ -4,24 +4,30 @@ import {ChatRoomListResponse} from "@/app/api/chat-rooms/route";
 import {Button} from "@/components/ui/button";
 import {FileText, Plus} from "lucide-react";
 import Link from "next/link";
+import {useRouter} from "next/navigation";
 
 export default function ChatSideBar() {
-    const {
-        data, mutate
-    } = useSWR<ChatRoomListResponse>(
+    const router = useRouter()
+
+    const {data: chatRoomData, mutate: chatRoomMutate} = useSWR<ChatRoomListResponse>(
         '/api/chat-rooms',
         (url: string) => fetch(url).then(res => res.json())
     )
 
+    const {data: sourceData, mutate: sourceMutate} = useSWR<ChatRoomListResponse>(
+        '/api/sources',
+        (url: string) => fetch(url).then(res => res.json())
+    )
+
     const currentConversation = '1'
-    const chatRooms = data?.chatRooms
+    const chatRooms = chatRoomData?.chatRooms
     const isLeftSidebarOpen = true
     const sources = []
 
     const handleStartNewChat = async () => {
         await fetch('/api/chat-rooms', {method: 'POST'})
         const oldChatRooms = chatRooms || []
-        await mutate({
+        await chatRoomMutate({
             chatRooms: [
                 ...oldChatRooms,
                 {id: `${Math.random()}`, name: 'New Chat', createdAt: new Date(), updatedAt: new Date()}]
@@ -62,7 +68,9 @@ export default function ChatSideBar() {
                         <Button
                             className="w-full bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 border-2 border-dashed border-blue-200"
                             variant="ghost"
-                            onClick={() => setIsSourceManagerOpen(true)}
+                            onClick={() => {
+                                router.push('/source/add')
+                            }}
                         >
                             <Plus className="w-4 h-4 mr-2"/>
                             Add Source
