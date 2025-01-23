@@ -1,6 +1,6 @@
 'use client'
 
-import React, {useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Menu, Send, Settings} from 'lucide-react';
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
@@ -59,7 +59,8 @@ const ConsultingModes = [
 ];
 
 export default function Page() {
-    const {id} = useParams()
+    const {id} = useParams();
+    const messagesEndRef = useRef<HTMLDivElement>(null);
 
     const [inputText, setInputText] = useState('');
     const [settings, setSettings] = useState({model: 'gpt4', apiKey: ''});
@@ -73,8 +74,14 @@ export default function Page() {
     const {data, mutate} = useSWR<ChatMessageListResponse>(`/api/chat-rooms/${id}/messages`, async (url: string) => {
         const response = await fetch(url);
         return response.json();
-    })
-    const messages = data?.chatMessages || []
+    });
+    const messages = data?.chatMessages || [];
+
+    useEffect(() => {
+        if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({behavior: 'smooth'});
+        }
+    }, [messages]);
 
     const handleSendMessage = async () => {
         if (!inputText.trim()) return;
@@ -86,8 +93,8 @@ export default function Page() {
             content: inputText,
             role: 'USER' as any,
             createdAt: new Date(),
-        }]
-        await mutate({chatMessages: oldMessages}, {revalidate: false})
+        }];
+        await mutate({chatMessages: oldMessages}, {revalidate: false});
 
         const response = await fetch(`/api/chat-rooms/${id}/messages`, {
             method: 'POST',
@@ -107,7 +114,7 @@ export default function Page() {
                 const {value, done: isDone} = await reader.read();
                 done = isDone;
 
-                const streamMessage = decoder.decode(value, {stream: !done})
+                const streamMessage = decoder.decode(value, {stream: !done});
                 await mutate({
                     chatMessages: [
                         ...oldMessages,
@@ -118,7 +125,7 @@ export default function Page() {
                             createdAt: new Date(),
                         }
                     ]
-                }, {revalidate: false})
+                }, {revalidate: false});
             }
             setInputText('');
             await mutate();
@@ -148,6 +155,7 @@ export default function Page() {
                         {messages.map((message, index) => (
                             <ChatMessage key={index} message={message}/>
                         ))}
+                        <div ref={messagesEndRef}/>
                     </div>
                     <div className="p-4 border-t">
                         <div className="flex gap-2">
@@ -244,4 +252,3 @@ export default function Page() {
         </div>
     );
 }
-
