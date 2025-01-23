@@ -12,7 +12,9 @@ export interface AssistantModeListResponse {
 }
 
 export async function GET() {
-    const assistantModes = await prisma.assistantMode.findMany({})
+    const assistantModes = await prisma.assistantMode.findMany({
+        orderBy: {id: 'asc'},
+    })
     return NextResponse.json<AssistantModeListResponse>({
         assistantModes
     })
