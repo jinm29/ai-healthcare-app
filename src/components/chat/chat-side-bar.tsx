@@ -18,24 +18,27 @@ interface SourceResponse {
     sources: Source[];
 }
 
-export default function ChatSideBar() {
+interface ChatSideBarProps {
+    isLeftSidebarOpen: boolean;
+}
+
+export default function ChatSideBar({ isLeftSidebarOpen }: ChatSideBarProps) {
     const router = useRouter()
-    const [isJsonViewerOpen, setJsonViewerOpen] = useState(false);
-    const [isSourceManagerOpen, setIsSourceManagerOpen] = useState(false);
+    const [, setJsonViewerOpen] = useState(false);
+    const [, setIsSourceManagerOpen] = useState(false);
 
     const {data: chatRoomData, mutate: chatRoomMutate} = useSWR<ChatRoomListResponse>(
         '/api/chat-rooms',
         (url: string) => fetch(url).then(res => res.json())
     )
 
-    const {data: sourceData, mutate: sourceMutate} = useSWR<SourceResponse>(
+    const {data: sourceData} = useSWR<SourceResponse>(
         '/api/sources',
         (url: string) => fetch(url).then(res => res.json())
     )
 
     const currentConversation = '1'
     const chatRooms = chatRoomData?.chatRooms
-    const isLeftSidebarOpen = true
     const sources = sourceData?.sources || []
 
     const handleStartNewChat = async () => {
@@ -49,7 +52,7 @@ export default function ChatSideBar() {
     }
 
     return <div className={`border-r bg-gray-50 flex flex-col transition-all duration-300 ease-in-out
-          ${isLeftSidebarOpen ? 'w-72' : 'w-0'} relative`}>
+          ${isLeftSidebarOpen ? 'w-72' : 'w-16'} relative`}>
         <div className={`absolute inset-0 ${isLeftSidebarOpen ? 'opacity-100' : 'opacity-0'} 
             transition-opacity duration-300 overflow-hidden flex flex-col`}>
             <div className="border-b bg-white">
@@ -118,6 +121,16 @@ export default function ChatSideBar() {
                 </div>
             </div>
         </div>
+        {!isLeftSidebarOpen && (
+            <div className="flex flex-col items-center pt-4 gap-4">
+                <Button variant="ghost" size="icon">
+                    <Files className="h-4 w-4" />
+                </Button>
+                <Button variant="ghost" size="icon">
+                    <MessageCircle className="h-4 w-4" />
+                </Button>
+            </div>
+        )}
     </div>
 }
 

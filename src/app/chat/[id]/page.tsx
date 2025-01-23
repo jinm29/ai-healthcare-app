@@ -66,7 +66,7 @@ export default function Page() {
     const [settings, setSettings] = useState({model: 'gpt4', apiKey: ''});
     const [selectedMode, setSelectedMode] = useState(ConsultingModes[0].id);
     const [systemPrompt, setSystemPrompt] = useState(ConsultingModes[0].systemPrompt);
-    const [sources, setSources] = useState([]);
+    const [sources] = useState([]);
     const [isJsonViewerOpen, setIsJsonViewerOpen] = useState(false);
     const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
     const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true);
@@ -148,7 +148,7 @@ export default function Page() {
             </div>
 
             <div className="flex-1 flex overflow-hidden">
-                <ChatSideBar/>
+                <ChatSideBar isLeftSidebarOpen={isLeftSidebarOpen} />
 
                 <div className="flex-1 flex flex-col bg-white min-w-0">
                     <div className="flex-1 overflow-y-auto p-2 space-y-2">
