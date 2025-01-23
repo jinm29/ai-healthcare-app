@@ -6,6 +6,7 @@ import {Textarea} from "@/components/ui/textarea";
 import React, {useEffect, useMemo, useState} from "react";
 import useSWR from "swr";
 import {AssistantMode, AssistantModeListResponse} from "@/app/api/assistant-modes/route";
+import {ChatRoomGetResponse} from "@/app/api/chat-rooms/[id]/route";
 
 interface ChatSettingSideBarProps {
     isRightSidebarOpen: boolean;
@@ -13,10 +14,23 @@ interface ChatSettingSideBarProps {
 }
 
 export default function ChatSettingSideBar(
-    {isRightSidebarOpen}: ChatSettingSideBarProps
+    {isRightSidebarOpen, chatRoomId}: ChatSettingSideBarProps
 ) {
     const [settings, setSettings] = useState({model: 'gpt4', apiKey: ''});
     const [selectedAssistantMode, setSelectedAssistantMode] = useState<AssistantMode>();
+
+    const {
+        data: chatRoomData,
+        mutate: chatRoomMutate
+    } = useSWR<ChatRoomGetResponse>(`/api/chat-rooms/${chatRoomId}`, async (url: string) => {
+        const response = await fetch(url);
+        return response.json();
+    })
+    useEffect(() => {
+        if (selectedAssistantMode === undefined && chatRoomData) {
+            setSelectedAssistantMode(chatRoomData.chatRoom.assistantMode);
+        }
+    }, [chatRoomData, selectedAssistantMode]);
 
     const {data: assistantModesData} = useSWR<AssistantModeListResponse>('/api/assistant-modes', async (url: string) => {
         const response = await fetch(url);
@@ -24,11 +38,23 @@ export default function ChatSettingSideBar(
     })
     const assistantModes = useMemo(() => assistantModesData?.assistantModes || [], [assistantModesData]);
 
-    useEffect(() => {
-        if (selectedAssistantMode === undefined && assistantModes.length > 0) {
-            setSelectedAssistantMode(assistantModes[0]);
-        }
-    }, [assistantModes, selectedAssistantMode]);
+    const onChangeAssistantMode = async (assistantModeId: string) => {
+        if (chatRoomData === undefined) return;
+        const response = await fetch(`/api/chat-rooms/${chatRoomId}`, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({assistantModeId})
+        });
+        const data = await response.json();
+        await chatRoomMutate({
+            ...chatRoomData,
+            chatRoom: {
+                ...chatRoomData.chatRoom,
+                assistantMode: data.chatRoom.assistantMode
+            }
+        })
+        setSelectedAssistantMode(data.chatRoom.assistantMode);
+    }
 
     return <div className={`border-l bg-gray-50 flex flex-col transition-all duration-300 ease-in-out
           ${isRightSidebarOpen ? 'w-80' : 'w-0'} relative`}>
@@ -81,8 +107,8 @@ export default function ChatSettingSideBar(
                                 className={`w-full p-3 rounded-lg text-left border transition-colors
                         ${selectedAssistantMode?.id === assistantMode.id ? 'bg-white border-gray-300' :
                                     'border-transparent hover:bg-gray-100'}`}
-                                onClick={() => {
-                                    setSelectedAssistantMode(assistantMode);
+                                onClick={async () => {
+                                    await onChangeAssistantMode(assistantMode.id);
                                 }}
                             >
                                 <div className="text-sm font-medium">{assistantMode.name}</div>
