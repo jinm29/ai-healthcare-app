@@ -41,6 +41,9 @@ export default function Page() {
     const handleSendMessage = async () => {
         if (!inputText.trim()) return;
 
+        // Clear input
+        setInputText('');
+
         const oldMessages = [...messages, {
             id: new Date().toISOString(),
             content: inputText,
@@ -62,7 +65,6 @@ export default function Page() {
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
         const createdAt = new Date()
-        const chatId = createdAt.toISOString()
         if (reader) {
             let done = false;
             while (!done) {
@@ -74,12 +76,11 @@ export default function Page() {
                     await mutate({
                         chatMessages: [
                             ...oldMessages,
-                            {id: chatId, content: content, role: 'ASSISTANT', createdAt}
+                            {id: new Date().toISOString(), content: content, role: 'ASSISTANT', createdAt}
                         ]
                     }, {revalidate: false});
                 }
             }
-            setInputText('');
             await mutate();
         }
     };

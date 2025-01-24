@@ -1,5 +1,6 @@
 import {NextRequest, NextResponse} from "next/server";
 import prisma, {Prisma} from "@/lib/prisma";
+import OpenAI from "openai";
 
 export interface ChatMessage extends Prisma.ChatMessageGetPayload<{
     select: {
@@ -64,81 +65,61 @@ export async function POST(
 
     // api call stream
     // TODO: Select LLM provider based on settings (OpenAI, Claude, etc.)
-    const messages = [
+    const messages: {
+        role: 'system' | 'user' | 'assistant',
+        content: string
+    }[] = [
         {"role": "system", "content": assistantMode.systemPrompt},
         {
             "role": "user",
             "content": `Health data sources: ${healthDataList.map((healthData) => `${healthData.type}: ${JSON.stringify(healthData.data)}`).join('\n')}`
         },
         ...chatMessages.map((message) => ({
-            role: message.role.toLowerCase(),
+            role: message.role.toLowerCase() as 'user' | 'assistant',
             content: message.content
         }))
     ]
-    const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-            "model": "gpt-4o-mini",
-            "messages": messages,
-            "stream": true
-        })
+    const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
     })
-
-    // Stream the response
-    const reader = response.body?.getReader();
-    const decoder = new TextDecoder();
-    const encoder = new TextEncoder();
-    const stream = new ReadableStream({
+    const chatStream = await openai.chat.completions.create({
+        model: "gpt-4o-mini",
+        messages: messages,
+        stream: true
+    });
+    const responseStream = new ReadableStream({
         async start(controller) {
-            if (reader) {
-                let done = false;
-                let messageContent = '';
-                while (!done) {
-                    const {value, done: isDone} = await reader.read();
-                    done = isDone;
+            let messageContent = '';
+            for await (const part of chatStream) {
+                const deltaContent = part.choices[0]?.delta.content
+                if (deltaContent !== undefined) messageContent += deltaContent;
 
-                    const rawMessage = decoder.decode(value, {stream: !done});
-                    for (const streamMessage of rawMessage.split('\n').filter(Boolean)) {
-                        const message = streamMessage.replace(/^data: /, "");
-                        if (message === '[DONE]') {
-                            await reader.cancel();
-                            break;
-                        }
-
-                        const data = JSON.parse(message);
-                        const deltaContent = data.choices[0].delta.content
-                        if (deltaContent !== undefined) messageContent += deltaContent;
-
-                        // Enqueue the chunk to the stream
-                        controller.enqueue(encoder.encode(`${JSON.stringify({content: messageContent})}\n`));
-                    }
-                }
-
-                // Save to prisma after the stream is done
-                await prisma.$transaction(async (prisma) => {
-                    await prisma.chatMessage.create({
-                        data: {
-                            content: messageContent,
-                            role: 'ASSISTANT',
-                            chatRoomId: id
-                        }
-                    });
-                    await prisma.chatRoom.update({
-                        where: {id}, data: {updatedAt: new Date(), name: messageContent}
-                    })
-                });
-                controller.close();
-            } else {
-                controller.close();
+                controller.enqueue(`${JSON.stringify({content: messageContent})}\n`);
             }
+
+            // Save to prisma after the stream is done
+            await prisma.$transaction(async (prisma) => {
+                await prisma.chatMessage.create({
+                    data: {
+                        content: messageContent,
+                        role: 'ASSISTANT',
+                        chatRoomId: id
+                    }
+                });
+                await prisma.chatRoom.update({
+                    where: {id}, data: {updatedAt: new Date(), name: messageContent}
+                })
+            });
+
+            controller.close();
         }
     });
 
-    return new NextResponse(stream, {
-        headers: response.headers
+    return new NextResponse(responseStream, {
+        headers: {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive'
+        }
     });
 }
