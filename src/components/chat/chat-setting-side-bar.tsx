@@ -17,7 +17,13 @@ interface ChatSettingSideBarProps {
 export default function ChatSettingSideBar(
     {isRightSidebarOpen, chatRoomId}: ChatSettingSideBarProps
 ) {
-    const [settings, setSettings] = useState({model: 'gpt4', apiKey: ''});
+    const [settings, setSettings] = useState({
+        company: 'openai',
+        model: 'gpt4',
+        apiKey: '',
+        apiEndpoint: '',
+        showApiKey: false
+    });
     const [selectedAssistantMode, setSelectedAssistantMode] = useState<AssistantMode>();
 
     const {
@@ -87,22 +93,85 @@ export default function ChatSettingSideBar(
                 <div className="space-y-4">
                     <h4 className="text-sm font-medium">Model Settings</h4>
                     <div className="space-y-2">
+                        <Select value={settings.company}
+                                onValueChange={(value) => {
+                                    const defaultModels = {
+                                        'openai': 'gpt4',
+                                        'anthropic': 'claude3',
+                                        'google': 'gemini-pro',
+                                        'local': 'llama2'
+                                    };
+                                    setSettings({...settings, company: value, model: defaultModels[value as keyof typeof defaultModels]})
+                                }}>
+                            <SelectTrigger>
+                                <SelectValue placeholder="Select company"/>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="openai">OpenAI</SelectItem>
+                                <SelectItem value="anthropic">Anthropic</SelectItem>
+                                <SelectItem value="google">Google</SelectItem>
+                                <SelectItem value="local">Local LLM</SelectItem>
+                            </SelectContent>
+                        </Select>
                         <Select value={settings.model}
                                 onValueChange={(value) => setSettings({...settings, model: value})}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select model"/>
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="gpt4">GPT-4</SelectItem>
-                                <SelectItem value="claude3">Claude 3</SelectItem>
+                                {settings.company === 'openai' && (
+                                    <>
+                                        <SelectItem value="gpt4">GPT-4</SelectItem>
+                                        <SelectItem value="gpt4-turbo">GPT-4 Turbo</SelectItem>
+                                        <SelectItem value="gpt3.5-turbo">GPT-3.5 Turbo</SelectItem>
+                                    </>
+                                )}
+                                {settings.company === 'anthropic' && (
+                                    <>
+                                        <SelectItem value="claude3-opus">Claude 3 Opus</SelectItem>
+                                        <SelectItem value="claude3-sonnet">Claude 3 Sonnet</SelectItem>
+                                        <SelectItem value="claude3-haiku">Claude 3 Haiku</SelectItem>
+                                    </>
+                                )}
+                                {settings.company === 'google' && (
+                                    <>
+                                        <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
+                                        <SelectItem value="gemini-ultra">Gemini Ultra</SelectItem>
+                                    </>
+                                )}
+                                {settings.company === 'local' && (
+                                    <>
+                                        <SelectItem value="llama2">Llama 2</SelectItem>
+                                        <SelectItem value="llama2-70b">Llama 2 70B</SelectItem>
+                                        <SelectItem value="mistral-7b">Mistral 7B</SelectItem>
+                                        <SelectItem value="mixtral-8x7b">Mixtral 8x7B</SelectItem>
+                                        <SelectItem value="phi2">Phi-2</SelectItem>
+                                        <SelectItem value="openchat">OpenChat</SelectItem>
+                                        <SelectItem value="neural-chat">Neural Chat</SelectItem>
+                                    </>
+                                )}
                             </SelectContent>
                         </Select>
                         <Input
-                            type="password"
-                            placeholder="Enter API key"
-                            value={settings.apiKey}
-                            onChange={(e) => setSettings({...settings, apiKey: e.target.value})}
+                            type="text"
+                            placeholder="Enter API endpoint"
+                            value={settings.apiEndpoint}
+                            onChange={(e) => setSettings({...settings, apiEndpoint: e.target.value})}
                         />
+                        <div className="relative">
+                            <Input
+                                type={settings.showApiKey ? "text" : "password"}
+                                placeholder="Enter API key"
+                                value={settings.apiKey}
+                                onChange={(e) => setSettings({...settings, apiKey: e.target.value})}
+                            />
+                            <button
+                                className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-sm text-gray-500 hover:text-gray-700"
+                                onClick={() => setSettings({...settings, showApiKey: !settings.showApiKey})}
+                            >
+                                {settings.showApiKey ? "Hide" : "Show"}
+                            </button>
+                        </div>
                     </div>
                 </div>
 
