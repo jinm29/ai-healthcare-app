@@ -18,3 +18,12 @@ export async function PATCH(
     })
     return NextResponse.json({healthData})
 }
+
+export async function DELETE(
+    req: NextRequest,
+    {params}: { params: Promise<{ id: string }> }
+) {
+    const {id} = await params
+    await prisma.healthData.delete({where: {id}})
+    return NextResponse.json({}, {status: 204})
+}

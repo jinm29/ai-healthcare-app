@@ -8,18 +8,10 @@ import {Activity, FileText, Loader2, Plus, Trash2, User} from 'lucide-react';
 import {Button} from "@/components/ui/button";
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,} from "@/components/ui/dialog";
 import useSWR from "swr";
-import {HealthData, HealthDataListResponse} from "@/app/api/health-data/route";
+import {HealthData, HealthDataCreateResponse, HealthDataListResponse} from "@/app/api/health-data/route";
 import DynamicForm from '../form/dynamic-form';
 import JSONEditor from '../form/json-editor';
-
-interface Source {
-    id: string;
-    type: string;
-    name: string;
-    file?: File;
-    status?: string;
-    date?: string;
-}
+import cuid from "cuid";
 
 interface Field {
     key: string;
@@ -30,7 +22,6 @@ interface Field {
     defaultValue?: string;
     placeholder?: string;
 }
-
 
 interface AddSourceDialogProps {
     onFileUpload: (e: ChangeEvent<HTMLInputElement>) => void;
@@ -309,7 +300,7 @@ export default function SourceAddScreen() {
     const [selectedHealthData, setSelectedHealthData] = useState<HealthData>();
     const [formData, setFormData] = useState<Record<string, any>>({});
 
-    const {data} = useSWR<HealthDataListResponse>('/api/health-data', async (url: string) => {
+    const {data, mutate: healthDataMutate} = useSWR<HealthDataListResponse>('/api/health-data', async (url: string) => {
         const response = await fetch(url);
         return await response.json();
     });
@@ -348,24 +339,34 @@ export default function SourceAddScreen() {
         });
     };
 
-    const handleAddSymptoms = (date: string) => {
-        const newSource: Source = {
-            id: 'symptoms_' + Date.now(),
-            type: HealthDataType.SYMPTOMS.id,
-            name: `Symptoms ${date}`,
-            date: date
-        };
-        setSources(prev => [...prev, newSource]);
-        setSelectedHealthData(newSource);
-        setFormData({});
+    const handleAddSymptoms = async (date: string) => {
+        const body = {id: cuid(), type: HealthDataType.SYMPTOMS.id, data: {date}}
+
+        const response = await fetch(`/api/health-data`, {method: 'POST', body: JSON.stringify(body)})
+        const newSource: HealthDataCreateResponse = await response.json();
+
+        setSelectedHealthData({...body, createdAt: new Date(), updatedAt: new Date()});
+        setFormData({...body.data});
+        await healthDataMutate({healthDataList: [...healthDataList, newSource]});
     };
 
-    const handleDeleteSource = (sourceId: string) => {
-        setSources(sources.filter(s => s.id !== sourceId));
-        if (selectedHealthData?.id === sourceId) {
-            setSelectedHealthData(sources[0]);
+    const handleDeleteSource = async (id: string) => {
+        await fetch(`/api/health-data/${id}`, {method: 'DELETE'});
+
+        const newSources = healthDataList.filter(s => s.id !== id);
+        await healthDataMutate({healthDataList: newSources});
+
+        if (selectedHealthData?.id === id) {
+            if (newSources.length > 0) {
+                setSelectedHealthData(newSources[0]);
+                setFormData(JSON.parse(JSON.stringify(newSources[0].data)));
+            } else {
+                setSelectedHealthData(undefined);
+                setFormData({})
+            }
         }
     };
+
     const onChangeFormData = async (data: Record<string, any>) => {
         if (selectedHealthData) {
             setFormData(data);
@@ -373,6 +374,13 @@ export default function SourceAddScreen() {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({data: data})
+            });
+            await healthDataMutate({
+                healthDataList: healthDataList.map(s =>
+                    s.id === selectedHealthData.id
+                        ? {...s, data: data}
+                        : s
+                )
             });
         }
     }
@@ -430,4 +438,5 @@ export default function SourceAddScreen() {
             </div>
         </div>
     );
-};
+}
+;
