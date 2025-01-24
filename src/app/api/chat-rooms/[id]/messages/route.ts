@@ -43,7 +43,7 @@ export async function POST(
     const {id} = await params
     const body: ChatMessageCreateRequest = await req.json()
 
-    const {assistantMode, chatMessages} = await prisma.$transaction(async (prisma) => {
+    const {assistantMode, chatMessages, healthDataList} = await prisma.$transaction(async (prisma) => {
         await prisma.chatMessage.create({data: {content: body.content, role: body.role, chatRoomId: id}});
         const {assistantMode} = await prisma.chatRoom.update({
             where: {id},
@@ -54,14 +54,27 @@ export async function POST(
             where: {chatRoomId: id},
             orderBy: {createdAt: 'asc'}
         })
+        const healthDataList = await prisma.healthData.findMany({})
         return {
             chatMessages,
-            assistantMode
+            assistantMode,
+            healthDataList
         }
     })
 
     // api call stream
     // TODO: Select LLM provider based on settings (OpenAI, Claude, etc.)
+    const messages = [
+        {"role": "system", "content": assistantMode.systemPrompt},
+        {
+            "role": "user",
+            "content": `Health data sources: ${healthDataList.map((healthData) => `${healthData.type}: ${JSON.stringify(healthData.data)}`).join('\n')}`
+        },
+        ...chatMessages.map((message) => ({
+            role: message.role.toLowerCase(),
+            content: message.content
+        }))
+    ]
     const response = await fetch(`https://api.openai.com/v1/chat/completions`, {
         method: 'POST',
         headers: {
@@ -70,13 +83,7 @@ export async function POST(
         },
         body: JSON.stringify({
             "model": "gpt-4o-mini",
-            "messages": [
-                {"role": "system", "content": assistantMode.systemPrompt},
-                ...chatMessages.map((message) => ({
-                    role: message.role.toLowerCase(),
-                    content: message.content
-                }))
-            ],
+            "messages": messages,
             "stream": true
         })
     })
