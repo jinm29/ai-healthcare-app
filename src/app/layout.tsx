@@ -1,6 +1,7 @@
 import type {Metadata} from "next";
 import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
+import 'katex/dist/katex.css';
 import React from "react";
 
 const geistSans = Geist({

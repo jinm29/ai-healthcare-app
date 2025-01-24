@@ -1,5 +1,9 @@
 import React from "react";
 import type {ChatMessage as ChatMessageType} from "@/app/api/chat-rooms/[id]/messages/route";
+import Markdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
+import remarkMath from 'remark-math'
+import rehypeKatex from 'rehype-katex'
 
 interface ChatMessageProps {
     message: ChatMessageType
@@ -19,7 +23,12 @@ export default function ChatMessage(
             </div>
         )}
         <div className={`flex-1 ${message.role === 'USER' ? 'text-right' : ''}`}>
-            <p className="text-sm text-gray-700 whitespace-pre-wrap">{message.content}</p>
+            <Markdown className="text-sm text-gray-700"
+                      remarkPlugins={[remarkGfm, remarkMath]}
+                      rehypePlugins={[rehypeKatex]}
+            >
+                {message.content}
+            </Markdown>
         </div>
     </div>
 }
