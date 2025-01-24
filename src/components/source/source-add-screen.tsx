@@ -13,6 +13,11 @@ import DynamicForm from '../form/dynamic-form';
 import JSONEditor from '../form/json-editor';
 import cuid from "cuid";
 
+interface SymptomsData {
+    date: string;
+    description: string;
+}
+
 interface Field {
     key: string;
     label?: string;
@@ -194,8 +199,9 @@ const HealthDataItem: React.FC<HealthDataItemProps> = ({healthData, isSelected, 
     };
 
     const getName = (type: string) => {
-        if (type === HealthDataType.SYMPTOMS.id && healthData.data?.date) {
-            return `${HealthDataType.SYMPTOMS.name} (${healthData.data.date})`;
+        if (type === HealthDataType.SYMPTOMS.id && healthData.data) {
+            const data = healthData.data as unknown as SymptomsData;
+            return `${HealthDataType.SYMPTOMS.name} (${data.date})`;
         }
         return Object.values(HealthDataType)
             .find((t) => t.id === type)?.name || '';
@@ -216,7 +222,7 @@ ${isSelected
                 <span className="truncate">{getName(healthData.type)}</span>
             </div>
             {(healthData.type === HealthDataType.FILE.id || healthData.type === HealthDataType.SYMPTOMS.id) && (
-                healthData.status === 'parsing' ? (
+                healthData.status === 'PARSING' ? (
                     <Button
                         variant="ghost"
                         size="icon"
@@ -293,7 +299,7 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
                     <JSONEditor
                         data={formData}
                         onSave={handleJSONSave}
-                        isEditable={healthData.type === HealthDataType.FILE.id}
+                        isEditable={healthData.type === HealthDataType.FILE.id && healthData.status === 'COMPLETED'}
                     />
                 </div>
             </div>
@@ -333,7 +339,6 @@ export default function SourceAddScreen() {
         files.forEach(file => formData.append('files', file));
         formData.append('id', body.id);
         formData.append('type', body.type);
-        formData.append('status', body.status);
         formData.append('data', JSON.stringify(body.data));
 
         // Optimistic update
@@ -345,14 +350,15 @@ export default function SourceAddScreen() {
         // Send request
         const response = await fetch(`/api/health-data`, {method: 'POST', body: formData})
         const newSource: HealthDataCreateResponse = await response.json();
+        setFormData(JSON.parse(JSON.stringify(newSource.data)));
         await healthDataMutate({healthDataList: [...oldHealthDataList, newSource]});
     };
 
     const handleAddSymptoms = async (date: string) => {
         const now = new Date();
         const body = {
-            id: cuid(), 
-            type: HealthDataType.SYMPTOMS.id, 
+            id: cuid(),
+            type: HealthDataType.SYMPTOMS.id,
             data: {
                 date,
                 description: ''
@@ -361,7 +367,7 @@ export default function SourceAddScreen() {
 
         try {
             const response = await fetch(`/api/health-data`, {
-                method: 'POST', 
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
@@ -488,6 +494,7 @@ export default function SourceAddScreen() {
                     <CardContent className="flex-1 overflow-y-auto">
                         {selectedHealthData ? (
                             <HealthDataPreview
+                                key={selectedHealthData.id}
                                 healthData={selectedHealthData}
                                 formData={formData}
                                 setFormData={onChangeFormData}

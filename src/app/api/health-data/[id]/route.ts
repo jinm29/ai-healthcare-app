@@ -25,5 +25,5 @@ export async function DELETE(
 ) {
     const {id} = await params
     await prisma.healthData.delete({where: {id}})
-    return NextResponse.json({}, {status: 204})
+    return NextResponse.json({})
 }

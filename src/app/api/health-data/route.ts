@@ -1,12 +1,14 @@
 import prisma, {Prisma} from "@/lib/prisma";
 import {NextRequest, NextResponse} from "next/server";
 import OpenAI from "openai";
+import {fromBuffer as pdf2picFromBuffer} from 'pdf2pic'
 
 export interface HealthData extends Prisma.HealthDataGetPayload<{
     select: {
         id: true,
         type: true,
         data: true,
+        status: true,
         createdAt: true,
         updatedAt: true
     }
@@ -46,27 +48,51 @@ export async function POST(
         const formData = await req.formData()
         const type = formData.get('type')
         const id = formData.get('id')
-        const status = formData.get('status')
         const files = formData.getAll('files')
+
+        // Create parsing data
+        await prisma.healthData.create({
+            data: {
+                id: id as string,
+                type: type as string,
+                status: 'PARSING',
+                data: {}
+            },
+        })
 
         const messages = [
             {
                 role: 'user', content: [
-                    {type: 'text', text: 'What is the status of my health data?\nresponse format: json'},
+                    {
+                        type: 'text',
+                        text: 'Extract all data.\nresponse format: json'
+                    },
                     ...(await Promise.all(files.map(async (file) => {
                         if (file instanceof File) {
                             if (file.type.startsWith('image')) {
                                 const arrayBuffer = await file.arrayBuffer()
-                                return {
+                                return [{
                                     type: 'image_url',
                                     image_url: {url: `data:${file.type};base64,${Buffer.from(arrayBuffer).toString('base64')}`}
-                                }
+                                }]
                             } else if (file.type.startsWith('application/pdf')) {
-                                return {role: 'user', content: 'I have uploaded an pdf file'}
+                                const messages = []
+                                const pdf2picConverter = pdf2picFromBuffer(
+                                    Buffer.from(await file.arrayBuffer()),
+                                )
+                                const images = await pdf2picConverter.bulk(-1, {responseType: 'base64'})
+                                for (const image of images) {
+                                    if (image.base64) messages.push({
+                                        type: 'image_url',
+                                        image_url: {url: `data:image/png;base64,${image.base64}`}
+                                    })
+                                }
+                                return messages
                             }
                         }
+
                         return undefined
-                    }))).filter((message) => message !== undefined)
+                    }))).flat().filter((message) => message !== undefined)
                 ]
             },
         ]
@@ -75,15 +101,18 @@ export async function POST(
         const chatCompletion = await openai.chat.completions.create({
             model: "gpt-4o",
             messages: messages as any,
+            response_format: {
+                type: 'json_object'
+            }
         })
         const content = chatCompletion.choices[0].message.content
         if (content) {
-            const healthData = await prisma.healthData.create({
+            const healthData = await prisma.healthData.update({
+                where: {id: id as string},
                 data: {
-                    id: id as string,
                     type: type as string,
-                    status: status,
-                    data: {parsed: content}
+                    status: 'COMPLETED',
+                    data: JSON.parse(content)
                 }
             })
             return NextResponse.json<HealthDataCreateResponse>(healthData)
