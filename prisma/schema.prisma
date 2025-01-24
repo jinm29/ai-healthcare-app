@@ -11,6 +11,8 @@ model HealthData {
   id        String   @id @default(cuid())
   type      String // PERSONAL_INFO
   data      Json
+  filePath  String?
+  fileType  String? // image/jpeg, image/png, application/pdf
   status    String   @default("COMPLETED") // PARSING, COMPLETED
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

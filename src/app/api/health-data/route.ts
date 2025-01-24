@@ -2,6 +2,8 @@ import prisma, {Prisma} from "@/lib/prisma";
 import {NextRequest, NextResponse} from "next/server";
 import OpenAI from "openai";
 import {fromBuffer as pdf2picFromBuffer} from 'pdf2pic'
+import fs from 'fs'
+import cuid from "cuid";
 
 export interface HealthData extends Prisma.HealthDataGetPayload<{
     select: {
@@ -9,6 +11,8 @@ export interface HealthData extends Prisma.HealthDataGetPayload<{
         type: true,
         data: true,
         status: true,
+        filePath: true,
+        fileType: true,
         createdAt: true,
         updatedAt: true
     }
@@ -48,7 +52,18 @@ export async function POST(
         const formData = await req.formData()
         const type = formData.get('type')
         const id = formData.get('id')
-        const files = formData.getAll('files')
+        const file = formData.get('file')
+
+        let filePath: string | undefined
+        let fileType: string | undefined
+
+        // Save files
+        if (file instanceof File) {
+            const filename = `${cuid()}.${file.name.split('.').pop()}`
+            fs.writeFileSync(`./public/uploads/${filename}`, Buffer.from(await file.arrayBuffer()))
+            fileType = file.type
+            filePath = `/uploads/${filename}`
+        }
 
         // Create parsing data
         await prisma.healthData.create({
@@ -56,6 +71,8 @@ export async function POST(
                 id: id as string,
                 type: type as string,
                 status: 'PARSING',
+                filePath: filePath,
+                fileType: fileType,
                 data: {}
             },
         })
@@ -67,7 +84,7 @@ export async function POST(
                         type: 'text',
                         text: 'Extract all data.\nresponse format: json'
                     },
-                    ...(await Promise.all(files.map(async (file) => {
+                    ...(await Promise.all([file].map(async (file) => {
                         if (file instanceof File) {
                             if (file.type.startsWith('image')) {
                                 const arrayBuffer = await file.arrayBuffer()

@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
+import {Document, Page, pdfjs} from 'react-pdf';
 import React, {ChangeEvent, useEffect, useMemo, useState} from 'react';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Activity, FileText, Loader2, Plus, Trash2, User} from 'lucide-react';
@@ -12,6 +13,10 @@ import {HealthData, HealthDataCreateResponse, HealthDataListResponse} from "@/ap
 import DynamicForm from '../form/dynamic-form';
 import JSONEditor from '../form/json-editor';
 import cuid from "cuid";
+import {cn} from "@/lib/utils";
+import Image from "next/image";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
 
 interface SymptomsData {
     date: string;
@@ -248,6 +253,8 @@ ${isSelected
 };
 
 const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPreviewProps) => {
+    const [numPages, setNumPages] = useState(0);
+
     const getFields = (): Field[] => {
         switch (healthData.type) {
             case HealthDataType.PERSONAL_INFO.id:
@@ -268,6 +275,10 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
         setFormData(newData);
     };
 
+    const onDocumentLoadSuccess = async ({numPages}: pdfjs.PDFDocumentProxy) => {
+        setNumPages(numPages);
+    }
+
     return (
         <div className="flex flex-col gap-4 h-full">
             <div className="h-[40%] min-h-[300px]">
@@ -279,15 +290,30 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
                             onChange={handleFormChange}
                         />
                     ) : healthData.type === HealthDataType.FILE.id ? (
-                        healthData.file?.type.includes('image') ? (
-                            <img
-                                src={URL.createObjectURL(healthData.file)}
+                        healthData.fileType?.includes('image') && healthData.filePath ? (
+                            <Image
+                                src={healthData.filePath}
                                 alt="Preview"
                                 className="max-w-full h-auto"
+                                unoptimized
                             />
                         ) : (
                             <div className="bg-gray-100 p-4 rounded">
-                                <p>PDF preview (PDF viewer integration needed)</p>
+                                <Document file={healthData.filePath}
+                                          className="w-full"
+                                          onLoadSuccess={onDocumentLoadSuccess}>
+                                    {Array.from(new Array(numPages), (_, index) => {
+                                        return (
+                                            <Page
+                                                className={cn('w-full')}
+                                                key={`page_${index + 1}`}
+                                                pageNumber={index + 1}
+                                                renderAnnotationLayer={false}
+                                                renderTextLayer={false}
+                                            />
+                                        );
+                                    })}
+                                </Document>
                             </div>
                         )
                     ) : null}
@@ -331,12 +357,14 @@ export default function SourceAddScreen() {
             type: HealthDataType.FILE.id,
             data: {},
             status: 'PARSING',
+            filePath: null,
+            fileType: null,
             createdAt: new Date(),
             updatedAt: new Date()
         }
 
         const formData = new FormData();
-        files.forEach(file => formData.append('files', file));
+        if (files.length > 0) formData.append('file', files[0]);
         formData.append('id', body.id);
         formData.append('type', body.type);
         formData.append('data', JSON.stringify(body.data));
@@ -350,6 +378,7 @@ export default function SourceAddScreen() {
         // Send request
         const response = await fetch(`/api/health-data`, {method: 'POST', body: formData})
         const newSource: HealthDataCreateResponse = await response.json();
+        setSelectedHealthData(newSource);
         setFormData(JSON.parse(JSON.stringify(newSource.data)));
         await healthDataMutate({healthDataList: [...oldHealthDataList, newSource]});
     };
