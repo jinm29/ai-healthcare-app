@@ -1,22 +1,13 @@
 'use client';
 
-import React, {useState} from "react";
+import React, {useMemo, useState} from "react";
 import useSWR from "swr";
-import {ChatRoomListResponse} from "@/app/api/chat-rooms/route";
+import {ChatRoom, ChatRoomListResponse} from "@/app/api/chat-rooms/route";
 import {Button} from "@/components/ui/button";
 import {Files, FileText, MessageCircle} from "lucide-react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
-
-interface Source {
-    id: string;
-    name: string;
-    tokens: number;
-}
-
-interface SourceResponse {
-    sources: Source[];
-}
+import {HealthDataListResponse} from "@/app/api/health-data/route";
 
 interface ChatSideBarProps {
     isLeftSidebarOpen: boolean;
@@ -29,29 +20,25 @@ export default function ChatSideBar({
                                     }: ChatSideBarProps) {
     const router = useRouter()
     const [, setJsonViewerOpen] = useState(false);
-    const [, setIsSourceManagerOpen] = useState(false);
 
     const {data: chatRoomData, mutate: chatRoomMutate} = useSWR<ChatRoomListResponse>(
         '/api/chat-rooms',
         (url: string) => fetch(url).then(res => res.json())
     )
 
-    const {data: sourceData} = useSWR<SourceResponse>(
-        '/api/sources',
+    const {data: healthDataListResponse} = useSWR<HealthDataListResponse>(
+        '/api/health-data',
         (url: string) => fetch(url).then(res => res.json())
     )
 
-    const chatRooms = chatRoomData?.chatRooms
-    const sources = sourceData?.sources || []
+    const healthDataList = useMemo(() => healthDataListResponse?.healthDataList || [], [healthDataListResponse])
+    const chatRooms = useMemo(() => chatRoomData?.chatRooms || [], [chatRoomData])
 
     const handleStartNewChat = async () => {
-        await fetch('/api/chat-rooms', {method: 'POST'})
+        const chatRoomResponse = await fetch('/api/chat-rooms', {method: 'POST'})
+        const newChatRoom: ChatRoom = await chatRoomResponse.json();
         const oldChatRooms = chatRooms || []
-        await chatRoomMutate({
-            chatRooms: [
-                ...oldChatRooms,
-                {id: `${Math.random()}`, name: 'New Chat', createdAt: new Date(), updatedAt: new Date()}]
-        })
+        await chatRoomMutate({chatRooms: [newChatRoom, ...oldChatRooms]})
     }
 
     return <div className={`border-r bg-gray-50 flex flex-col transition-all duration-300 ease-in-out
@@ -60,14 +47,14 @@ export default function ChatSideBar({
             transition-opacity duration-300 overflow-hidden flex flex-col`}>
             <div className="border-b bg-white">
                 <div className="p-4 space-y-3">
-                    {sources.length > 0 ? (
+                    {healthDataList.length > 0 ? (
                         <>
                             <div className="flex items-center justify-between">
                                 <div className="space-y-1">
                                     <h3 className="text-sm font-medium tracking-tight">Sources</h3>
                                     <div className="flex gap-3 text-xs text-gray-500">
-                                        <span>{sources.length} files</span>
-                                        <span>{sources.reduce((sum, source) => sum + (source.tokens || 0), 0).toLocaleString()} tokens</span>
+                                        <span>{healthDataList.length} files</span>
+                                        <span>{healthDataList.reduce((sum, source) => sum + (source.tokens || 0), 0).toLocaleString()} tokens</span>
                                     </div>
                                 </div>
                                 <Button size="sm" variant="ghost" onClick={() => setJsonViewerOpen(true)}
@@ -78,7 +65,7 @@ export default function ChatSideBar({
                             <Button
                                 className="w-full justify-start"
                                 variant="outline"
-                                onClick={() => setIsSourceManagerOpen(true)}
+                                onClick={() => router.push('/source/add')}
                             >
                                 <Files className="w-3 h-3 mr-2"/>
                                 Manage Sources
@@ -88,9 +75,7 @@ export default function ChatSideBar({
                         <Button
                             className="w-full justify-start"
                             variant="outline"
-                            onClick={() => {
-                                router.push('/source/add')
-                            }}
+                            onClick={() => router.push('/source/add')}
                         >
                             <Files className="w-3 h-3 mr-2"/>
                             Manage Sources
