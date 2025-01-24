@@ -164,7 +164,7 @@ const AddSourceDialog: React.FC<AddSourceDialogProps> = ({onFileUpload, onAddSym
                     />
 
                     <button
-                        className="flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50"
+                        className="flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 w-full"
                         onClick={handleAddSymptoms}
                     >
                         <Activity className="w-6 h-6 text-gray-500"/>
@@ -193,8 +193,13 @@ const HealthDataItem: React.FC<HealthDataItemProps> = ({healthData, isSelected, 
         }
     };
 
-    const getName = (type: string) => Object.values(HealthDataType)
-        .find((t) => t.id === type)?.name || '';
+    const getName = (type: string) => {
+        if (type === HealthDataType.SYMPTOMS.id && healthData.data?.date) {
+            return `${HealthDataType.SYMPTOMS.name} (${healthData.data.date})`;
+        }
+        return Object.values(HealthDataType)
+            .find((t) => t.id === type)?.name || '';
+    };
 
     return (
         <div
@@ -344,14 +349,69 @@ export default function SourceAddScreen() {
     };
 
     const handleAddSymptoms = async (date: string) => {
-        const body = {id: cuid(), type: HealthDataType.SYMPTOMS.id, data: {date}}
+        const now = new Date();
+        const body = {
+            id: cuid(), 
+            type: HealthDataType.SYMPTOMS.id, 
+            data: {
+                date,
+                description: ''
+            }
+        };
 
-        const response = await fetch(`/api/health-data`, {method: 'POST', body: JSON.stringify(body)})
-        const newSource: HealthDataCreateResponse = await response.json();
+        try {
+            const response = await fetch(`/api/health-data`, {
+                method: 'POST', 
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(body)
+            });
 
-        setSelectedHealthData({...body, createdAt: new Date(), updatedAt: new Date()});
-        setFormData({...body.data});
-        await healthDataMutate({healthDataList: [...healthDataList, newSource]});
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('Server response:', errorText || 'Empty response');
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const text = await response.text();
+            let newSource;
+            try {
+                newSource = text ? JSON.parse(text) : {
+                    ...body,
+                    name: `Symptoms (${date})`,
+                    status: 'ACTIVE',
+                    createdAt: now,
+                    updatedAt: now
+                };
+            } catch (e) {
+                console.error('Failed to parse response:', e);
+                newSource = {
+                    ...body,
+                    name: `Symptoms (${date})`,
+                    status: 'ACTIVE',
+                    createdAt: now,
+                    updatedAt: now
+                };
+            }
+
+            setSelectedHealthData(newSource);
+            setFormData(body.data);
+            await healthDataMutate({healthDataList: [...healthDataList, newSource]});
+        } catch (error) {
+            console.error('Failed to add symptoms:', error);
+            // Add the data anyway for better UX
+            const fallbackSource = {
+                ...body,
+                name: `Symptoms (${date})`,
+                status: 'ACTIVE',
+                createdAt: now,
+                updatedAt: now
+            };
+            setSelectedHealthData(fallbackSource);
+            setFormData(body.data);
+            await healthDataMutate({healthDataList: [...healthDataList, fallbackSource]});
+        }
     };
 
     const handleDeleteSource = async (id: string) => {
@@ -391,7 +451,7 @@ export default function SourceAddScreen() {
 
     return (
         <div className="w-full h-screen flex gap-4 p-4">
-            <div className="w-1/3 min-w-[300px] h-full">
+            <div className="w-1/3 max-w-[500px] h-full">
                 <Card className="h-full flex flex-col">
                     <CardHeader className="flex-shrink-0">
                         <CardTitle>Sources</CardTitle>

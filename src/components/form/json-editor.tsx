@@ -3,8 +3,8 @@ import {Button} from "@/components/ui/button";
 import {Save} from "lucide-react";
 
 interface JSONEditorProps {
-    data: Record<string, any>;
-    onSave: (data: Record<string, any>) => void;
+    data: Record<string, unknown>;
+    onSave: (data: Record<string, unknown>) => void;
     isEditable?: boolean;
 }
 
@@ -23,9 +23,6 @@ export default function JSONEditor({data, onSave, isEditable = false}: JSONEdito
     if (!isEditable) {
         return (
             <div className="h-full">
-                <div className="flex justify-between items-center mb-2">
-                    <h3 className="text-sm font-medium">Extracted Data</h3>
-                </div>
                 <pre className="text-sm font-mono bg-muted/30 p-4 rounded h-full whitespace-pre overflow-auto">
                     {JSON.stringify(data, null, 2)}
                 </pre>
@@ -35,8 +32,7 @@ export default function JSONEditor({data, onSave, isEditable = false}: JSONEdito
 
     return (
         <div className="h-full flex flex-col">
-            <div className="flex justify-between items-center mb-2">
-                <h3 className="text-sm font-medium">Extracted Data</h3>
+            <div className="flex justify-end mb-2">
                 <Button size="sm" onClick={handleSave}>
                     <Save className="w-4 h-4 mr-2"/>
                     Update

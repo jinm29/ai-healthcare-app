@@ -72,3 +72,17 @@ export async function PATCH(
         chatRoom
     })
 }
+
+interface Props {
+    params: { id: string }
+}
+
+export async function DELETE(request: Request, { params }: Props) {
+    const { id } = params;
+    
+    await prisma.chatRoom.delete({
+        where: { id }
+    });
+
+    return new NextResponse(null, { status: 204 });
+}
