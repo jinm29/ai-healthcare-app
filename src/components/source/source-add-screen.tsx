@@ -313,30 +313,34 @@ export default function SourceAddScreen() {
         }
     }, [healthDataList, selectedHealthData]);
 
-    const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
-        const timestamp = Date.now();
-        const newSources = files.map((file, index) => ({
-            id: `file_${timestamp}_${index}`,
-            type: HealthDataType.FILE,
-            name: file.name,
-            file: file,
-            status: 'parsing'
-        }));
+        const body = {
+            id: cuid(),
+            type: HealthDataType.FILE.id,
+            data: {},
+            status: 'PARSING',
+            createdAt: new Date(),
+            updatedAt: new Date()
+        }
 
-        setSources(prev => [...prev, ...newSources]);
+        const formData = new FormData();
+        files.forEach(file => formData.append('files', file));
+        formData.append('id', body.id);
+        formData.append('type', body.type);
+        formData.append('status', body.status);
+        formData.append('data', JSON.stringify(body.data));
 
-        newSources.forEach(source => {
-            setTimeout(() => {
-                setSources(prev =>
-                    prev.map(s =>
-                        s.id === source.id
-                            ? {...s, status: 'completed'}
-                            : s
-                    )
-                );
-            }, 2000);
-        });
+        // Optimistic update
+        const oldHealthDataList = [...healthDataList];
+        await healthDataMutate({healthDataList: [...oldHealthDataList, body]}, {revalidate: false});
+        setSelectedHealthData({...body});
+        setFormData({...body.data});
+
+        // Send request
+        const response = await fetch(`/api/health-data`, {method: 'POST', body: formData})
+        const newSource: HealthDataCreateResponse = await response.json();
+        await healthDataMutate({healthDataList: [...oldHealthDataList, newSource]});
     };
 
     const handleAddSymptoms = async (date: string) => {
