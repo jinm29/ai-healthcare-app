@@ -73,16 +73,14 @@ export async function PATCH(
     })
 }
 
-interface Props {
-    params: { id: string }
-}
+export async function DELETE(request: Request, {params}: {
+    params: Promise<{ id: string }>
+}) {
+    const {id} = await params;
 
-export async function DELETE(request: Request, { params }: Props) {
-    const { id } = params;
-    
     await prisma.chatRoom.delete({
-        where: { id }
+        where: {id}
     });
 
-    return new NextResponse(null, { status: 204 });
+    return new NextResponse(null, {status: 204});
 }

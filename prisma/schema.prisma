@@ -35,7 +35,7 @@ model ChatMessage {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id])
+  chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
 }
 
 model AssistantMode {
