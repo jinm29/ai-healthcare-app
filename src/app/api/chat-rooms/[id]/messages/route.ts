@@ -114,7 +114,7 @@ export async function POST(
                         if (deltaContent !== undefined) messageContent += deltaContent;
 
                         // Enqueue the chunk to the stream
-                        controller.enqueue(encoder.encode(messageContent));
+                        controller.enqueue(encoder.encode(`${JSON.stringify({content: messageContent})}\n`));
                     }
                 }
 
@@ -131,6 +131,8 @@ export async function POST(
                         where: {id}, data: {updatedAt: new Date(), name: messageContent}
                     })
                 });
+                controller.close();
+            } else {
                 controller.close();
             }
         }

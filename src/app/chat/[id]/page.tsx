@@ -61,24 +61,23 @@ export default function Page() {
         // Read as a stream
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
+        const createdAt = new Date()
+        const chatId = createdAt.toISOString()
         if (reader) {
             let done = false;
             while (!done) {
                 const {value, done: isDone} = await reader.read();
                 done = isDone;
-
-                const streamMessage = decoder.decode(value, {stream: !done});
-                await mutate({
-                    chatMessages: [
-                        ...oldMessages,
-                        {
-                            id: new Date().toISOString(),
-                            content: streamMessage,
-                            role: 'ASSISTANT',
-                            createdAt: new Date(),
-                        }
-                    ]
-                }, {revalidate: false});
+                const content = decoder.decode(value, {stream: !done});
+                for (const data of content.split('\n').filter(Boolean)) {
+                    const {content}: { content: string } = JSON.parse(data)
+                    await mutate({
+                        chatMessages: [
+                            ...oldMessages,
+                            {id: chatId, content: content, role: 'ASSISTANT', createdAt}
+                        ]
+                    }, {revalidate: false});
+                }
             }
             setInputText('');
             await mutate();
