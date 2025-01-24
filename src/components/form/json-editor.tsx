@@ -23,7 +23,8 @@ export default function JSONEditor({data, onSave, isEditable = false}: JSONEdito
     if (!isEditable) {
         return (
             <div className="h-full">
-                <pre className="text-sm font-mono bg-muted/30 p-4 rounded h-full whitespace-pre overflow-auto">
+                <h3 className="text-base font-semibold mb-2.5 text-gray-800">Extracted Data</h3>
+                <pre className="text-sm font-mono bg-muted/30 p-4 rounded h-full whitespace-pre-wrap break-all">
                     {JSON.stringify(data, null, 2)}
                 </pre>
             </div>
@@ -32,6 +33,7 @@ export default function JSONEditor({data, onSave, isEditable = false}: JSONEdito
 
     return (
         <div className="h-full flex flex-col">
+            <h3 className="text-base font-semibold mb-2.5 text-gray-800">Extracted Data</h3>
             <div className="flex justify-end mb-2">
                 <Button size="sm" onClick={handleSave}>
                     <Save className="w-4 h-4 mr-2"/>
@@ -39,7 +41,7 @@ export default function JSONEditor({data, onSave, isEditable = false}: JSONEdito
                 </Button>
             </div>
             <textarea
-                className="flex-1 font-mono text-sm p-4 border rounded-md whitespace-pre"
+                className="flex-1 font-mono text-sm p-4 border rounded-md whitespace-pre-wrap break-all"
                 value={editableData}
                 onChange={(e) => setEditableData(e.target.value)}
             />

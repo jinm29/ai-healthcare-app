@@ -12,8 +12,8 @@ interface Field {
 
 interface DynamicFormProps {
     fields: Field[];
-    data: Record<string, any>;
-    onChange: (key: string, value: any) => void;
+    data: Record<string, unknown>;
+    onChange: (key: string, value: string | number | readonly string[] | undefined) => void;
 }
 
 export default function DynamicForm({fields, data, onChange}: DynamicFormProps) {
@@ -24,7 +24,7 @@ export default function DynamicForm({fields, data, onChange}: DynamicFormProps) 
                     <label className="text-sm font-medium">{field.label}</label>
                     {field.type === 'textarea' ? (
                         <textarea
-                            className="w-full p-2 border rounded min-h-[100px]"
+                            className={`w-full p-2 border rounded ${field.key === 'description' ? 'min-h-[200px]' : 'min-h-[100px]'}`}
                             value={data[field.key] || ''}
                             onChange={(e) => onChange(field.key, e.target.value)}
                         />
