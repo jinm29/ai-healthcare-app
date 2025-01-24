@@ -8,6 +8,7 @@ import {Files, FileText, MessageCircle} from "lucide-react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 import {HealthDataListResponse} from "@/app/api/health-data/route";
+import dayjs from "@/lib/dayjs";
 
 interface ChatSideBarProps {
     isLeftSidebarOpen: boolean;
@@ -103,7 +104,8 @@ export default function ChatSideBar({
                             href={`/chat/${chatRoom.id}`}
                         >
                             <div className="font-medium truncate">{chatRoom.name}</div>
-                            <div className="text-xs text-gray-500 mt-0.5">{chatRoom.createdAt.toLocaleString()}</div>
+                            <div
+                                className="text-xs text-gray-500 mt-0.5">{dayjs(chatRoom.updatedAt).format('L LT')}</div>
                         </Link>
                     ))}
                 </div>
