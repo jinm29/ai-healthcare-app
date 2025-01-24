@@ -8,6 +8,11 @@ async function main() {
         data: assistantModeSeed,
         skipDuplicates: true
     });
+
+    const personalInfo = await prisma.healthData.findFirst({where: {type: 'PERSONAL_INFO'}})
+    if (!personalInfo) {
+        await prisma.healthData.create({data: {type: 'PERSONAL_INFO', data: {}}})
+    }
 }
 
 main()

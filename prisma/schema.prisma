@@ -7,6 +7,14 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model HealthData {
+  id        String   @id @default(cuid())
+  type      String // PERSONAL_INFO
+  data      Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 model ChatRoom {
   id              String   @id @default(cuid())
   name            String
