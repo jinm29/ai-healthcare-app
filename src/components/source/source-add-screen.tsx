@@ -208,6 +208,10 @@ const HealthDataItem: React.FC<HealthDataItemProps> = ({healthData, isSelected, 
             const data = healthData.data as unknown as SymptomsData;
             return `${HealthDataType.SYMPTOMS.name} (${data.date})`;
         }
+        if (type === HealthDataType.FILE.id && healthData.data) {
+            const data = healthData.data as any;
+            return data.fileName || HealthDataType.FILE.name;
+        }
         return Object.values(HealthDataType)
             .find((t) => t.id === type)?.name || '';
     };
@@ -226,28 +230,21 @@ ${isSelected
                 </div>
                 <span className="truncate">{getName(healthData.type)}</span>
             </div>
-            {(healthData.type === HealthDataType.FILE.id || healthData.type === HealthDataType.SYMPTOMS.id) && (
-                healthData.status === 'PARSING' ? (
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        disabled
-                    >
-                        <Loader2 className="h-5 w-5 animate-spin"/>
-                    </Button>
-                ) : (
-                    <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={(e) => {
-                            e.stopPropagation();
-                            onDelete(healthData.id);
-                        }}
-                    >
-                        <Trash2 className="h-5 w-5"/>
-                    </Button>
-                )
-            )}
+            <div className="flex items-center gap-1">
+                {healthData.status === 'PARSING' && (
+                    <Loader2 className="h-5 w-5 animate-spin"/>
+                )}
+                <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(healthData.id);
+                    }}
+                >
+                    <Trash2 className="h-5 w-5"/>
+                </Button>
+            </div>
         </div>
     );
 };
@@ -282,23 +279,30 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
     return (
         <div className="flex flex-col gap-4 h-full">
             <div className="h-[40%] min-h-[300px]">
-                <div className="bg-white h-full overflow-y-auto">
+                <div className="bg-white h-full overflow-y-auto rounded-lg border">
                     {(healthData.type === HealthDataType.PERSONAL_INFO.id || healthData.type === HealthDataType.SYMPTOMS.id) ? (
-                        <DynamicForm
-                            fields={getFields()}
-                            data={formData}
-                            onChange={handleFormChange}
-                        />
+                        <div className="p-4">
+                            <DynamicForm
+                                fields={getFields()}
+                                data={formData}
+                                onChange={handleFormChange}
+                            />
+                        </div>
                     ) : healthData.type === HealthDataType.FILE.id ? (
                         healthData.fileType?.includes('image') && healthData.filePath ? (
-                            <Image
-                                src={healthData.filePath}
-                                alt="Preview"
-                                className="max-w-full h-auto"
-                                unoptimized
-                            />
+                            <div className="p-4">
+                                <Image
+                                    src={healthData.filePath}
+                                    alt="Preview"
+                                    className="w-full h-auto"
+                                    width={800}
+                                    height={600}
+                                    unoptimized
+                                    style={{ objectFit: 'contain' }}
+                                />
+                            </div>
                         ) : (
-                            <div className="bg-gray-100 p-4 rounded">
+                            <div className="bg-gray-50 p-4 rounded-lg">
                                 <Document file={healthData.filePath}
                                           className="w-full"
                                           onLoadSuccess={onDocumentLoadSuccess}>
@@ -321,12 +325,28 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
             </div>
 
             <div className="flex-1">
-                <div className="bg-white p-4 rounded-lg border h-full">
-                    <JSONEditor
-                        data={formData}
-                        onSave={handleJSONSave}
-                        isEditable={healthData.type === HealthDataType.FILE.id && healthData.status === 'COMPLETED'}
-                    />
+                <div className="bg-white rounded-lg border h-full flex flex-col gap-4">
+                    <div className="flex-1 min-h-0 p-4">
+                        <JSONEditor
+                            data={formData}
+                            onSave={handleJSONSave}
+                            isEditable={healthData.type === HealthDataType.FILE.id && healthData.status === 'COMPLETED'}
+                        />
+                    </div>
+                    {healthData.type === HealthDataType.FILE.id && formData.parsingLogs && (
+                        <div className="border-t">
+                            <div className="p-4">
+                                <h3 className="text-sm font-medium mb-2">Processing Log</h3>
+                                <div className="h-[160px] bg-gray-50 p-3 rounded-lg text-sm font-mono overflow-y-auto">
+                                    {(formData.parsingLogs as string[]).map((log, index) => (
+                                        <div key={index} className="mb-1">
+                                            {log}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>
@@ -352,35 +372,62 @@ export default function SourceAddScreen() {
 
     const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
         const files = Array.from(e.target.files || []);
-        const body = {
+        const oldHealthDataList = [...healthDataList];
+        let newHealthDataList = [...oldHealthDataList];
+        const uploadPromises = [];
+
+        // Create temporary entries for all files first
+        const tempEntries = files.map(file => ({
             id: cuid(),
             type: HealthDataType.FILE.id,
-            data: {},
+            data: {} as Record<string, any>,
             status: 'PARSING',
             filePath: null,
             fileType: null,
             createdAt: new Date(),
             updatedAt: new Date()
+        } as HealthData));
+
+        // Add all temporary entries to the list first
+        newHealthDataList = [...newHealthDataList, ...tempEntries];
+        await healthDataMutate({healthDataList: newHealthDataList}, {revalidate: false});
+
+        // Process all files in parallel
+        for (let i = 0; i < files.length; i++) {
+            const file = files[i];
+            const tempEntry = tempEntries[i];
+            
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('id', tempEntry.id);
+            formData.append('type', tempEntry.type);
+            formData.append('data', JSON.stringify(tempEntry.data));
+
+            const uploadPromise = fetch(`/api/health-data`, {method: 'POST', body: formData})
+                .then(async response => {
+                    const newSource: HealthDataCreateResponse = await response.json();
+                    // Update the list with the actual data
+                    newHealthDataList = newHealthDataList.map(item => 
+                        item.id === tempEntry.id ? newSource : item
+                    );
+                    await healthDataMutate({healthDataList: newHealthDataList}, {revalidate: false});
+                    return newSource;
+                });
+            
+            uploadPromises.push(uploadPromise);
         }
 
-        const formData = new FormData();
-        if (files.length > 0) formData.append('file', files[0]);
-        formData.append('id', body.id);
-        formData.append('type', body.type);
-        formData.append('data', JSON.stringify(body.data));
+        // Wait for all uploads to complete
+        const results = await Promise.all(uploadPromises);
+        
+        // Select the first uploaded file
+        if (results.length > 0) {
+            setSelectedHealthData(results[0]);
+            setFormData(results[0].data as Record<string, any>);
+        }
 
-        // Optimistic update
-        const oldHealthDataList = [...healthDataList];
-        await healthDataMutate({healthDataList: [...oldHealthDataList, body]}, {revalidate: false});
-        setSelectedHealthData({...body});
-        setFormData({...body.data});
-
-        // Send request
-        const response = await fetch(`/api/health-data`, {method: 'POST', body: formData})
-        const newSource: HealthDataCreateResponse = await response.json();
-        setSelectedHealthData(newSource);
-        setFormData(JSON.parse(JSON.stringify(newSource.data)));
-        await healthDataMutate({healthDataList: [...oldHealthDataList, newSource]});
+        // Final update of the list
+        await healthDataMutate({healthDataList: newHealthDataList});
     };
 
     const handleAddSymptoms = async (date: string) => {
@@ -391,8 +438,13 @@ export default function SourceAddScreen() {
             data: {
                 date,
                 description: ''
-            }
-        };
+            } as Record<string, any>,
+            status: 'COMPLETED',
+            filePath: null,
+            fileType: null,
+            createdAt: now,
+            updatedAt: now
+        } as HealthData;
 
         try {
             const response = await fetch(`/api/health-data`, {
@@ -412,40 +464,21 @@ export default function SourceAddScreen() {
             const text = await response.text();
             let newSource;
             try {
-                newSource = text ? JSON.parse(text) : {
-                    ...body,
-                    name: `Symptoms (${date})`,
-                    status: 'ACTIVE',
-                    createdAt: now,
-                    updatedAt: now
-                };
+                newSource = text ? JSON.parse(text) : body;
             } catch (e) {
                 console.error('Failed to parse response:', e);
-                newSource = {
-                    ...body,
-                    name: `Symptoms (${date})`,
-                    status: 'ACTIVE',
-                    createdAt: now,
-                    updatedAt: now
-                };
+                newSource = body;
             }
 
             setSelectedHealthData(newSource);
-            setFormData(body.data);
+            setFormData(newSource.data as Record<string, any>);
             await healthDataMutate({healthDataList: [...healthDataList, newSource]});
         } catch (error) {
             console.error('Failed to add symptoms:', error);
             // Add the data anyway for better UX
-            const fallbackSource = {
-                ...body,
-                name: `Symptoms (${date})`,
-                status: 'ACTIVE',
-                createdAt: now,
-                updatedAt: now
-            };
-            setSelectedHealthData(fallbackSource);
-            setFormData(body.data);
-            await healthDataMutate({healthDataList: [...healthDataList, fallbackSource]});
+            setSelectedHealthData(body);
+            setFormData(body.data as Record<string, any>);
+            await healthDataMutate({healthDataList: [...healthDataList, body]});
         }
     };
 
@@ -518,7 +551,12 @@ export default function SourceAddScreen() {
             <div className="w-2/3 flex-1 h-full">
                 <Card className="h-full flex flex-col">
                     <CardHeader className="flex-shrink-0">
-                        <CardTitle>{selectedHealthData?.name || 'Select a source'}</CardTitle>
+                        <CardTitle>
+                            {selectedHealthData ? (
+                                selectedHealthData.type === HealthDataType.FILE.id ? formData.fileName || 'Untitled File' :
+                                HealthDataType[selectedHealthData.type as keyof typeof HealthDataType]?.name || 'Unknown'
+                            ) : 'Select a source'}
+                        </CardTitle>
                     </CardHeader>
                     <CardContent className="flex-1 overflow-y-auto">
                         {selectedHealthData ? (

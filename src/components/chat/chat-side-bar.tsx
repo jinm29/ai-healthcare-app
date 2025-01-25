@@ -59,11 +59,33 @@ export default function ChatSideBar({
     }
 
     const handleCopyToClipboard = () => {
-        navigator.clipboard.writeText(JSON.stringify(healthDataList, null, 2));
+        const cleanedData = {
+            sources: healthDataList.map(({data, type}) => ({
+                type,
+                data: typeof data === 'object' && data !== null ? 
+                    (() => {
+                        const { parsingLogs: _, id: __, filePath: ___, fileType: ____, status: _____, updatedAt: ______, createdAt: _______, ...cleanedContent } = data as any;
+                        return cleanedContent;
+                    })() 
+                    : data
+            }))
+        };
+        navigator.clipboard.writeText(JSON.stringify(cleanedData, null, 2));
     }
 
     const handleDownload = () => {
-        const blob = new Blob([JSON.stringify(healthDataList, null, 2)], { type: 'application/json' });
+        const cleanedData = {
+            sources: healthDataList.map(({data, type}) => ({
+                type,
+                data: typeof data === 'object' && data !== null ? 
+                    (() => {
+                        const { parsingLogs: _, id: __, filePath: ___, fileType: ____, status: _____, updatedAt: ______, createdAt: _______, ...cleanedContent } = data as any;
+                        return cleanedContent;
+                    })() 
+                    : data
+            }))
+        };
+        const blob = new Blob([JSON.stringify(cleanedData, null, 2)], { type: 'application/json' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -214,7 +236,17 @@ export default function ChatSideBar({
                 </DialogHeader>
                 <div className="flex-1 overflow-y-auto min-h-0">
                     <JSONEditor
-                        data={healthDataList}
+                        data={{
+                            sources: healthDataList.map(({data, type}) => ({
+                                type,
+                                data: typeof data === 'object' && data !== null ? 
+                                    (() => {
+                                        const { parsingLogs: _, id: __, filePath: ___, fileType: ____, status: _____, updatedAt: ______, createdAt: _______, ...cleanedContent } = data as any;
+                                        return cleanedContent;
+                                    })() 
+                                    : data
+                            }))
+                        }}
                         onSave={() => {}}
                         isEditable={false}
                     />
