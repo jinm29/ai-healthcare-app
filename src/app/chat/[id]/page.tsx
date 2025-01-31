@@ -25,20 +25,6 @@ export default function Page() {
     const [isJsonViewerOpen, setIsJsonViewerOpen] = useState(false);
     const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
     const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true);
-    const [settings, setSettings] = useState(() => {
-        // Initialize settings from localStorage
-        const savedSettings = localStorage.getItem('chatSettings');
-        if (savedSettings) {
-            return JSON.parse(savedSettings);
-        }
-        return {
-            company: 'openai',
-            model: 'gpt4',
-            apiKey: '',
-            apiEndpoint: '',
-            showApiKey: false
-        };
-    });
 
     const {data, mutate} = useSWR<ChatMessageListResponse>(`/api/chat-rooms/${id}/messages`, async (url: string) => {
         const response = await fetch(url);
@@ -72,12 +58,6 @@ export default function Page() {
             body: JSON.stringify({
                 content: inputText,
                 role: 'USER',
-                settings: {
-                    company: settings.company,
-                    model: settings.model,
-                    apiEndpoint: settings.apiEndpoint,
-                    apiKey: settings.apiKey
-                }
             })
         });
 
@@ -156,11 +136,9 @@ export default function Page() {
                     </div>
                 </div>
 
-                <ChatSettingSideBar 
-                    chatRoomId={id} 
+                <ChatSettingSideBar
+                    chatRoomId={id}
                     isRightSidebarOpen={isRightSidebarOpen}
-                    settings={settings}
-                    onSettingsChange={setSettings}
                 />
             </div>
 

@@ -32,6 +32,8 @@ export async function GET(
                     systemPrompt: true
                 }
             },
+            llmProviderId: true,
+            llmProviderModelId: true,
             createdAt: true,
             updatedAt: true
         }
@@ -63,6 +65,8 @@ export async function PATCH(
                     systemPrompt: true
                 }
             },
+            llmProviderId: true,
+            llmProviderModelId: true,
             createdAt: true,
             updatedAt: true
         }

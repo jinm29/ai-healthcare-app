@@ -6,6 +6,8 @@ export interface ChatRoom extends Prisma.ChatRoomGetPayload<{
         id: true,
         name: true,
         assistantMode: { select: { id: true, name: true, description: true, systemPrompt: true } },
+        llmProviderId: true,
+        llmProviderModelId: true,
         createdAt: true,
         updatedAt: true
     }
@@ -26,6 +28,8 @@ export async function GET() {
         select: {
             id: true,
             name: true,
+            llmProviderId: true,
+            llmProviderModelId: true,
             assistantMode: {
                 select: {
                     id: true,
@@ -45,11 +49,11 @@ export async function GET() {
 }
 
 export async function POST() {
-    const chatRoom = await prisma.$transaction(async (prisma) => {
+    const {id} = await prisma.$transaction(async (prisma) => {
         // Get the last used chat room to get its assistant mode
         const lastChatRoom = await prisma.chatRoom.findFirst({
-            orderBy: { updatedAt: 'desc' },
-            select: { assistantModeId: true }
+            orderBy: {updatedAt: 'desc'},
+            select: {assistantModeId: true}
         });
 
         // If we have a last chat room, use its assistant mode, otherwise find the first one
@@ -58,23 +62,30 @@ export async function POST() {
         return prisma.chatRoom.create({
             data: {
                 name: 'New Chat',
-                assistantModeId: assistantModeId
+                assistantModeId: assistantModeId,
+                llmProviderId: (await prisma.lLMProvider.findFirstOrThrow()).id,
             },
-            select: {
-                id: true,
-                name: true,
-                assistantMode: {
-                    select: {
-                        id: true,
-                        name: true,
-                        description: true,
-                        systemPrompt: true
-                    }
-                },
-                createdAt: true,
-                updatedAt: true
-            }
         });
     });
+
+    const chatRoom = await prisma.chatRoom.findUniqueOrThrow({
+        where: {id: id},
+        select: {
+            id: true,
+            name: true,
+            llmProviderId: true,
+            llmProviderModelId: true,
+            assistantMode: {
+                select: {
+                    id: true,
+                    name: true,
+                    description: true,
+                    systemPrompt: true
+                }
+            },
+            createdAt: true,
+            updatedAt: true
+        }
+    })
     return NextResponse.json<ChatRoomCreateResponse>(chatRoom);
 }

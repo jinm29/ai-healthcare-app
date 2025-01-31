@@ -8,31 +8,21 @@ import useSWR from "swr";
 import {AssistantMode, AssistantModeListResponse} from "@/app/api/assistant-modes/route";
 import {ChatRoomGetResponse} from "@/app/api/chat-rooms/[id]/route";
 import {AssistantModePatchRequest} from "@/app/api/assistant-modes/[id]/route";
+import {LLMProvider, LLMProviderListResponse} from "@/app/api/llm-providers/route";
+import {LLMProviderModel, LLMProviderModelListResponse} from "@/app/api/llm-providers/[id]/models/route";
 
 interface ChatSettingSideBarProps {
     isRightSidebarOpen: boolean;
     chatRoomId: string;
-    settings: {
-        company: string;
-        model: string;
-        apiKey: string;
-        apiEndpoint: string;
-        showApiKey: boolean;
-    };
-    onSettingsChange: (settings: {
-        company: string;
-        model: string;
-        apiKey: string;
-        apiEndpoint: string;
-        showApiKey: boolean;
-    }) => void;
 }
 
-export default function ChatSettingSideBar(
-    {isRightSidebarOpen, chatRoomId, settings, onSettingsChange}: ChatSettingSideBarProps
+export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: ChatSettingSideBarProps
 ) {
     const [selectedAssistantMode, setSelectedAssistantMode] = useState<AssistantMode>();
-    const [localModels, setLocalModels] = useState<Array<{name: string}>>([]);
+    const [selectedLLMProvider, setSelectedLLMProvider] = useState<LLMProvider>();
+    const [selectedLLMProviderModel, setSelectedLLMProviderModel] = useState<LLMProviderModel>();
+    const [llmProviderModels, setLLMProviderModels] = useState<LLMProviderModel[]>([]);
+    const [showApiKey, setShowApiKey] = useState(false);
 
     const {
         data: chatRoomData,
@@ -42,13 +32,19 @@ export default function ChatSettingSideBar(
         return response.json();
     });
 
-    // Load settings from localStorage on mount
+    const {
+        data: llmProvidersData,
+        mutate: llmProvidersMutate
+    } = useSWR<LLMProviderListResponse>('/api/llm-providers', async (url: string) => {
+        const response = await fetch(url);
+        return response.json();
+    })
+
     useEffect(() => {
-        const savedSettings = localStorage.getItem('chatSettings');
-        if (savedSettings) {
-            onSettingsChange(JSON.parse(savedSettings));
-        }
-    }, []);
+        onChangeChatRoom({
+            llmProviderModelId: selectedLLMProviderModel?.id
+        })
+    }, [selectedLLMProviderModel]);
 
     // Initialize assistant mode from localStorage or chatRoomData
     useEffect(() => {
@@ -70,10 +66,21 @@ export default function ChatSettingSideBar(
         }
     }, [chatRoomData?.chatRoom.assistantMode?.id]);
 
-    // Save settings to localStorage whenever they change
     useEffect(() => {
-        localStorage.setItem('chatSettings', JSON.stringify(settings));
-    }, [settings]);
+        const chatRoom = chatRoomData?.chatRoom;
+        if (!chatRoom) return;
+
+        const llmProviders = llmProvidersData?.llmProviders || [];
+        const models = llmProviderModels || [];
+
+        if (selectedLLMProvider === undefined && llmProviders.length > 0) {
+            setSelectedLLMProvider(llmProviders.find((provider) => provider.id === chatRoom.llmProviderId) || llmProviders[0]);
+        }
+
+        if (selectedLLMProviderModel === undefined && models.length > 0) {
+            setSelectedLLMProviderModel(models.find((model) => model.id === chatRoom.llmProviderModelId) || models[0]);
+        }
+    }, [chatRoomData, llmProvidersData, llmProviderModels]);
 
     // Save system prompt to localStorage whenever it changes
     useEffect(() => {
@@ -91,44 +98,31 @@ export default function ChatSettingSideBar(
     })
     const assistantModes = useMemo(() => assistantModesData?.assistantModes || [], [assistantModesData]);
 
-    // Fetch local models when Local LLM is selected
+    // Fetch models when LLM is selected
     useEffect(() => {
-        const fetchLocalModels = async () => {
-            if (settings.company === 'local' && settings.apiEndpoint) {
-                try {
-                    const response = await fetch(`${settings.apiEndpoint}/api/tags`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        const models = data.models || [];
-                        setLocalModels(models);
-                        
-                        // If we have models and current model is not in the list, set the first model
-                        if (models.length > 0 && !models.some((m: {name: string}) => m.name === settings.model)) {
-                            onSettingsChange({
-                                ...settings,
-                                model: models[0].name
-                            });
-                        }
-                    } else {
-                        console.error('Failed to fetch local models');
-                        setLocalModels([]);
-                    }
-                } catch (error) {
-                    console.error('Error fetching local models:', error);
-                    setLocalModels([]);
-                }
-            }
-        };
+        if (!selectedLLMProvider) return;
+        const fetchLLMProviderModels = async () => {
+            const response = await fetch(`/api/llm-providers/${selectedLLMProvider.id}/models`)
+            const data: LLMProviderModelListResponse = await response.json();
+            setLLMProviderModels(data.llmProviderModels || []);
+        }
+        fetchLLMProviderModels();
+    }, [selectedLLMProvider]);
 
-        fetchLocalModels();
-    }, [settings.company, settings.apiEndpoint]);
-
-    const onChangeChatRoom = async (assistantModeId: string) => {
+    const onChangeChatRoom = async ({
+                                        assistantModeId,
+                                        llmProviderId,
+                                        llmProviderModelId,
+                                    }: {
+        assistantModeId?: string
+        llmProviderId?: string
+        llmProviderModelId?: string | null
+    }) => {
         if (chatRoomData === undefined) return;
         const response = await fetch(`/api/chat-rooms/${chatRoomId}`, {
             method: 'PATCH',
             headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({assistantModeId})
+            body: JSON.stringify({assistantModeId, llmProviderId, llmProviderModelId}),
         });
         const data = await response.json();
 
@@ -143,7 +137,9 @@ export default function ChatSettingSideBar(
             ...chatRoomData,
             chatRoom: {
                 ...chatRoomData.chatRoom,
-                assistantMode: updatedAssistantMode
+                assistantMode: updatedAssistantMode,
+                llmProviderId: llmProviderId || chatRoomData.chatRoom.llmProviderId,
+                llmProviderModelId: llmProviderModelId || chatRoomData.chatRoom.llmProviderModelId,
             }
         });
         setSelectedAssistantMode(updatedAssistantMode);
@@ -173,6 +169,33 @@ export default function ChatSettingSideBar(
         })
     }
 
+    const onLLMProviderChange = async ({
+                                           apiKey,
+                                           apiURL,
+                                       }: {
+        apiKey?: string,
+        apiURL?: string,
+    }) => {
+        if (!selectedLLMProvider) return;
+
+        const data = {
+            ...selectedLLMProvider,
+            apiKey: apiKey || selectedLLMProvider.apiKey,
+            apiURL: apiURL || selectedLLMProvider.apiURL
+        };
+        setSelectedLLMProvider(data);
+        await fetch(`/api/llm-providers/${selectedLLMProvider.id}`, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data),
+        });
+        await llmProvidersMutate();
+        setSelectedLLMProvider(data)
+
+        // Patch ChatRoom with new LLMProvider
+        await onChangeChatRoom({llmProviderId: selectedLLMProvider.id, llmProviderModelId: null});
+    }
+
     return <div className={`border-l bg-gray-50 flex flex-col transition-all duration-300 ease-in-out
           ${isRightSidebarOpen ? 'w-80' : 'w-0'} relative`}>
         <div className={`absolute inset-0 ${isRightSidebarOpen ? 'opacity-100' : 'opacity-0'}
@@ -181,100 +204,61 @@ export default function ChatSettingSideBar(
                 <div className="space-y-4">
                     <h4 className="text-sm font-medium">Model Settings</h4>
                     <div className="space-y-2">
-                        <Select value={settings.company}
+                        <Select value={selectedLLMProvider?.id}
                                 onValueChange={(value) => {
-                                    const defaultModels = {
-                                        'openai': 'gpt4',
-                                        'anthropic': 'claude3',
-                                        'google': 'gemini-pro',
-                                        'local': 'llama2'
-                                    };
-                                    const defaultEndpoints = {
-                                        'openai': '',
-                                        'anthropic': '',
-                                        'google': '',
-                                        'local': 'http://localhost:11434'  // Default Ollama endpoint
-                                    };
-                                    onSettingsChange({
-                                        ...settings,
-                                        company: value,
-                                        model: defaultModels[value as keyof typeof defaultModels],
-                                        apiEndpoint: defaultEndpoints[value as keyof typeof defaultEndpoints]
-                                    });
+                                    setSelectedLLMProvider(llmProvidersData?.llmProviders.find((provider) => provider.id === value));
+                                    setLLMProviderModels([])
+                                    setSelectedLLMProviderModel(undefined);
+                                    onChangeChatRoom({llmProviderId: value, llmProviderModelId: null});
                                 }}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select company"/>
                             </SelectTrigger>
                             <SelectContent>
-                                <SelectItem value="openai">OpenAI</SelectItem>
-                                <SelectItem value="anthropic">Anthropic</SelectItem>
-                                <SelectItem value="google">Google</SelectItem>
-                                <SelectItem value="local">Local LLM</SelectItem>
+                                {llmProvidersData?.llmProviders.map((provider) => <SelectItem
+                                    key={provider.id}
+                                    value={provider.id}>{provider.name}</SelectItem>)}
                             </SelectContent>
                         </Select>
-                        <Select value={settings.model}
-                                onValueChange={(value) => onSettingsChange({...settings, model: value})}>
+                        <Select value={selectedLLMProviderModel?.id}
+                                onValueChange={(value) => setSelectedLLMProviderModel(llmProviderModels.find((model) => model.id === value))}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select model"/>
                             </SelectTrigger>
                             <SelectContent>
-                                {settings.company === 'openai' && (
-                                    <>
-                                        <SelectItem value="gpt4">GPT-4</SelectItem>
-                                        <SelectItem value="gpt4-turbo">GPT-4 Turbo</SelectItem>
-                                        <SelectItem value="gpt3.5-turbo">GPT-3.5 Turbo</SelectItem>
-                                    </>
+                                {llmProviderModels.map((model) => (
+                                    <SelectItem key={model.id} value={model.id}>
+                                        {model.name}
+                                    </SelectItem>
+                                ))}
+
+                                {llmProviderModels.length === 0 && (
+                                    <div className="p-2 text-sm text-gray-500">No models found</div>
                                 )}
-                                {settings.company === 'anthropic' && (
-                                    <>
-                                        <SelectItem value="claude3-opus">Claude 3 Opus</SelectItem>
-                                        <SelectItem value="claude3-sonnet">Claude 3 Sonnet</SelectItem>
-                                        <SelectItem value="claude3-haiku">Claude 3 Haiku</SelectItem>
-                                    </>
-                                )}
-                                {settings.company === 'google' && (
-                                    <>
-                                        <SelectItem value="gemini-pro">Gemini Pro</SelectItem>
-                                        <SelectItem value="gemini-ultra">Gemini Ultra</SelectItem>
-                                    </>
-                                )}
-                                {settings.company === 'local' && localModels.length > 0 ? (
-                                    <>
-                                        {localModels.map((model) => (
-                                            <SelectItem key={model.name} value={model.name}>
-                                                {model.name}
-                                            </SelectItem>
-                                        ))}
-                                    </>
-                                ) : settings.company === 'local' ? (
-                                    <div className="p-2 text-sm text-gray-500">No local models found</div>
-                                ) : null}
                             </SelectContent>
                         </Select>
-                        {settings.company === 'local' && (
+                        {selectedLLMProvider?.id === 'ollama' && (
                             <Input
                                 type="text"
                                 placeholder="API endpoint (default: http://localhost:11434)"
-                                value={settings.apiEndpoint}
-                                onChange={(e) => onSettingsChange({...settings, apiEndpoint: e.target.value})}
+                                value={selectedLLMProvider?.apiURL}
+                                onChange={(e) => onLLMProviderChange({apiURL: e.target.value})}
                             />
                         )}
-                        {settings.company !== 'local' && (
-                            <div className="relative">
-                                <Input
-                                    type={settings.showApiKey ? "text" : "password"}
-                                    placeholder="Enter API key"
-                                    value={settings.apiKey}
-                                    onChange={(e) => onSettingsChange({...settings, apiKey: e.target.value})}
-                                />
-                                <button
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-sm text-gray-500 hover:text-gray-700"
-                                    onClick={() => onSettingsChange({...settings, showApiKey: !settings.showApiKey})}
-                                >
-                                    {settings.showApiKey ? "Hide" : "Show"}
-                                </button>
-                            </div>
-                        )}
+                        <div className="relative">
+                            <Input
+                                type={showApiKey ? "text" : "password"}
+                                placeholder="Enter API key"
+                                value={selectedLLMProvider?.apiKey}
+                                onChange={(e) => onLLMProviderChange({apiKey: e.target.value})}
+                            />
+                            <button
+                                className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-sm text-gray-500 hover:text-gray-700"
+                                onClick={() => setShowApiKey(!showApiKey)}
+                            >
+                                {showApiKey ? "Hide" : "Show"}
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -303,7 +287,7 @@ export default function ChatSettingSideBar(
                         ${selectedAssistantMode?.id === assistantMode.id ? 'bg-white border-gray-300' :
                                     'border-transparent hover:bg-gray-100'}`}
                                 onClick={async () => {
-                                    await onChangeChatRoom(assistantMode.id);
+                                    await onChangeChatRoom({assistantModeId: assistantMode.id});
                                 }}
                             >
                                 <div className="text-sm font-medium">{assistantMode.name}</div>

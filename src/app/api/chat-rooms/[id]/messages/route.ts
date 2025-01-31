@@ -50,7 +50,13 @@ export async function POST(
     const {id} = await params
     const body: ChatMessageCreateRequest = await req.json()
 
-    const {assistantMode, chatMessages, healthDataList} = await prisma.$transaction(async (prisma) => {
+    const {
+        chatRoom,
+        assistantMode,
+        chatMessages,
+        healthDataList,
+        llmProvider
+    } = await prisma.$transaction(async (prisma) => {
         await prisma.chatMessage.create({data: {content: body.content, role: body.role, chatRoomId: id}});
         const {assistantMode} = await prisma.chatRoom.update({
             where: {id},
@@ -62,10 +68,14 @@ export async function POST(
             orderBy: {createdAt: 'asc'}
         })
         const healthDataList = await prisma.healthData.findMany({})
+        const chatRoom = await prisma.chatRoom.findUniqueOrThrow({where: {id}})
+        const llmProvider = await prisma.lLMProvider.findUniqueOrThrow({where: {id: chatRoom.llmProviderId}});
         return {
+            chatRoom,
             chatMessages,
             assistantMode,
-            healthDataList
+            healthDataList,
+            llmProvider
         }
     })
 
@@ -86,15 +96,12 @@ export async function POST(
             let messageContent = '';
 
             try {
-                if (body.settings?.company === 'local') {
-                    // Ollama API call
-                    const response = await fetch(`${body.settings.apiEndpoint}/api/chat`, {
+                if (chatRoom.llmProviderId === 'ollama') {
+                    const response = await fetch(`${llmProvider.apiURL}/api/chat`, {
                         method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
+                        headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({
-                            model: body.settings.model,
+                            model: chatRoom.llmProviderModelId,
                             messages: messages,
                             stream: true,
                         }),
@@ -109,7 +116,7 @@ export async function POST(
 
                         const chunk = new TextDecoder().decode(value);
                         const lines = chunk.split('\n').filter(line => line.trim());
-                        
+
                         for (const line of lines) {
                             if (line.includes('[DONE]')) continue;
                             try {
@@ -124,13 +131,13 @@ export async function POST(
                             }
                         }
                     }
-                } else {
-                    // OpenAI API call (existing code)
-                    const openai = new OpenAI({
-                        apiKey: body.settings?.apiKey || process.env.OPENAI_API_KEY,
-                    })
+                } else if (chatRoom.llmProviderId === 'openai') {
+                    // OpenAI API call
+                    const openai = new OpenAI({apiKey: llmProvider.apiKey, baseURL: llmProvider.apiURL});
+                    const llmProviderModelId = chatRoom.llmProviderModelId;
+                    if (!llmProviderModelId) throw new Error('No LLM model ID provided');
                     const chatStream = await openai.chat.completions.create({
-                        model: "gpt-4",
+                        model: llmProviderModelId,
                         messages: messages,
                         stream: true
                     });
@@ -140,6 +147,8 @@ export async function POST(
                         if (deltaContent !== undefined) messageContent += deltaContent;
                         controller.enqueue(`${JSON.stringify({content: messageContent})}\n`);
                     }
+                } else {
+                    throw new Error('Unsupported LLM provider');
                 }
 
                 // Save to prisma after the stream is done

@@ -19,13 +19,16 @@ model HealthData {
 }
 
 model ChatRoom {
-  id              String   @id @default(cuid())
-  name            String
-  assistantModeId String
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                 String   @id @default(cuid())
+  name               String
+  assistantModeId    String
+  llmProviderId      String
+  llmProviderModelId String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
 
   assistantMode AssistantMode @relation(fields: [assistantModeId], references: [id])
+  llmProvider   LLMProvider   @relation(fields: [llmProviderId], references: [id])
   chatMessages  ChatMessage[]
 }
 
@@ -56,8 +59,11 @@ model LLMProvider {
   name      String
   apiKey    String   @default("")
   apiURL    String
+  order     Int
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  chatRooms ChatRoom[]
 }
 
 enum ChatRole {

@@ -3,24 +3,28 @@
     "id": "openai",
     "name": "OpenAI",
     "apiKey": "",
-    "apiURL": "https://api.openai.com/v1"
+    "apiURL": "https://api.openai.com/v1",
+    "order": 0
   },
   {
     "id": "anthropic",
     "name": "Anthropic",
     "apiKey": "",
-    "apiURL": "https://api.anthropic.com/v1"
+    "apiURL": "https://api.anthropic.com/v1",
+    "order": 1
   },
   {
     "id": "google",
     "name": "Google",
     "apiKey": "",
-    "apiURL": ""
+    "apiURL": "",
+    "order": 2
   },
   {
-    "id": "local",
+    "id": "ollama",
     "name": "Ollama",
     "apiKey": "",
-    "apiURL": "http://localhost:11434"
+    "apiURL": "http://localhost:11434",
+    "order": 3
   }
 ]
