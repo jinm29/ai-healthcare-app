@@ -51,6 +51,15 @@ model AssistantMode {
   chatRoom ChatRoom[]
 }
 
+model LLMProvider {
+  id        String   @id @default(cuid())
+  name      String
+  apiKey    String   @default("")
+  apiURL    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
 enum ChatRole {
   USER
   ASSISTANT

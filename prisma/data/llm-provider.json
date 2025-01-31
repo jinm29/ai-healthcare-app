@@ -1,0 +1,26 @@
+[
+  {
+    "id": "openai",
+    "name": "OpenAI",
+    "apiKey": "",
+    "apiURL": "https://api.openai.com/v1"
+  },
+  {
+    "id": "anthropic",
+    "name": "Anthropic",
+    "apiKey": "",
+    "apiURL": "https://api.anthropic.com/v1"
+  },
+  {
+    "id": "google",
+    "name": "Google",
+    "apiKey": "",
+    "apiURL": ""
+  },
+  {
+    "id": "local",
+    "name": "Ollama",
+    "apiKey": "",
+    "apiURL": "http://localhost:11434"
+  }
+]
