@@ -25,6 +25,20 @@ export default function Page() {
     const [isJsonViewerOpen, setIsJsonViewerOpen] = useState(false);
     const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(true);
     const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(true);
+    const [settings, setSettings] = useState(() => {
+        // Initialize settings from localStorage
+        const savedSettings = localStorage.getItem('chatSettings');
+        if (savedSettings) {
+            return JSON.parse(savedSettings);
+        }
+        return {
+            company: 'openai',
+            model: 'gpt4',
+            apiKey: '',
+            apiEndpoint: '',
+            showApiKey: false
+        };
+    });
 
     const {data, mutate} = useSWR<ChatMessageListResponse>(`/api/chat-rooms/${id}/messages`, async (url: string) => {
         const response = await fetch(url);
@@ -57,7 +71,13 @@ export default function Page() {
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 content: inputText,
-                role: 'USER'
+                role: 'USER',
+                settings: {
+                    company: settings.company,
+                    model: settings.model,
+                    apiEndpoint: settings.apiEndpoint,
+                    apiKey: settings.apiKey
+                }
             })
         });
 
@@ -72,13 +92,19 @@ export default function Page() {
                 done = isDone;
                 const content = decoder.decode(value, {stream: !done});
                 for (const data of content.split('\n').filter(Boolean)) {
-                    const {content}: { content: string } = JSON.parse(data)
-                    await mutate({
-                        chatMessages: [
-                            ...oldMessages,
-                            {id: new Date().toISOString(), content: content, role: 'ASSISTANT', createdAt}
-                        ]
-                    }, {revalidate: false});
+                    const {content, error}: { content?: string, error?: string } = JSON.parse(data)
+                    if (error) {
+                        console.error('Error from LLM:', error);
+                        continue;
+                    }
+                    if (content) {
+                        await mutate({
+                            chatMessages: [
+                                ...oldMessages,
+                                {id: new Date().toISOString(), content: content, role: 'ASSISTANT', createdAt}
+                            ]
+                        }, {revalidate: false});
+                    }
                 }
             }
             await mutate();
@@ -130,7 +156,12 @@ export default function Page() {
                     </div>
                 </div>
 
-                <ChatSettingSideBar chatRoomId={id} isRightSidebarOpen={isRightSidebarOpen}/>
+                <ChatSettingSideBar 
+                    chatRoomId={id} 
+                    isRightSidebarOpen={isRightSidebarOpen}
+                    settings={settings}
+                    onSettingsChange={setSettings}
+                />
             </div>
 
             <Dialog open={isJsonViewerOpen} onOpenChange={setIsJsonViewerOpen}>

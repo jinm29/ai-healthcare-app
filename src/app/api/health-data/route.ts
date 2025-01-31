@@ -5,25 +5,23 @@ import {fromBuffer as pdf2picFromBuffer} from 'pdf2pic'
 import fs from 'fs'
 import cuid from "cuid";
 
-export interface HealthData extends Prisma.HealthDataGetPayload<{
-    select: {
-        id: true,
-        type: true,
-        data: true,
-        status: true,
-        filePath: true,
-        fileType: true,
-        createdAt: true,
-        updatedAt: true
-    }
-}> {
-    id: string
+export interface HealthData {
+    id: string;
+    type: string;
+    data: Prisma.JsonValue;
+    filePath?: string | null;
+    fileType?: string | null;
+    status: string;
+    createdAt: Date;
+    updatedAt: Date;
 }
 
 export interface HealthDataCreateRequest {
     id?: string;
     type: string;
     data: Prisma.InputJsonValue;
+    filePath?: string | null;
+    fileType?: string | null;
 }
 
 export interface HealthDataListResponse {
@@ -56,6 +54,7 @@ export async function POST(
 
         let filePath: string | undefined
         let fileType: string | undefined
+        let data: any = undefined
 
         // Save files
         if (file instanceof File) {
@@ -63,79 +62,139 @@ export async function POST(
             fs.writeFileSync(`./public/uploads/${filename}`, Buffer.from(await file.arrayBuffer()))
             fileType = file.type
             filePath = `/uploads/${filename}`
+            data = {
+                fileName: file.name
+            }
         }
 
         // Create parsing data
-        await prisma.healthData.create({
-            data: {
-                id: id as string,
-                type: type as string,
-                status: 'PARSING',
-                filePath: filePath,
-                fileType: fileType,
-                data: {}
-            },
-        })
+        let healthData;
+        let parsingLogs: string[] = [];
+        try {
+            healthData = await prisma.healthData.create({
+                data: {
+                    id: id as string,
+                    type: type as string,
+                    status: 'PARSING',
+                    filePath: filePath,
+                    fileType: fileType,
+                    data: {
+                        ...data,
+                        parsingLogs: ['Started file processing...']
+                    }
+                },
+            });
 
-        const messages = [
-            {
-                role: 'user', content: [
-                    {
-                        type: 'text',
-                        text: 'Extract all data.\nresponse format: json'
-                    },
-                    ...(await Promise.all([file].map(async (file) => {
-                        if (file instanceof File) {
-                            if (file.type.startsWith('image')) {
-                                const arrayBuffer = await file.arrayBuffer()
-                                return [{
-                                    type: 'image_url',
-                                    image_url: {url: `data:${file.type};base64,${Buffer.from(arrayBuffer).toString('base64')}`}
-                                }]
-                            } else if (file.type.startsWith('application/pdf')) {
-                                const messages = []
-                                const pdf2picConverter = pdf2picFromBuffer(
-                                    Buffer.from(await file.arrayBuffer()),
-                                )
-                                const images = await pdf2picConverter.bulk(-1, {responseType: 'base64'})
-                                for (const image of images) {
-                                    if (image.base64) messages.push({
-                                        type: 'image_url',
-                                        image_url: {url: `data:image/png;base64,${image.base64}`}
-                                    })
-                                }
-                                return messages
-                            }
-                        }
-
-                        return undefined
-                    }))).flat().filter((message) => message !== undefined)
-                ]
-            },
-        ]
-
-        const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY})
-        const chatCompletion = await openai.chat.completions.create({
-            model: "gpt-4o",
-            messages: messages as any,
-            response_format: {
-                type: 'json_object'
+            // Return initial response
+            if (!file) {
+                return NextResponse.json(healthData);
             }
-        })
-        const content = chatCompletion.choices[0].message.content
-        if (content) {
-            const healthData = await prisma.healthData.update({
+
+            parsingLogs.push(`File type: ${file instanceof File ? file.type : 'unknown'}`);
+            const messages = [
+                {
+                    role: 'user', content: [
+                        {
+                            type: 'text',
+                            text: 'Extract all data.\nresponse format: json'
+                        },
+                        ...(await Promise.all([file].map(async (file) => {
+                            if (file instanceof File) {
+                                if (file.type.startsWith('image')) {
+                                    parsingLogs.push('Processing image file...');
+                                    const arrayBuffer = await file.arrayBuffer()
+                                    parsingLogs.push('Image converted to base64');
+                                    return [{
+                                        type: 'image_url',
+                                        image_url: {url: `data:${file.type};base64,${Buffer.from(arrayBuffer).toString('base64')}`}
+                                    }]
+                                } else if (file.type.startsWith('application/pdf')) {
+                                    parsingLogs.push('Processing PDF file...');
+                                    const messages = []
+                                    const pdf2picConverter = pdf2picFromBuffer(
+                                        Buffer.from(await file.arrayBuffer()),
+                                    )
+                                    const images = await pdf2picConverter.bulk(-1, {responseType: 'base64'})
+                                    parsingLogs.push(`Converted ${images.length} PDF pages to images`);
+                                    for (const image of images) {
+                                        if (image.base64) messages.push({
+                                            type: 'image_url',
+                                            image_url: {url: `data:image/png;base64,${image.base64}`}
+                                        })
+                                    }
+                                    return messages
+                                }
+                            }
+                            return undefined
+                        }))).flat().filter((message) => message !== undefined)
+                    ]
+                },
+            ];
+
+            parsingLogs.push('Sending to GPT for analysis...');
+            const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
+            const chatCompletion = await openai.chat.completions.create({
+                model: "gpt-4o",
+                messages: messages as any,
+                max_tokens: 4096,
+                response_format: {
+                    type: 'json_object'
+                }
+            });
+
+            const content = chatCompletion.choices[0].message.content;
+            if (content) {
+                parsingLogs.push('Received GPT analysis results');
+                const parsedContent = JSON.parse(content);
+                // Remove fields that shouldn't be included in GPT context
+                const { parsingLogs: _, id: __, filePath: ___, fileType: ____, status: _____, updatedAt: ______, createdAt: _______, ...cleanedContent } = parsedContent;
+                
+                healthData = await prisma.healthData.update({
+                    where: {id: id as string},
+                    data: {
+                        type: type as string,
+                        status: 'COMPLETED',
+                        data: {
+                            ...cleanedContent,
+                            fileName: data.fileName,
+                            parsingLogs
+                        }
+                    }
+                });
+                return NextResponse.json(healthData);
+            }
+
+            parsingLogs.push('No content received from GPT');
+            healthData = await prisma.healthData.update({
                 where: {id: id as string},
                 data: {
-                    type: type as string,
                     status: 'COMPLETED',
-                    data: JSON.parse(content)
+                    data: {
+                        ...data,
+                        parsingLogs
+                    }
                 }
-            })
-            return NextResponse.json<HealthDataCreateResponse>(healthData)
+            });
+            return NextResponse.json(healthData);
+        } catch (error) {
+            console.error('Error processing file:', error);
+            parsingLogs.push(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            // If there's an error, update the health data with error logs
+            if (healthData) {
+                healthData = await prisma.healthData.update({
+                    where: {id: id as string},
+                    data: {
+                        status: 'COMPLETED',
+                        data: {
+                            ...data,
+                            parsingLogs
+                        }
+                    }
+                });
+                return NextResponse.json(healthData);
+            }
+            return NextResponse.json({error: 'Failed to process file'}, {status: 500});
         }
-
-        return NextResponse.json({error: 'Invalid request'}, {status: 400})
     }
 }
 

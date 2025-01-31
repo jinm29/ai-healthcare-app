@@ -12,19 +12,27 @@ import {AssistantModePatchRequest} from "@/app/api/assistant-modes/[id]/route";
 interface ChatSettingSideBarProps {
     isRightSidebarOpen: boolean;
     chatRoomId: string;
+    settings: {
+        company: string;
+        model: string;
+        apiKey: string;
+        apiEndpoint: string;
+        showApiKey: boolean;
+    };
+    onSettingsChange: (settings: {
+        company: string;
+        model: string;
+        apiKey: string;
+        apiEndpoint: string;
+        showApiKey: boolean;
+    }) => void;
 }
 
 export default function ChatSettingSideBar(
-    {isRightSidebarOpen, chatRoomId}: ChatSettingSideBarProps
+    {isRightSidebarOpen, chatRoomId, settings, onSettingsChange}: ChatSettingSideBarProps
 ) {
-    const [settings, setSettings] = useState({
-        company: 'openai',
-        model: 'gpt4',
-        apiKey: '',
-        apiEndpoint: '',
-        showApiKey: false
-    });
     const [selectedAssistantMode, setSelectedAssistantMode] = useState<AssistantMode>();
+    const [localModels, setLocalModels] = useState<Array<{name: string}>>([]);
 
     const {
         data: chatRoomData,
@@ -32,12 +40,47 @@ export default function ChatSettingSideBar(
     } = useSWR<ChatRoomGetResponse>(`/api/chat-rooms/${chatRoomId}`, async (url: string) => {
         const response = await fetch(url);
         return response.json();
-    })
+    });
+
+    // Load settings from localStorage on mount
     useEffect(() => {
-        if (selectedAssistantMode === undefined && chatRoomData) {
-            setSelectedAssistantMode(chatRoomData.chatRoom.assistantMode);
+        const savedSettings = localStorage.getItem('chatSettings');
+        if (savedSettings) {
+            onSettingsChange(JSON.parse(savedSettings));
         }
-    }, [chatRoomData, selectedAssistantMode]);
+    }, []);
+
+    // Initialize assistant mode from localStorage or chatRoomData
+    useEffect(() => {
+        if (!chatRoomData?.chatRoom.assistantMode) return;
+
+        const savedSystemPrompt = localStorage.getItem('systemPrompt');
+        if (savedSystemPrompt) {
+            // If we have a saved system prompt, use it
+            const updatedMode = {
+                ...chatRoomData.chatRoom.assistantMode,
+                systemPrompt: savedSystemPrompt
+            };
+            setSelectedAssistantMode(updatedMode);
+            onChangeAssistantMode(updatedMode.id, {systemPrompt: savedSystemPrompt});
+        } else {
+            // If no saved prompt, use the current one and save it
+            setSelectedAssistantMode(chatRoomData.chatRoom.assistantMode);
+            localStorage.setItem('systemPrompt', chatRoomData.chatRoom.assistantMode.systemPrompt);
+        }
+    }, [chatRoomData?.chatRoom.assistantMode?.id]);
+
+    // Save settings to localStorage whenever they change
+    useEffect(() => {
+        localStorage.setItem('chatSettings', JSON.stringify(settings));
+    }, [settings]);
+
+    // Save system prompt to localStorage whenever it changes
+    useEffect(() => {
+        if (selectedAssistantMode?.systemPrompt) {
+            localStorage.setItem('systemPrompt', selectedAssistantMode.systemPrompt);
+        }
+    }, [selectedAssistantMode?.systemPrompt]);
 
     const {
         data: assistantModesData,
@@ -48,6 +91,38 @@ export default function ChatSettingSideBar(
     })
     const assistantModes = useMemo(() => assistantModesData?.assistantModes || [], [assistantModesData]);
 
+    // Fetch local models when Local LLM is selected
+    useEffect(() => {
+        const fetchLocalModels = async () => {
+            if (settings.company === 'local' && settings.apiEndpoint) {
+                try {
+                    const response = await fetch(`${settings.apiEndpoint}/api/tags`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        const models = data.models || [];
+                        setLocalModels(models);
+                        
+                        // If we have models and current model is not in the list, set the first model
+                        if (models.length > 0 && !models.some((m: {name: string}) => m.name === settings.model)) {
+                            onSettingsChange({
+                                ...settings,
+                                model: models[0].name
+                            });
+                        }
+                    } else {
+                        console.error('Failed to fetch local models');
+                        setLocalModels([]);
+                    }
+                } catch (error) {
+                    console.error('Error fetching local models:', error);
+                    setLocalModels([]);
+                }
+            }
+        };
+
+        fetchLocalModels();
+    }, [settings.company, settings.apiEndpoint]);
+
     const onChangeChatRoom = async (assistantModeId: string) => {
         if (chatRoomData === undefined) return;
         const response = await fetch(`/api/chat-rooms/${chatRoomId}`, {
@@ -56,14 +131,27 @@ export default function ChatSettingSideBar(
             body: JSON.stringify({assistantModeId})
         });
         const data = await response.json();
+
+        // Get the saved system prompt
+        const savedSystemPrompt = localStorage.getItem('systemPrompt');
+        const updatedAssistantMode = {
+            ...data.chatRoom.assistantMode,
+            systemPrompt: savedSystemPrompt || data.chatRoom.assistantMode.systemPrompt
+        };
+
         await chatRoomMutate({
             ...chatRoomData,
             chatRoom: {
                 ...chatRoomData.chatRoom,
-                assistantMode: data.chatRoom.assistantMode
+                assistantMode: updatedAssistantMode
             }
-        })
-        setSelectedAssistantMode(data.chatRoom.assistantMode);
+        });
+        setSelectedAssistantMode(updatedAssistantMode);
+
+        // If there's no saved prompt, save the current one
+        if (!savedSystemPrompt) {
+            localStorage.setItem('systemPrompt', updatedAssistantMode.systemPrompt);
+        }
     }
 
     const onChangeAssistantMode = async (assistantModeId: string, body: AssistantModePatchRequest) => {
@@ -101,7 +189,18 @@ export default function ChatSettingSideBar(
                                         'google': 'gemini-pro',
                                         'local': 'llama2'
                                     };
-                                    setSettings({...settings, company: value, model: defaultModels[value as keyof typeof defaultModels]})
+                                    const defaultEndpoints = {
+                                        'openai': '',
+                                        'anthropic': '',
+                                        'google': '',
+                                        'local': 'http://localhost:11434'  // Default Ollama endpoint
+                                    };
+                                    onSettingsChange({
+                                        ...settings,
+                                        company: value,
+                                        model: defaultModels[value as keyof typeof defaultModels],
+                                        apiEndpoint: defaultEndpoints[value as keyof typeof defaultEndpoints]
+                                    });
                                 }}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select company"/>
@@ -114,7 +213,7 @@ export default function ChatSettingSideBar(
                             </SelectContent>
                         </Select>
                         <Select value={settings.model}
-                                onValueChange={(value) => setSettings({...settings, model: value})}>
+                                onValueChange={(value) => onSettingsChange({...settings, model: value})}>
                             <SelectTrigger>
                                 <SelectValue placeholder="Select model"/>
                             </SelectTrigger>
@@ -139,39 +238,43 @@ export default function ChatSettingSideBar(
                                         <SelectItem value="gemini-ultra">Gemini Ultra</SelectItem>
                                     </>
                                 )}
-                                {settings.company === 'local' && (
+                                {settings.company === 'local' && localModels.length > 0 ? (
                                     <>
-                                        <SelectItem value="llama2">Llama 2</SelectItem>
-                                        <SelectItem value="llama2-70b">Llama 2 70B</SelectItem>
-                                        <SelectItem value="mistral-7b">Mistral 7B</SelectItem>
-                                        <SelectItem value="mixtral-8x7b">Mixtral 8x7B</SelectItem>
-                                        <SelectItem value="phi2">Phi-2</SelectItem>
-                                        <SelectItem value="openchat">OpenChat</SelectItem>
-                                        <SelectItem value="neural-chat">Neural Chat</SelectItem>
+                                        {localModels.map((model) => (
+                                            <SelectItem key={model.name} value={model.name}>
+                                                {model.name}
+                                            </SelectItem>
+                                        ))}
                                     </>
-                                )}
+                                ) : settings.company === 'local' ? (
+                                    <div className="p-2 text-sm text-gray-500">No local models found</div>
+                                ) : null}
                             </SelectContent>
                         </Select>
-                        <Input
-                            type="text"
-                            placeholder="Enter API endpoint"
-                            value={settings.apiEndpoint}
-                            onChange={(e) => setSettings({...settings, apiEndpoint: e.target.value})}
-                        />
-                        <div className="relative">
+                        {settings.company === 'local' && (
                             <Input
-                                type={settings.showApiKey ? "text" : "password"}
-                                placeholder="Enter API key"
-                                value={settings.apiKey}
-                                onChange={(e) => setSettings({...settings, apiKey: e.target.value})}
+                                type="text"
+                                placeholder="API endpoint (default: http://localhost:11434)"
+                                value={settings.apiEndpoint}
+                                onChange={(e) => onSettingsChange({...settings, apiEndpoint: e.target.value})}
                             />
-                            <button
-                                className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-sm text-gray-500 hover:text-gray-700"
-                                onClick={() => setSettings({...settings, showApiKey: !settings.showApiKey})}
-                            >
-                                {settings.showApiKey ? "Hide" : "Show"}
-                            </button>
-                        </div>
+                        )}
+                        {settings.company !== 'local' && (
+                            <div className="relative">
+                                <Input
+                                    type={settings.showApiKey ? "text" : "password"}
+                                    placeholder="Enter API key"
+                                    value={settings.apiKey}
+                                    onChange={(e) => onSettingsChange({...settings, apiKey: e.target.value})}
+                                />
+                                <button
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-sm text-gray-500 hover:text-gray-700"
+                                    onClick={() => onSettingsChange({...settings, showApiKey: !settings.showApiKey})}
+                                >
+                                    {settings.showApiKey ? "Hide" : "Show"}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
 
