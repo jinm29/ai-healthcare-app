@@ -1,6 +1,7 @@
 import {NextRequest, NextResponse} from "next/server";
 import prisma, {Prisma} from "@/lib/prisma";
 import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 
 export interface ChatMessage extends Prisma.ChatMessageGetPayload<{
     select: {
@@ -147,6 +148,34 @@ export async function POST(
                         if (deltaContent !== undefined) messageContent += deltaContent;
                         controller.enqueue(`${JSON.stringify({content: messageContent})}\n`);
                     }
+                } else if (chatRoom.llmProviderId === 'anthropic') {
+                    const anthropic = new Anthropic({apiKey: llmProvider.apiKey, baseURL: llmProvider.apiURL});
+                    const llmProviderModelId = chatRoom.llmProviderModelId;
+                    if (!llmProviderModelId) throw new Error('No LLM model ID provided');
+                    messageContent = await new Promise((resolve, reject) => {
+                        let messageContent = '';
+                        anthropic.messages.stream({
+                            model: llmProviderModelId,
+                            messages: messages
+                                .filter(message => message.content)
+                                .filter((message) => message.role !== 'system'),
+                            system: messages
+                                .filter(message => message.content)
+                                .filter((message) => message.role === 'system').join('\n'),
+                            max_tokens: 4096,
+                            stream: true,
+                        })
+                            .on('text', (text) => {
+                                if (text !== undefined) messageContent += text;
+                                controller.enqueue(`${JSON.stringify({content: messageContent})}\n`);
+                            })
+                            .on('end', () => {
+                                resolve(messageContent);
+                            })
+                            .on('error', (error) => {
+                                reject(error);
+                            });
+                    })
                 } else {
                     throw new Error('Unsupported LLM provider');
                 }

@@ -10,7 +10,7 @@
     "id": "anthropic",
     "name": "Anthropic",
     "apiKey": "",
-    "apiURL": "https://api.anthropic.com/v1",
+    "apiURL": "https://api.anthropic.com/",
     "order": 1
   },
   {

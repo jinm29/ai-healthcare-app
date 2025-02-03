@@ -1,6 +1,7 @@
 import {NextRequest, NextResponse} from "next/server";
 import prisma from "@/lib/prisma";
 import OpenAI from "openai";
+import Anthropic from "@anthropic-ai/sdk";
 
 export interface LLMProviderModel {
     id: string
@@ -24,6 +25,19 @@ export async function GET(
         const results: LLMProviderModel[] = []
         const openAI = new OpenAI({apiKey: llmProvider.apiKey, baseURL: llmProvider.apiURL})
         const modelsPage = await openAI.models.list()
+        for await (const models of modelsPage.iterPages()) {
+            const modelList = models.data;
+            results.push(...modelList.map(
+                model => ({id: model.id, name: model.id})
+            ))
+        }
+        return NextResponse.json<LLMProviderModelListResponse>({
+            llmProviderModels: results,
+        })
+    } else if (llmProvider.id === 'anthropic') {
+        const results: LLMProviderModel[] = []
+        const anthropic = new Anthropic({apiKey: llmProvider.apiKey, baseURL: llmProvider.apiURL});
+        const modelsPage = await anthropic.models.list();
         for await (const models of modelsPage.iterPages()) {
             const modelList = models.data;
             results.push(...modelList.map(
