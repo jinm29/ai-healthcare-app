@@ -1,9 +1,9 @@
 import prisma, {Prisma} from "@/lib/prisma";
 import {NextRequest, NextResponse} from "next/server";
-import OpenAI from "openai";
-import {fromBuffer as pdf2picFromBuffer} from 'pdf2pic'
+
 import fs from 'fs'
 import cuid from "cuid";
+import {parseHealthDataFromPDF} from "@/lib/health-data/parser/pdf";
 
 export interface HealthData {
     id: string;
@@ -54,7 +54,7 @@ export async function POST(
 
         let filePath: string | undefined
         let fileType: string | undefined
-        let data: any = undefined
+        let data: { fileName: string } | undefined = undefined
 
         // Save files
         if (file instanceof File) {
@@ -69,7 +69,6 @@ export async function POST(
 
         // Create parsing data
         let healthData;
-        let parsingLogs: string[] = [];
         try {
             healthData = await prisma.healthData.create({
                 data: {
@@ -86,98 +85,23 @@ export async function POST(
             });
 
             // Return initial response
-            if (!file) {
-                return NextResponse.json(healthData);
-            }
+            if (!file) return NextResponse.json(healthData);
 
-            parsingLogs.push(`File type: ${file instanceof File ? file.type : 'unknown'}`);
-            const messages = [
-                {
-                    role: 'user', content: [
-                        {
-                            type: 'text',
-                            text: 'Extract all data.\nresponse format: json'
-                        },
-                        ...(await Promise.all([file].map(async (file) => {
-                            if (file instanceof File) {
-                                if (file.type.startsWith('image')) {
-                                    parsingLogs.push('Processing image file...');
-                                    const arrayBuffer = await file.arrayBuffer()
-                                    parsingLogs.push('Image converted to base64');
-                                    return [{
-                                        type: 'image_url',
-                                        image_url: {url: `data:${file.type};base64,${Buffer.from(arrayBuffer).toString('base64')}`}
-                                    }]
-                                } else if (file.type.startsWith('application/pdf')) {
-                                    parsingLogs.push('Processing PDF file...');
-                                    const messages = []
-                                    const pdf2picConverter = pdf2picFromBuffer(
-                                        Buffer.from(await file.arrayBuffer()),
-                                    )
-                                    const images = await pdf2picConverter.bulk(-1, {responseType: 'base64'})
-                                    parsingLogs.push(`Converted ${images.length} PDF pages to images`);
-                                    for (const image of images) {
-                                        if (image.base64) messages.push({
-                                            type: 'image_url',
-                                            image_url: {url: `data:image/png;base64,${image.base64}`}
-                                        })
-                                    }
-                                    return messages
-                                }
-                            }
-                            return undefined
-                        }))).flat().filter((message) => message !== undefined)
-                    ]
-                },
-            ];
+            // Process file
+            const {parsed, parsingLogs} = await parseHealthDataFromPDF({file: file});
 
-            parsingLogs.push('Sending to GPT for analysis...');
-            const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
-            const chatCompletion = await openai.chat.completions.create({
-                model: "gpt-4o",
-                messages: messages as any,
-                max_tokens: 4096,
-                response_format: {
-                    type: 'json_object'
-                }
-            });
-
-            const content = chatCompletion.choices[0].message.content;
-            if (content) {
-                parsingLogs.push('Received GPT analysis results');
-                const parsedContent = JSON.parse(content);
-                // Remove fields that shouldn't be included in GPT context
-                const { parsingLogs: _, id: __, filePath: ___, fileType: ____, status: _____, updatedAt: ______, createdAt: _______, ...cleanedContent } = parsedContent;
-                
-                healthData = await prisma.healthData.update({
-                    where: {id: id as string},
-                    data: {
-                        type: type as string,
-                        status: 'COMPLETED',
-                        data: {
-                            ...cleanedContent,
-                            fileName: data.fileName,
-                            parsingLogs
-                        }
-                    }
-                });
-                return NextResponse.json(healthData);
-            }
-
-            parsingLogs.push('No content received from GPT');
+            // Update health data with parsed data
             healthData = await prisma.healthData.update({
                 where: {id: id as string},
                 data: {
                     status: 'COMPLETED',
-                    data: {
-                        ...data,
-                        parsingLogs
-                    }
+                    data: {...data, ...parsed, parsingLogs}
                 }
             });
             return NextResponse.json(healthData);
         } catch (error) {
             console.error('Error processing file:', error);
+            const parsingLogs: string[] = []
             parsingLogs.push(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
             // If there's an error, update the health data with error logs
             if (healthData) {
@@ -185,10 +109,7 @@ export async function POST(
                     where: {id: id as string},
                     data: {
                         status: 'COMPLETED',
-                        data: {
-                            ...data,
-                            parsingLogs
-                        }
+                        data: {...data, parsingLogs},
                     }
                 });
                 return NextResponse.json(healthData);
