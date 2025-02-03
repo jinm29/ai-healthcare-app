@@ -17,7 +17,7 @@
     "id": "google",
     "name": "Google",
     "apiKey": "",
-    "apiURL": "",
+    "apiURL": "https://generativelanguage.googleapis.com/v1beta",
     "order": 2
   },
   {

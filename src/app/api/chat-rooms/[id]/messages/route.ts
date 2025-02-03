@@ -2,6 +2,7 @@ import {NextRequest, NextResponse} from "next/server";
 import prisma, {Prisma} from "@/lib/prisma";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
+import {GoogleGenerativeAI} from "@google/generative-ai";
 
 export interface ChatMessage extends Prisma.ChatMessageGetPayload<{
     select: {
@@ -176,6 +177,37 @@ export async function POST(
                                 reject(error);
                             });
                     })
+                } else if (chatRoom.llmProviderId == 'google') {
+                    const gemini = new GoogleGenerativeAI(llmProvider.apiKey)
+                    const llmProviderModelId = chatRoom.llmProviderModelId;
+                    if (!llmProviderModelId) throw new Error('No LLM model ID provided');
+                    const model = gemini.getGenerativeModel({model: llmProviderModelId})
+
+                    const lastMessage = messages[messages.length - 1]
+                    const history = messages.filter(message => message.role !== 'system').slice(0, -1)
+                    const systemInstruction = messages.find(message => message.role === 'system')
+
+                    const chat = model.startChat({
+                        systemInstruction: systemInstruction ? {
+                            role: 'system',
+                            parts: [{text: systemInstruction.content}]
+                        } : undefined,
+                        history: history.map(message => ({
+                            role: message.role === 'assistant' ? 'model' : message.role,
+                            parts: [{text: message.content}]
+                        })),
+                    })
+
+                    const result = await chat.sendMessageStream(lastMessage.content)
+                    for await (const chunk of result.stream) {
+                        if (chunk.candidates) {
+                            const candidates = chunk.candidates[0]
+                            messageContent += candidates.content.parts.map(part => part.text).join('')
+                        } else {
+                            messageContent += chunk.text
+                        }
+                        controller.enqueue(`${JSON.stringify({content: messageContent})}\n`);
+                    }
                 } else {
                     throw new Error('Unsupported LLM provider');
                 }

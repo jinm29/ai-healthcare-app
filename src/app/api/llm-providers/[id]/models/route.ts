@@ -47,6 +47,20 @@ export async function GET(
         return NextResponse.json<LLMProviderModelListResponse>({
             llmProviderModels: results,
         })
+    } else if (llmProvider.id === 'google') {
+        const url = new URL('https://generativelanguage.googleapis.com/v1beta/models');
+        url.searchParams.append('key', llmProvider.apiKey);
+        url.searchParams.append('pageSize', '1000');
+        const response = await fetch(url.toString())
+        const {models} = await response.json()
+        return NextResponse.json<LLMProviderModelListResponse>({
+            llmProviderModels: models.map(
+                ({name, displayName}: { name: string, displayName: string }) => ({
+                    id: name,
+                    name: displayName
+                })
+            ),
+        })
     } else if (llmProvider.id === 'ollama') {
         const apiURL = llmProvider.apiURL;
         const response = await fetch(`${apiURL}/api/tags`)
