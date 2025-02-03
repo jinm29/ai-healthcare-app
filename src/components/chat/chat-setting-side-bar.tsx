@@ -50,20 +50,8 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
     useEffect(() => {
         if (!chatRoomData?.chatRoom.assistantMode) return;
 
-        const savedSystemPrompt = localStorage.getItem('systemPrompt');
-        if (savedSystemPrompt) {
-            // If we have a saved system prompt, use it
-            const updatedMode = {
-                ...chatRoomData.chatRoom.assistantMode,
-                systemPrompt: savedSystemPrompt
-            };
-            setSelectedAssistantMode(updatedMode);
-            onChangeAssistantMode(updatedMode.id, {systemPrompt: savedSystemPrompt});
-        } else {
-            // If no saved prompt, use the current one and save it
-            setSelectedAssistantMode(chatRoomData.chatRoom.assistantMode);
-            localStorage.setItem('systemPrompt', chatRoomData.chatRoom.assistantMode.systemPrompt);
-        }
+        // If no saved prompt, use the current one and save it
+        setSelectedAssistantMode(chatRoomData.chatRoom.assistantMode);
     }, [chatRoomData?.chatRoom.assistantMode?.id]);
 
     useEffect(() => {
@@ -81,13 +69,6 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
             setSelectedLLMProviderModel(models.find((model) => model.id === chatRoom.llmProviderModelId) || models[0]);
         }
     }, [chatRoomData, llmProvidersData, llmProviderModels]);
-
-    // Save system prompt to localStorage whenever it changes
-    useEffect(() => {
-        if (selectedAssistantMode?.systemPrompt) {
-            localStorage.setItem('systemPrompt', selectedAssistantMode.systemPrompt);
-        }
-    }, [selectedAssistantMode?.systemPrompt]);
 
     const {
         data: assistantModesData,
@@ -127,10 +108,9 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
         const data = await response.json();
 
         // Get the saved system prompt
-        const savedSystemPrompt = localStorage.getItem('systemPrompt');
         const updatedAssistantMode = {
             ...data.chatRoom.assistantMode,
-            systemPrompt: savedSystemPrompt || data.chatRoom.assistantMode.systemPrompt
+            systemPrompt: data.chatRoom.assistantMode.systemPrompt
         };
 
         await chatRoomMutate({
@@ -143,11 +123,6 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
             }
         });
         setSelectedAssistantMode(updatedAssistantMode);
-
-        // If there's no saved prompt, save the current one
-        if (!savedSystemPrompt) {
-            localStorage.setItem('systemPrompt', updatedAssistantMode.systemPrompt);
-        }
     }
 
     const onChangeAssistantMode = async (assistantModeId: string, body: AssistantModePatchRequest) => {
@@ -249,7 +224,7 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
                             <Input
                                 type={showApiKey ? "text" : "password"}
                                 placeholder="Enter API key"
-                                value={selectedLLMProvider?.apiKey}
+                                value={selectedLLMProvider?.apiKey || ''}
                                 onChange={(e) => onLLMProviderChange({apiKey: e.target.value})}
                             />
                             <button
