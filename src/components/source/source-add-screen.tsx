@@ -344,8 +344,6 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
         const {test_result} = dataPerPage[page - 1] as {
             test_result: { [key: string]: { value: string, unit: string } }
         }
-        console.log(test_result)
-
         return test_result
     }, [page, dataPerPage]);
 
@@ -574,6 +572,16 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
                                                         }
                                                     } as any;
                                                 });
+                                                setFormData({
+                                                    ...formData,
+                                                    test_result: {
+                                                        ...formData?.test_result,
+                                                        [item.name]: {
+                                                            ...formData?.test_result[item.name],
+                                                            value: v.target.value,
+                                                        }
+                                                    }
+                                                })
                                             }}
                                             onDelete={() => {
                                                 setUserBloodTestResults((prev) => {
