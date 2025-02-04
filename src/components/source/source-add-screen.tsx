@@ -286,10 +286,11 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
         [key: string]: { page: number }
     } | null>(null);
 
-    const {ocr, dataPerPage} = (healthData.metadata || {}) as {
+    const {ocr, dataPerPage: sourceDataPerPage} = (healthData.metadata || {}) as {
         ocr?: any,
         dataPerPage?: any
     };
+    const [dataPerPage, setDataPerPage] = useState(sourceDataPerPage)
 
     const allInputsBlurred = Object.values(inputFocusStates).every((isFocused) => !isFocused);
 
@@ -368,7 +369,7 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
 
                 return getNearestBoundingBox(aFocusedWords[0].boundingBox, bFocusedWords[0].boundingBox);
             })
-    }, [getFocusedWords, page, healthData])
+    }, [getFocusedWords, page, healthData, dataPerPage])
 
     const getFields = (): Field[] => {
         switch (healthData.type) {
@@ -598,8 +599,22 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
                                                         delete test_result[item.name];
                                                         return {test_result};
                                                     });
+
+                                                    // Delete From FormData
                                                     delete formData.test_result[item.name]
                                                     setFormData(formData)
+
+                                                    // Delete From Metadata
+                                                    const data = dataPerPage[page - 1]
+                                                    delete data.test_result[item.name]
+                                                    setDataPerPage((prev) => {
+                                                        return prev.map((d, i) => {
+                                                            if (i === page - 1) {
+                                                                return data
+                                                            }
+                                                            return d
+                                                        })
+                                                    })
                                                 }}
                                                 onBlur={(v) => handleBlur(item.name)}
                                                 onFocus={(v) => handleFocus(item.name)}
@@ -718,6 +733,24 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
                                            }
                                        } as any;
                                    });
+
+                                   setDataPerPage(
+                                       dataPerPage.map((d, i) => {
+                                           if (i === page - 1) {
+                                               return {
+                                                   ...d,
+                                                   test_result: {
+                                                       ...d.test_result,
+                                                       [value]: {
+                                                           value: '',
+                                                           unit: '',
+                                                       }
+                                                   }
+                                               }
+                                           }
+                                           return d
+                                       })
+                                   )
 
                                    setFormData(
                                        {
