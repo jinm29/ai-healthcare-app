@@ -28,7 +28,23 @@ export async function parseHealthDataFromPDF(
     {file}: { file: File | string },
 ) {
     const parsingLogs: string[] = [];
+    let ocrResult: unknown = undefined;
     parsingLogs.push(`File type: ${file instanceof File ? file.type : 'unknown'}`);
+
+    parsingLogs.push(`OCR processing...`);
+    try {
+        const formData = new FormData();
+        formData.append('document', file);
+        const response = await fetch(`https://api.upstage.ai/v1/document-ai/ocr`, {
+            headers: {Authorization: `Bearer ${process.env.UPSTAGE_API_KEY}`},
+            body: formData,
+            method: 'POST'
+        })
+        ocrResult = await response.json()
+    } catch (e) {
+        // OCR processing failed
+        parsingLogs.push(`OCR processing failed: ${e}`);
+    }
 
     const messages = [
         {
@@ -86,21 +102,32 @@ export async function parseHealthDataFromPDF(
     parsingLogs.push("Sending parallel requests to GPT (chunked schemas)...");
 
     const openai = new OpenAI({apiKey: process.env.OPENAI_API_KEY});
-    const partialResults = await Promise.all(
-        partialSchemas.map(async (partialSchema, index) => {
-            parsingLogs.push(`Requesting partial schema #${index + 1} ...`);
-            const chatCompletion = await openai.beta.chat.completions.parse({
-                model: "gpt-4o",
-                messages: messages as any,
-                max_tokens: 4096,
-                response_format: zodResponseFormat(partialSchema, `partial_schema_${index + 1}`),
-            });
+    const batchSize = 5;
+    const partialResults = [];
 
-            const parsed = chatCompletion.choices[0].message.parsed;
-            parsingLogs.push(`Received partial result #${index + 1}`);
-            return parsed;
-        })
-    );
+    for (let i = 0; i < partialSchemas.length; i += batchSize) {
+        const batch = partialSchemas.slice(i, i + batchSize);
+
+        const batchResults = await Promise.all(
+            batch.map(async (partialSchema, index) => {
+                const actualIndex = i + index;
+                parsingLogs.push(`Requesting partial schema #${actualIndex + 1} ...`);
+
+                const chatCompletion = await openai.beta.chat.completions.parse({
+                    model: "gpt-4o",
+                    messages: messages as any,
+                    max_tokens: 4096,
+                    response_format: zodResponseFormat(partialSchema, `partial_schema_${actualIndex + 1}`),
+                });
+
+                const parsed = chatCompletion.choices[0].message.parsed;
+                parsingLogs.push(`Received partial result #${actualIndex + 1}`);
+                return parsed;
+            })
+        );
+
+        partialResults.push(...batchResults);
+    }
 
     parsingLogs.push("Merging partial results...");
     const mergedResult: z.infer<typeof HealthCheckupSchema> = {
@@ -124,5 +151,9 @@ export async function parseHealthDataFromPDF(
     mergedResult.test_result = mergedTestResult;
 
 
-    return {parsed: mergedResult, parsingLogs}
+    return {
+        parsed: mergedResult,
+        ocr: ocrResult,
+        parsingLogs
+    }
 }

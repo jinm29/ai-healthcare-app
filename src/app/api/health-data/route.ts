@@ -88,13 +88,14 @@ export async function POST(
             if (!file) return NextResponse.json(healthData);
 
             // Process file
-            const {parsed, parsingLogs} = await parseHealthDataFromPDF({file: file});
+            const {parsed, ocr, parsingLogs} = await parseHealthDataFromPDF({file: file});
 
             // Update health data with parsed data
             healthData = await prisma.healthData.update({
                 where: {id: id as string},
                 data: {
                     status: 'COMPLETED',
+                    ocrData: ocr ? JSON.parse(JSON.stringify(ocr)) : null,
                     data: {...data, ...parsed, parsingLogs}
                 }
             });
