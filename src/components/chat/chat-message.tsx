@@ -5,6 +5,7 @@ import remarkGfm from 'remark-gfm'
 import remarkMath from 'remark-math'
 import rehypeKatex from 'rehype-katex'
 import Image from 'next/image'
+import {cn} from "@/lib/utils";
 
 interface ChatMessageProps {
     message: ChatMessageType
@@ -26,7 +27,10 @@ export default function ChatMessage(
             </div>
         )}
         <div className={`flex-1 ${message.role === 'USER' ? 'text-right' : ''}`}>
-            <Markdown className="text-sm text-gray-700"
+            <Markdown className={cn(
+                'text-sm',
+                message.role === 'USER' ? undefined : 'prose'
+            )}
                       remarkPlugins={[remarkGfm, remarkMath]}
                       rehypePlugins={[rehypeKatex]}
             >
