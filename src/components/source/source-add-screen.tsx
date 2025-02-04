@@ -18,6 +18,7 @@ import Image from "next/image";
 import {FaChevronLeft, FaChevronRight} from 'react-icons/fa';
 import testItems from '@/lib/health-data/parser/test-items.json'
 import TextInput from "@/components/form/text-input";
+import Select from 'react-select';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
 
@@ -270,6 +271,13 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
     const [inputFocusStates, setInputFocusStates] = useState<{ [key: string]: boolean }>({});
     const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
 
+    const [showAddFieldModal, setShowAddFieldModal] = useState<boolean>(false);
+    const [showAddFieldName, setShowAddFieldName] = useState<{
+        value: string;
+        label: string;
+        isDisabled?: boolean
+    } | undefined>(undefined);
+
     const [userBloodTestResults, setUserBloodTestResults] = useState<{
         test_result: { [key: string]: { value: string, unit: string } }
     } | null>(null);
@@ -484,167 +492,265 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
     }, [page]);
 
     return (
-        <div className="flex flex-col gap-4 h-full">
-            <div className="h-[40%] min-h-[300px]">
-                <div className="bg-white h-full overflow-y-auto rounded-lg border">
-                    {(healthData.type === HealthDataType.PERSONAL_INFO.id || healthData.type === HealthDataType.SYMPTOMS.id) ? (
-                        <div className="p-4">
-                            <DynamicForm
-                                fields={getFields()}
-                                data={formData}
-                                onChange={handleFormChange}
-                            />
-                        </div>
-                    ) : healthData.type === HealthDataType.FILE.id ? (
-                        healthData.fileType?.includes('image') && healthData.filePath ? (
+        <>
+            <div className="flex flex-col gap-4 h-full">
+                <div className="h-[40%] min-h-[300px]">
+                    <div className="bg-white h-full overflow-y-auto rounded-lg border">
+                        {(healthData.type === HealthDataType.PERSONAL_INFO.id || healthData.type === HealthDataType.SYMPTOMS.id) ? (
                             <div className="p-4">
-                                <Image
-                                    src={healthData.filePath}
-                                    alt="Preview"
-                                    className="w-full h-auto"
-                                    width={800}
-                                    height={600}
-                                    unoptimized
-                                    style={{objectFit: 'contain'}}
+                                <DynamicForm
+                                    fields={getFields()}
+                                    data={formData}
+                                    onChange={handleFormChange}
                                 />
                             </div>
-                        ) : (
-                            <div className="bg-gray-50 p-4 rounded-lg relative flex flex-row h-full">
-                                <div id="pdf" className="w-[60%] overflow-y-auto h-full">
-                                    <Document file={healthData.filePath}
-                                              className="w-full"
-                                              onLoadSuccess={onDocumentLoadSuccess}>
-                                        {Array.from(new Array(numPages), (_, index) => {
-                                            return (
-                                                <Page
-                                                    className={cn(
-                                                        'w-full',
-                                                        {hidden: index + 1 !== page}
-                                                    )}
-                                                    key={`page_${index + 1}`}
-                                                    pageNumber={index + 1}
-                                                    renderAnnotationLayer={false}
-                                                    renderTextLayer={false}
-                                                />
-                                            );
-                                        })}
-                                    </Document>
-                                    <div
-                                        className="relative w-fit bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-4 bg-white p-2 rounded shadow">
-                                        <button
-                                            className="px-4 py-2 bg-gray-300 rounded"
-                                            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-                                            disabled={page <= 1}
-                                        >
-                                            <FaChevronLeft/>
-                                        </button>
-                                        <span>{page} / {numPages}</span>
-                                        <button
-                                            className="px-4 py-2 bg-gray-300 rounded"
-                                            onClick={() => setPage((prev) => Math.min(prev + 1, numPages))}
-                                            disabled={page >= numPages}
-                                        >
-                                            <FaChevronRight/>
-                                        </button>
-                                    </div>
+                        ) : healthData.type === HealthDataType.FILE.id ? (
+                            healthData.fileType?.includes('image') && healthData.filePath ? (
+                                <div className="p-4">
+                                    <Image
+                                        src={healthData.filePath}
+                                        alt="Preview"
+                                        className="w-full h-auto"
+                                        width={800}
+                                        height={600}
+                                        unoptimized
+                                        style={{objectFit: 'contain'}}
+                                    />
                                 </div>
-                                {userBloodTestResults?.test_result && <div
-                                    id="test-result"
-                                    className="w-[40%] overflow-y-auto p-4">
-                                    {sortedPageTestResults.map((item) =>
-                                        <TextInput
-                                            key={item.name}
-                                            name={item.name.replace(/(^\w|_\w)/g, (match) => match.replace('_', '').toUpperCase())}
-                                            label={item.description}
-                                            value={
-                                                userBloodTestResults && userBloodTestResults.test_result ? userBloodTestResults.test_result[item.name]?.value : ''
-                                            }
-                                            onChange={(v) => {
-                                                setUserBloodTestResults((prev) => {
-                                                    return {
-                                                        ...prev,
+                            ) : (
+                                <div className="bg-gray-50 p-4 rounded-lg relative flex flex-row h-full">
+                                    <div id="pdf" className="w-[60%] overflow-y-auto h-full">
+                                        <Document file={healthData.filePath}
+                                                  className="w-full"
+                                                  onLoadSuccess={onDocumentLoadSuccess}>
+                                            {Array.from(new Array(numPages), (_, index) => {
+                                                return (
+                                                    <Page
+                                                        className={cn(
+                                                            'w-full',
+                                                            {hidden: index + 1 !== page}
+                                                        )}
+                                                        key={`page_${index + 1}`}
+                                                        pageNumber={index + 1}
+                                                        renderAnnotationLayer={false}
+                                                        renderTextLayer={false}
+                                                    />
+                                                );
+                                            })}
+                                        </Document>
+                                        <div
+                                            className="relative w-fit bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-4 bg-white p-2 rounded shadow">
+                                            <button
+                                                className="px-4 py-2 bg-gray-300 rounded"
+                                                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                                                disabled={page <= 1}
+                                            >
+                                                <FaChevronLeft/>
+                                            </button>
+                                            <span>{page} / {numPages}</span>
+                                            <button
+                                                className="px-4 py-2 bg-gray-300 rounded"
+                                                onClick={() => setPage((prev) => Math.min(prev + 1, numPages))}
+                                                disabled={page >= numPages}
+                                            >
+                                                <FaChevronRight/>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    {userBloodTestResults?.test_result && <div
+                                        id="test-result"
+                                        className="w-[40%] overflow-y-auto p-4">
+                                        {sortedPageTestResults.map((item) =>
+                                            <TextInput
+                                                key={item.name}
+                                                name={item.name.replace(/(^\w|_\w)/g, (match) => match.replace('_', '').toUpperCase())}
+                                                label={item.description}
+                                                value={
+                                                    userBloodTestResults && userBloodTestResults.test_result ? userBloodTestResults.test_result[item.name]?.value : ''
+                                                }
+                                                onChange={(v) => {
+                                                    setUserBloodTestResults((prev) => {
+                                                        return {
+                                                            ...prev,
+                                                            test_result: {
+                                                                ...prev?.test_result,
+                                                                [item.name]: {
+                                                                    ...prev?.test_result[item.name],
+                                                                    value: v.target.value,
+                                                                }
+                                                            }
+                                                        } as any;
+                                                    });
+                                                    setFormData({
+                                                        ...formData,
                                                         test_result: {
-                                                            ...prev?.test_result,
+                                                            ...formData?.test_result,
                                                             [item.name]: {
-                                                                ...prev?.test_result[item.name],
+                                                                ...formData?.test_result[item.name],
                                                                 value: v.target.value,
                                                             }
                                                         }
-                                                    } as any;
-                                                });
-                                                setFormData({
-                                                    ...formData,
-                                                    test_result: {
-                                                        ...formData?.test_result,
-                                                        [item.name]: {
-                                                            ...formData?.test_result[item.name],
-                                                            value: v.target.value,
-                                                        }
-                                                    }
-                                                })
-                                            }}
-                                            onDelete={() => {
-                                                setUserBloodTestResults((prev) => {
-                                                    const {test_result} = prev ?? {test_result: {}};
-                                                    delete test_result[item.name];
-                                                    return {test_result};
-                                                });
-                                            }}
-                                            onBlur={(v) => handleBlur(item.name)}
-                                            onFocus={(v) => handleFocus(item.name)}
-                                            onKeyDown={(e) => handleKeyDown(e, item.name)}
-                                            ref={(el) => {
-                                                inputRefs.current[item.name] = el;
-                                            }}
-                                        />)}
-
-                                    {/* 추가하기 버튼 */}
-                                    {healthData &&
-                                        <div className="mt-4 w-full">
-                                            <button
-                                                className="w-full py-2 bg-blue-500 text-white rounded"
-                                                onClick={() => {
-                                                    setShowAddFieldName(undefined);
-                                                    setShowAddFieldModal(true);
+                                                    })
                                                 }}
-                                            >
-                                                추가하기
-                                            </button>
-                                        </div>
-                                    }
-                                </div>}
-                            </div>
-                        )
-                    ) : null}
-                </div>
-            </div>
+                                                onDelete={() => {
+                                                    setUserBloodTestResults((prev) => {
+                                                        const {test_result} = prev ?? {test_result: {}};
+                                                        delete test_result[item.name];
+                                                        return {test_result};
+                                                    });
+                                                    delete formData.test_result[item.name]
+                                                    setFormData(formData)
+                                                }}
+                                                onBlur={(v) => handleBlur(item.name)}
+                                                onFocus={(v) => handleFocus(item.name)}
+                                                onKeyDown={(e) => handleKeyDown(e, item.name)}
+                                                ref={(el) => {
+                                                    inputRefs.current[item.name] = el;
+                                                }}
+                                            />)}
 
-            <div className="flex-1">
-                <div className="bg-white rounded-lg border h-full flex flex-col gap-4">
-                    <div className="flex-1 min-h-0 p-4">
-                        <JSONEditor
-                            data={formData}
-                            onSave={handleJSONSave}
-                            isEditable={healthData.type === HealthDataType.FILE.id && healthData.status === 'COMPLETED'}
-                        />
+                                        {healthData &&
+                                            <div className="mt-4 w-full">
+                                                <button
+                                                    className="w-full py-2 bg-blue-500 text-white rounded"
+                                                    onClick={() => {
+                                                        setShowAddFieldName(undefined);
+                                                        setShowAddFieldModal(true);
+                                                    }}
+                                                >
+                                                    Add
+                                                </button>
+                                            </div>
+                                        }
+                                    </div>}
+                                </div>
+                            )
+                        ) : null}
                     </div>
-                    {healthData.type === HealthDataType.FILE.id && formData.parsingLogs && (
-                        <div className="border-t">
-                            <div className="p-4">
-                                <h3 className="text-sm font-medium mb-2">Processing Log</h3>
-                                <div className="h-[160px] bg-gray-50 p-3 rounded-lg text-sm font-mono overflow-y-auto">
-                                    {(formData.parsingLogs as string[]).map((log, index) => (
-                                        <div key={index} className="mb-1">
-                                            {log}
-                                        </div>
-                                    ))}
+                </div>
+
+                <div className="flex-1">
+                    <div className="bg-white rounded-lg border h-full flex flex-col gap-4">
+                        <div className="flex-1 min-h-0 p-4">
+                            <JSONEditor
+                                data={formData}
+                                onSave={handleJSONSave}
+                                isEditable={healthData.type === HealthDataType.FILE.id && healthData.status === 'COMPLETED'}
+                            />
+                        </div>
+                        {healthData.type === HealthDataType.FILE.id && formData.parsingLogs && (
+                            <div className="border-t">
+                                <div className="p-4">
+                                    <h3 className="text-sm font-medium mb-2">Processing Log</h3>
+                                    <div
+                                        className="h-[160px] bg-gray-50 p-3 rounded-lg text-sm font-mono overflow-y-auto">
+                                        {(formData.parsingLogs as string[]).map((log, index) => (
+                                            <div key={index} className="mb-1">
+                                                {log}
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
-        </div>
+            {showAddFieldModal && <div
+                className="fixed top-0 left-0 w-screen h-screen bg-black bg-opacity-50 flex justify-center items-center">
+                {/* Input modal for adding, searchable dropdown to select a field, with confirm and cancel buttons */}
+                <div className="bg-white p-4 rounded-lg flex flex-col w-[50vw]">
+                    <p className="mb-4 font-bold">
+                        Please select a field to add
+                    </p>
+                    <Select
+                        className="basic-single"
+                        classNamePrefix="select"
+                        isDisabled={false}
+                        isLoading={false}
+                        isClearable={true}
+                        isRtl={false}
+                        isSearchable={true}
+                        name="field"
+                        options={testItems.map((bloodTestItem) => (
+                            {
+                                value: bloodTestItem.name,
+                                label: `${bloodTestItem.name} (${bloodTestItem.description})`,
+                                isDisabled: Object.entries(userBloodTestResults?.test_result ?? {}).filter(([_, value]) => value).map(([key, _]) => key).includes(bloodTestItem.name),
+                            }
+                        ))}
+                        value={showAddFieldName}
+                        onChange={(selectedOption) => {
+                            if (selectedOption) {
+                                setShowAddFieldName(selectedOption);
+                            } else {
+                                setShowAddFieldName(undefined);
+                            }
+                        }}
+                    />
+                    <div className="flex flex-row gap-2 mt-4">
+                        <p className={
+                            cn(
+                                'bg-blue-500 text-white py-2 px-4 rounded',
+                                'hover:bg-blue-600',
+                                'focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50',
+                            )
+                        }
+                           onClick={() => {
+                               if (showAddFieldName) {
+                                   const value = showAddFieldName.value
+
+                                   setUserBloodTestResultsPage((prev) => {
+                                       return {
+                                           ...prev,
+                                           [value]: {page: page - 1}
+                                       }
+                                   })
+
+                                   setUserBloodTestResults((prev) => {
+                                       return {
+                                           test_result: {
+                                               ...prev?.test_result,
+                                               [value]: {
+                                                   value: '',
+                                                   unit: '',
+                                               }
+                                           }
+                                       } as any;
+                                   });
+
+                                   setFormData(
+                                       {
+                                           ...formData,
+                                           test_result: {
+                                               ...formData?.test_result,
+                                               [value]: {
+                                                   value: '',
+                                                   unit: '',
+                                               }
+                                           }
+                                       }
+                                   )
+
+                               }
+                               setShowAddFieldModal(false);
+                           }}
+                        >Add
+                        </p>
+                        <p className={
+                            cn(
+                                'bg-gray-300 text-black py-2 px-4 rounded',
+                                'hover:bg-gray-400',
+                                'focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50',
+                            )
+                        }
+                           onClick={() => setShowAddFieldModal(false)}
+                        >Cancel</p>
+                    </div>
+                </div>
+            </div>
+            }
+        </>
     );
 };
 

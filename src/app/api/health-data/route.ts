@@ -14,6 +14,8 @@ export interface HealthData extends Prisma.HealthDataGetPayload<{
         status: true,
         fileType: true,
         filePath: true,
+        createdAt: true,
+        updatedAt: true,
     }
 }> {
     id: string
