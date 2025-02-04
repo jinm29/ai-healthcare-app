@@ -64,6 +64,7 @@ interface HealthDataPreviewProps {
     healthData: HealthData;
     formData: Record<string, any>;
     setFormData: (data: Record<string, any>) => void;
+    setHealthData?: (data: HealthData) => void;
 }
 
 const HealthDataType = {
@@ -264,7 +265,7 @@ ${isSelected
     );
 };
 
-const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPreviewProps) => {
+const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: HealthDataPreviewProps) => {
     const [numPages, setNumPages] = useState(0);
     const [page, setPage] = useState<number>(1);
     const [focusedItem, setFocusedItem] = useState<string | null>(null);
@@ -615,6 +616,15 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
                                                             return d
                                                         })
                                                     })
+
+                                                    // Update Health Data
+                                                    if (setHealthData) {
+                                                        const metadata: any = healthData.metadata || {}
+                                                        setHealthData({
+                                                            ...healthData,
+                                                            metadata: {...metadata, dataPerPage}
+                                                        })
+                                                    }
                                                 }}
                                                 onBlur={(v) => handleBlur(item.name)}
                                                 onFocus={(v) => handleFocus(item.name)}
@@ -734,23 +744,8 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
                                        } as any;
                                    });
 
-                                   setDataPerPage(
-                                       dataPerPage.map((d, i) => {
-                                           if (i === page - 1) {
-                                               return {
-                                                   ...d,
-                                                   test_result: {
-                                                       ...d.test_result,
-                                                       [value]: {
-                                                           value: '',
-                                                           unit: '',
-                                                       }
-                                                   }
-                                               }
-                                           }
-                                           return d
-                                       })
-                                   )
+                                   dataPerPage[page - 1].test_result[value] = {value: '', unit: ''}
+                                   setDataPerPage(dataPerPage)
 
                                    setFormData(
                                        {
@@ -764,6 +759,15 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
                                            }
                                        }
                                    )
+
+                                   // Update Health Data
+                                   if (setHealthData) {
+                                       const metadata: any = healthData.metadata || {}
+                                       setHealthData({
+                                           ...healthData,
+                                           metadata: {...metadata, dataPerPage}
+                                       })
+                                   }
 
                                }
                                setShowAddFieldModal(false);
@@ -933,6 +937,25 @@ export default function SourceAddScreen() {
         }
     };
 
+    const onChangeHealthData = async (data: HealthData) => {
+        if (selectedHealthData) {
+            setSelectedHealthData(data);
+            setFormData(data.data as Record<string, any>);
+            await fetch(`/api/health-data/${selectedHealthData.id}`, {
+                method: 'PATCH',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(data)
+            });
+            await healthDataMutate({
+                healthDataList: healthDataList.map(s =>
+                    s.id === selectedHealthData.id
+                        ? data
+                        : s
+                )
+            });
+        }
+    }
+
     const onChangeFormData = async (data: Record<string, any>) => {
         if (selectedHealthData) {
             setFormData(data);
@@ -999,6 +1022,7 @@ export default function SourceAddScreen() {
                                 healthData={selectedHealthData}
                                 formData={formData}
                                 setFormData={onChangeFormData}
+                                setHealthData={onChangeHealthData}
                             />
                         ) : (
                             <div className="h-full flex items-center justify-center text-gray-500">
