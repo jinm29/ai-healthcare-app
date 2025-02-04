@@ -511,8 +511,8 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
                                 />
                             </div>
                         ) : (
-                            <div className="bg-gray-50 p-4 rounded-lg relative flex flex-row">
-                                <div id="pdf" className="w-[60%] overflow-y-auto">
+                            <div className="bg-gray-50 p-4 rounded-lg relative flex flex-row h-full">
+                                <div id="pdf" className="w-[60%] overflow-y-auto h-full">
                                     <Document file={healthData.filePath}
                                               className="w-full"
                                               onLoadSuccess={onDocumentLoadSuccess}>
