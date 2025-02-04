@@ -5,15 +5,18 @@ import fs from 'fs'
 import cuid from "cuid";
 import {parseHealthDataFromPDF} from "@/lib/health-data/parser/pdf";
 
-export interface HealthData {
-    id: string;
-    type: string;
-    data: Prisma.JsonValue;
-    filePath?: string | null;
-    fileType?: string | null;
-    status: string;
-    createdAt: Date;
-    updatedAt: Date;
+export interface HealthData extends Prisma.HealthDataGetPayload<{
+    select: {
+        id: true,
+        type: true,
+        data: true,
+        metadata: true,
+        status: true,
+        fileType: true,
+        filePath: true,
+    }
+}> {
+    id: string
 }
 
 export interface HealthDataCreateRequest {
@@ -88,14 +91,17 @@ export async function POST(
             if (!file) return NextResponse.json(healthData);
 
             // Process file
-            const {parsed, ocr, parsingLogs} = await parseHealthDataFromPDF({file: file});
+            const {parsed, ocr, dataPerPage, parsingLogs} = await parseHealthDataFromPDF({file: file});
 
             // Update health data with parsed data
             healthData = await prisma.healthData.update({
                 where: {id: id as string},
                 data: {
                     status: 'COMPLETED',
-                    ocrData: ocr ? JSON.parse(JSON.stringify(ocr)) : null,
+                    metadata: {
+                        ocr: ocr ? JSON.parse(JSON.stringify(ocr)) : null,
+                        dataPerPage: dataPerPage ? JSON.parse(JSON.stringify(dataPerPage)) : null
+                    },
                     data: {...data, ...parsed, parsingLogs}
                 }
             });

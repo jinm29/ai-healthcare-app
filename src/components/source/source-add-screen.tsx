@@ -3,7 +3,7 @@
 'use client';
 
 import {Document, Page, pdfjs} from 'react-pdf';
-import React, {ChangeEvent, useEffect, useMemo, useState} from 'react';
+import React, {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
 import {Activity, FileText, Loader2, Plus, Trash2, User} from 'lucide-react';
 import {Button} from "@/components/ui/button";
@@ -15,8 +15,22 @@ import JSONEditor from '../form/json-editor';
 import cuid from "cuid";
 import {cn} from "@/lib/utils";
 import Image from "next/image";
+import {FaChevronLeft, FaChevronRight} from 'react-icons/fa';
+import testItems from '@/lib/health-data/parser/test-items.json'
+import TextInput from "@/components/form/text-input";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
+
+interface BoundingBox {
+    vertices: { x: number, y: number }[]
+}
+
+interface Word {
+    boundingBox: BoundingBox,
+    confidence: number,
+    id: number,
+    text: string,
+}
 
 interface SymptomsData {
     date: string;
@@ -251,6 +265,104 @@ ${isSelected
 
 const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPreviewProps) => {
     const [numPages, setNumPages] = useState(0);
+    const [page, setPage] = useState<number>(1);
+    const [focusedItem, setFocusedItem] = useState<string | null>(null);
+    const [inputFocusStates, setInputFocusStates] = useState<{ [key: string]: boolean }>({});
+    const inputRefs = useRef<{ [key: string]: HTMLInputElement | null }>({});
+
+    const [userBloodTestResults, setUserBloodTestResults] = useState<{
+        test_result: { [key: string]: { value: string, unit: string } }
+    } | null>(null);
+
+    const [userBloodTestResultsPage, setUserBloodTestResultsPage] = useState<{
+        [key: string]: { page: number }
+    } | null>(null);
+
+    const {ocr, dataPerPage} = (healthData.metadata || {}) as {
+        ocr?: any,
+        dataPerPage?: any
+    };
+
+    const allInputsBlurred = Object.values(inputFocusStates).every((isFocused) => !isFocused);
+
+    const handleFocus = (name: string) => {
+        setFocusedItem(name);
+        setInputFocusStates((prev) => ({...prev, [name]: true}));
+    };
+
+    const handleBlur = (name: string) => {
+        if (focusedItem === name) setFocusedItem(null);
+        setInputFocusStates((prev) => ({...prev, [name]: false}));
+    };
+
+    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>, name: string) => {
+        if (event.key === 'Enter') {
+            const inputNames = Object.keys(inputRefs.current);
+            const currentIndex = inputNames.indexOf(name);
+            const nextInput = inputRefs.current[inputNames[currentIndex + 1]];
+            if (nextInput) {
+                nextInput.focus();
+            } else {
+                event.currentTarget.blur();
+            }
+
+        }
+    };
+
+    const getNearestBoundingBox = (a: BoundingBox, b: BoundingBox): number => {
+        const aCenter = {
+            x: a.vertices.reduce((acc, cur) => acc + cur.x, 0) / a.vertices.length,
+            y: a.vertices.reduce((acc, cur) => acc + cur.y, 0) / a.vertices.length,
+        }
+
+        const bCenter = {
+            x: b.vertices.reduce((acc, cur) => acc + cur.x, 0) / b.vertices.length,
+            y: b.vertices.reduce((acc, cur) => acc + cur.y, 0) / b.vertices.length,
+        }
+
+        const aDistance = Math.sqrt(Math.pow(aCenter.x, 2) + Math.pow(aCenter.y, 2));
+        const bDistance = Math.sqrt(Math.pow(bCenter.x, 2) + Math.pow(bCenter.y, 2));
+
+        return aDistance - bDistance;
+    }
+
+    const getFocusedWords = useCallback((page: number, keyword: string): Word[] => {
+        if (!keyword) return [];
+        if (!ocr) return [];
+        const ocrPageData: { words: Word[] } = ocr.pages[page - 1];
+        if (!ocrPageData) return [];
+        let eFields = ocrPageData.words.filter((word) => word.text === keyword)
+        if (eFields.length === 0) {
+            eFields = ocrPageData.words.filter((word) => word.text.includes(keyword))
+        }
+        return eFields.sort((a, b) => getNearestBoundingBox(a.boundingBox, b.boundingBox));
+    }, [ocr]);
+
+    const currentPageTestResults = useMemo(() => {
+        if (!dataPerPage) return {};
+
+        const {test_result} = dataPerPage[page - 1] as {
+            test_result: { [key: string]: { value: string, unit: string } }
+        }
+        console.log(test_result)
+
+        return test_result
+    }, [page, dataPerPage]);
+
+    const sortedPageTestResults = useMemo(() => {
+        return testItems
+            .filter((item) => Object.entries(currentPageTestResults).some(([key, _]) => key === item.name))
+            .sort((a, b) => {
+                const aFocusedWords = userBloodTestResults?.test_result[a.name] ? getFocusedWords(page, userBloodTestResults?.test_result[a.name].value) : [];
+                const bFocusedWords = userBloodTestResults?.test_result[b.name] ? getFocusedWords(page, userBloodTestResults?.test_result[b.name].value) : [];
+
+                // focused words 에 좌표 정보가 없는게 있으면 가장 마지막 인덱스로 보내기
+                if (aFocusedWords.length === 0) return 1;
+                if (bFocusedWords.length === 0) return -1;
+
+                return getNearestBoundingBox(aFocusedWords[0].boundingBox, bFocusedWords[0].boundingBox);
+            })
+    }, [getFocusedWords, page, healthData])
 
     const getFields = (): Field[] => {
         switch (healthData.type) {
@@ -274,7 +386,104 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
 
     const onDocumentLoadSuccess = async ({numPages}: pdfjs.PDFDocumentProxy) => {
         setNumPages(numPages);
+        setUserBloodTestResults(JSON.parse(JSON.stringify(healthData.data)));
+
+        if (dataPerPage) {
+            const testResultsPage: {
+                [key: string]: { page: number }
+            } = {}
+            for (let i = 0; i < dataPerPage.length; i++) {
+                const {test_result} = dataPerPage[i] as {
+                    test_result: { [key: string]: { value: string, unit: string } }
+                }
+                for (const [key,] of Object.entries(test_result)) {
+                    testResultsPage[key] = {page: i}
+                }
+            }
+            setUserBloodTestResultsPage(testResultsPage);
+        }
     }
+
+    useEffect(() => {
+        let focusedWords: Word[];
+
+        if (userBloodTestResultsPage && focusedItem !== null) {
+            const resultPage = userBloodTestResultsPage[focusedItem];
+            const result = userBloodTestResults?.test_result[focusedItem];
+            if (!resultPage || !result) return;
+            const {page} = resultPage;
+            focusedWords = getFocusedWords(page, result.value);
+        } else {
+            focusedWords = Object.entries(currentPageTestResults).map(([_, value]) => {
+                return getFocusedWords(page, value.value);
+            }).flat();
+        }
+
+        if (focusedWords && ocr) {
+            const ocrPageMetadata = ocr.metadata.pages[page - 1];
+
+            // pdf canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            const element: HTMLElement | null = document.querySelector(`div[data-page-number="${page}"]`);
+            if (!element) return;
+
+            const pageElement = element.querySelector('canvas');
+            if (!pageElement) return;
+
+            canvas.width = pageElement.width;
+            canvas.height = pageElement.height;
+            canvas.style.position = 'absolute';
+            canvas.style.top = '0';
+            canvas.style.left = '0';
+            canvas.style.width = pageElement.style.width;
+            canvas.style.height = pageElement.style.height;
+
+            ctx.drawImage(pageElement, 0, 0);
+
+            ctx.strokeStyle = 'red';
+            ctx.lineWidth = 2;
+
+            const paddingX = 5;
+            const paddingY = 5;
+
+            focusedWords.forEach((word) => {
+                const {vertices} = word.boundingBox;
+
+                const originalHeight = ocrPageMetadata.height;
+                const originalWidth = ocrPageMetadata.width;
+
+                const canvasWidth = pageElement.width;
+                const canvasHeight = pageElement.height;
+
+                const scaleX = canvasWidth / originalWidth;
+                const scaleY = canvasHeight / originalHeight;
+
+                ctx.beginPath();
+                ctx.moveTo(vertices[0].x * scaleX - paddingX, vertices[0].y * scaleY - paddingY);
+                ctx.lineTo(vertices[1].x * scaleX + paddingX, vertices[1].y * scaleY - paddingY);
+                ctx.lineTo(vertices[2].x * scaleX + paddingX, vertices[2].y * scaleY + paddingY);
+                ctx.lineTo(vertices[3].x * scaleX - paddingX, vertices[3].y * scaleY + paddingY);
+                ctx.closePath();
+                ctx.stroke();
+            });
+
+            element.style.position = 'relative';
+            element.appendChild(canvas);
+
+            return () => {
+                element.removeChild(canvas);
+            };
+        }
+
+    }, [focusedItem, getFocusedWords, ocr, userBloodTestResults?.test_result, allInputsBlurred, page]);
+
+    useEffect(() => {
+        document.querySelector('#test-result')?.scrollTo(0, 0);
+        document.querySelector('#pdf')?.scrollTo(0, 0);
+    }, [page]);
 
     return (
         <div className="flex flex-col gap-4 h-full">
@@ -298,26 +507,104 @@ const HealthDataPreview = ({healthData, formData, setFormData}: HealthDataPrevie
                                     width={800}
                                     height={600}
                                     unoptimized
-                                    style={{ objectFit: 'contain' }}
+                                    style={{objectFit: 'contain'}}
                                 />
                             </div>
                         ) : (
-                            <div className="bg-gray-50 p-4 rounded-lg">
-                                <Document file={healthData.filePath}
-                                          className="w-full"
-                                          onLoadSuccess={onDocumentLoadSuccess}>
-                                    {Array.from(new Array(numPages), (_, index) => {
-                                        return (
-                                            <Page
-                                                className={cn('w-full')}
-                                                key={`page_${index + 1}`}
-                                                pageNumber={index + 1}
-                                                renderAnnotationLayer={false}
-                                                renderTextLayer={false}
-                                            />
-                                        );
-                                    })}
-                                </Document>
+                            <div className="bg-gray-50 p-4 rounded-lg relative flex flex-row">
+                                <div id="pdf" className="w-[60%] overflow-y-auto">
+                                    <Document file={healthData.filePath}
+                                              className="w-full"
+                                              onLoadSuccess={onDocumentLoadSuccess}>
+                                        {Array.from(new Array(numPages), (_, index) => {
+                                            return (
+                                                <Page
+                                                    className={cn(
+                                                        'w-full',
+                                                        {hidden: index + 1 !== page}
+                                                    )}
+                                                    key={`page_${index + 1}`}
+                                                    pageNumber={index + 1}
+                                                    renderAnnotationLayer={false}
+                                                    renderTextLayer={false}
+                                                />
+                                            );
+                                        })}
+                                    </Document>
+                                    <div
+                                        className="relative w-fit bottom-4 left-1/2 transform -translate-x-1/2 flex items-center space-x-4 bg-white p-2 rounded shadow">
+                                        <button
+                                            className="px-4 py-2 bg-gray-300 rounded"
+                                            onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                                            disabled={page <= 1}
+                                        >
+                                            <FaChevronLeft/>
+                                        </button>
+                                        <span>{page} / {numPages}</span>
+                                        <button
+                                            className="px-4 py-2 bg-gray-300 rounded"
+                                            onClick={() => setPage((prev) => Math.min(prev + 1, numPages))}
+                                            disabled={page >= numPages}
+                                        >
+                                            <FaChevronRight/>
+                                        </button>
+                                    </div>
+                                </div>
+                                {userBloodTestResults?.test_result && <div
+                                    id="test-result"
+                                    className="w-[40%] overflow-y-auto p-4">
+                                    {sortedPageTestResults.map((item) =>
+                                        <TextInput
+                                            key={item.name}
+                                            name={item.name.replace(/(^\w|_\w)/g, (match) => match.replace('_', '').toUpperCase())}
+                                            label={item.description}
+                                            value={
+                                                userBloodTestResults && userBloodTestResults.test_result ? userBloodTestResults.test_result[item.name]?.value : ''
+                                            }
+                                            onChange={(v) => {
+                                                setUserBloodTestResults((prev) => {
+                                                    return {
+                                                        ...prev,
+                                                        test_result: {
+                                                            ...prev?.test_result,
+                                                            [item.name]: {
+                                                                ...prev?.test_result[item.name],
+                                                                value: v.target.value,
+                                                            }
+                                                        }
+                                                    } as any;
+                                                });
+                                            }}
+                                            onDelete={() => {
+                                                setUserBloodTestResults((prev) => {
+                                                    const {test_result} = prev ?? {test_result: {}};
+                                                    delete test_result[item.name];
+                                                    return {test_result};
+                                                });
+                                            }}
+                                            onBlur={(v) => handleBlur(item.name)}
+                                            onFocus={(v) => handleFocus(item.name)}
+                                            onKeyDown={(e) => handleKeyDown(e, item.name)}
+                                            ref={(el) => {
+                                                inputRefs.current[item.name] = el;
+                                            }}
+                                        />)}
+
+                                    {/* 추가하기 버튼 */}
+                                    {healthData &&
+                                        <div className="mt-4 w-full">
+                                            <button
+                                                className="w-full py-2 bg-blue-500 text-white rounded"
+                                                onClick={() => {
+                                                    setShowAddFieldName(undefined);
+                                                    setShowAddFieldModal(true);
+                                                }}
+                                            >
+                                                추가하기
+                                            </button>
+                                        </div>
+                                    }
+                                </div>}
                             </div>
                         )
                     ) : null}
@@ -396,7 +683,7 @@ export default function SourceAddScreen() {
         for (let i = 0; i < files.length; i++) {
             const file = files[i];
             const tempEntry = tempEntries[i];
-            
+
             const formData = new FormData();
             formData.append('file', file);
             formData.append('id', tempEntry.id);
@@ -407,19 +694,19 @@ export default function SourceAddScreen() {
                 .then(async response => {
                     const newSource: HealthDataCreateResponse = await response.json();
                     // Update the list with the actual data
-                    newHealthDataList = newHealthDataList.map(item => 
+                    newHealthDataList = newHealthDataList.map(item =>
                         item.id === tempEntry.id ? newSource : item
                     );
                     await healthDataMutate({healthDataList: newHealthDataList}, {revalidate: false});
                     return newSource;
                 });
-            
+
             uploadPromises.push(uploadPromise);
         }
 
         // Wait for all uploads to complete
         const results = await Promise.all(uploadPromises);
-        
+
         // Select the first uploaded file
         if (results.length > 0) {
             setSelectedHealthData(results[0]);
@@ -554,7 +841,7 @@ export default function SourceAddScreen() {
                         <CardTitle>
                             {selectedHealthData ? (
                                 selectedHealthData.type === HealthDataType.FILE.id ? formData.fileName || 'Untitled File' :
-                                HealthDataType[selectedHealthData.type as keyof typeof HealthDataType]?.name || 'Unknown'
+                                    HealthDataType[selectedHealthData.type as keyof typeof HealthDataType]?.name || 'Unknown'
                             ) : 'Select a source'}
                         </CardTitle>
                     </CardHeader>
