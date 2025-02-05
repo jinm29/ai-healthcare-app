@@ -266,6 +266,7 @@ ${isSelected
 };
 
 const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: HealthDataPreviewProps) => {
+    const [loading, setLoading] = useState<boolean>(false);
     const [numPages, setNumPages] = useState(0);
     const [page, setPage] = useState<number>(1);
     const [focusedItem, setFocusedItem] = useState<string | null>(null);
@@ -349,13 +350,28 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
     }, [ocr]);
 
     const currentPageTestResults = useMemo(() => {
-        if (!dataPerPage) return {};
+        if (!dataPerPage) return {}
 
-        const {test_result} = dataPerPage[page - 1] as {
+        const {test_result} = formData as {
             test_result: { [key: string]: { value: string, unit: string } }
         }
-        return test_result
-    }, [page, dataPerPage]);
+
+        const entries = Object.entries(dataPerPage).filter(([, value]) => {
+            if (!value) return false;
+            const {page: fieldPage} = value as { page: number }
+            return fieldPage === page
+        }).map(([key,]) => key);
+
+        if (!dataPerPage) return {};
+
+        return Object.entries(dataPerPage).reduce((acc, [key, value]) => {
+            const newValue = test_result[key] || {value: '', unit: ''};
+            if (entries.includes(key)) {
+                return {...acc, [key]: newValue}
+            }
+            return acc
+        }, {})
+    }, [page, dataPerPage, formData]);
 
     const sortedPageTestResults = useMemo(() => {
         return testItems
@@ -370,7 +386,7 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
 
                 return getNearestBoundingBox(aFocusedWords[0].boundingBox, bFocusedWords[0].boundingBox);
             })
-    }, [getFocusedWords, page, healthData, dataPerPage])
+    }, [getFocusedWords, page, currentPageTestResults, healthData, dataPerPage])
 
     const getFields = (): Field[] => {
         switch (healthData.type) {
@@ -393,23 +409,13 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
     };
 
     const onDocumentLoadSuccess = async ({numPages}: pdfjs.PDFDocumentProxy) => {
+        setLoading(true);
         setNumPages(numPages);
         setUserBloodTestResults(JSON.parse(JSON.stringify(healthData.data)));
-
-        if (dataPerPage) {
-            const testResultsPage: {
-                [key: string]: { page: number }
-            } = {}
-            for (let i = 0; i < dataPerPage.length; i++) {
-                const {test_result} = dataPerPage[i] as {
-                    test_result: { [key: string]: { value: string, unit: string } }
-                }
-                for (const [key,] of Object.entries(test_result)) {
-                    testResultsPage[key] = {page: i}
-                }
-            }
-            setUserBloodTestResultsPage(testResultsPage);
-        }
+        setUserBloodTestResultsPage(dataPerPage);
+        setTimeout(() => {
+            setLoading(false);
+        }, 300);
     }
 
     useEffect(() => {
@@ -486,7 +492,7 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
             };
         }
 
-    }, [focusedItem, getFocusedWords, ocr, userBloodTestResults?.test_result, allInputsBlurred, page]);
+    }, [loading, focusedItem, getFocusedWords, ocr, userBloodTestResults?.test_result, allInputsBlurred, page]);
 
     useEffect(() => {
         document.querySelector('#test-result')?.scrollTo(0, 0);
@@ -601,25 +607,20 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
                                                         return {test_result};
                                                     });
 
+                                                    // Delete From Metadata
+                                                    setDataPerPage((prev: any) => {
+                                                        delete prev[item.name]
+                                                        return {...prev}
+                                                    })
+
                                                     // Delete From FormData
                                                     delete formData.test_result[item.name]
                                                     setFormData(formData)
 
-                                                    // Delete From Metadata
-                                                    const data = dataPerPage[page - 1]
-                                                    delete data.test_result[item.name]
-                                                    setDataPerPage((prev) => {
-                                                        return prev.map((d, i) => {
-                                                            if (i === page - 1) {
-                                                                return data
-                                                            }
-                                                            return d
-                                                        })
-                                                    })
-
                                                     // Update Health Data
                                                     if (setHealthData) {
                                                         const metadata: any = healthData.metadata || {}
+                                                        delete dataPerPage[item.name]
                                                         setHealthData({
                                                             ...healthData,
                                                             metadata: {...metadata, dataPerPage}
@@ -725,13 +726,6 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
                                if (showAddFieldName) {
                                    const value = showAddFieldName.value
 
-                                   setUserBloodTestResultsPage((prev) => {
-                                       return {
-                                           ...prev,
-                                           [value]: {page: page - 1}
-                                       }
-                                   })
-
                                    setUserBloodTestResults((prev) => {
                                        return {
                                            test_result: {
@@ -744,8 +738,14 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
                                        } as any;
                                    });
 
-                                   dataPerPage[page - 1].test_result[value] = {value: '', unit: ''}
-                                   setDataPerPage(dataPerPage)
+                                   setDataPerPage({
+                                       ...dataPerPage,
+                                       [value]: {page: page}
+                                   })
+                                   setUserBloodTestResultsPage({
+                                       ...userBloodTestResultsPage,
+                                       [value]: {page: page}
+                                   })
 
                                    setFormData(
                                        {
@@ -765,7 +765,12 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
                                        const metadata: any = healthData.metadata || {}
                                        setHealthData({
                                            ...healthData,
-                                           metadata: {...metadata, dataPerPage}
+                                           metadata: {
+                                               ...metadata, dataPerPage: {
+                                                   ...dataPerPage,
+                                                   [value]: {page: page}
+                                               }
+                                           }
                                        })
                                    }
 

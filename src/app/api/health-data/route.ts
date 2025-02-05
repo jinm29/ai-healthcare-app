@@ -3,7 +3,6 @@ import {NextRequest, NextResponse} from "next/server";
 
 import fs from 'fs'
 import cuid from "cuid";
-import {parseHealthDataFromPDF} from "@/lib/health-data/parser/pdf";
 
 export interface HealthData extends Prisma.HealthDataGetPayload<{
     select: {
@@ -59,7 +58,7 @@ export async function POST(
 
         let filePath: string | undefined
         let fileType: string | undefined
-        let data: { fileName: string } | undefined = undefined
+        let baseData: { fileName: string } | undefined = undefined
 
         // Save files
         if (file instanceof File) {
@@ -67,7 +66,7 @@ export async function POST(
             fs.writeFileSync(`./public/uploads/${filename}`, Buffer.from(await file.arrayBuffer()))
             fileType = file.type
             filePath = `/uploads/${filename}`
-            data = {
+            baseData = {
                 fileName: file.name
             }
         }
@@ -82,18 +81,27 @@ export async function POST(
                     status: 'PARSING',
                     filePath: filePath,
                     fileType: fileType,
-                    data: {
-                        ...data,
-                        parsingLogs: ['Started file processing...']
-                    }
+                    data: baseData ? {...baseData} : {}
                 },
             });
 
             // Return initial response
             if (!file) return NextResponse.json(healthData);
+            if (!(file instanceof File)) return NextResponse.json(healthData);
 
             // Process file
-            const {parsed, ocr, dataPerPage, parsingLogs} = await parseHealthDataFromPDF({file: file});
+            const formData = new FormData();
+            formData.append('files', file, file.name);
+            formData.append('strategy', 'ocr_with_gpt_vision_merge')
+            formData.append('user_id', '')
+            formData.append('dynamic_extract_fields', 'false')
+            formData.append('run_in_background', 'false')
+
+            const response = await fetch('https://equation.zazz.buzz/api/upload/health-checkup-report', {
+                method: 'POST',
+                body: formData
+            })
+            const {data, pages, ocrResults} = await response.json();
 
             // Update health data with parsed data
             healthData = await prisma.healthData.update({
@@ -101,10 +109,10 @@ export async function POST(
                 data: {
                     status: 'COMPLETED',
                     metadata: {
-                        ocr: ocr ? JSON.parse(JSON.stringify(ocr)) : null,
-                        dataPerPage: dataPerPage ? JSON.parse(JSON.stringify(dataPerPage)) : null
+                        ocr: ocrResults[0],
+                        dataPerPage: pages[0]
                     },
-                    data: {...data, ...parsed, parsingLogs}
+                    data: {...baseData, ...data[0]}
                 }
             });
             return NextResponse.json(healthData);
@@ -118,7 +126,7 @@ export async function POST(
                     where: {id: id as string},
                     data: {
                         status: 'COMPLETED',
-                        data: {...data, parsingLogs},
+                        data: {...baseData, parsingLogs},
                     }
                 });
                 return NextResponse.json(healthData);
