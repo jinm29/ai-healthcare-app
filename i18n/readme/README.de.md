@@ -1,10 +1,6 @@
 # 🚀 **OpenHealth**
 
-<div align="center">
-
-**KI-Gesundheitsassistent | Betrieben durch Ihre Daten, Lokal Ausgeführt**
-
-</div>
+**KI-Gesundheitsassistent | Betrieben mit Ihren Daten, Lokal ausgeführt**
 
 ---
 
@@ -16,6 +12,10 @@
 </div>
 
 ---
+
+<p align="center">
+  <img src="/intro/openhealth.gif" alt="OpenHealth Demo">
+</p>
 
 ## 🌟 Überblick
 

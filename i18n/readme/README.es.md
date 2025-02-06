@@ -1,10 +1,6 @@
 # 🚀 **OpenHealth**
 
-<div align="center">
-
-**Asistente de Salud IA | Impulsado por Sus Datos, Ejecutado Localmente**
-
-</div>
+**Asistente de Salud con IA | Impulsado por tus datos, Ejecutado localmente**
 
 ---
 
@@ -16,6 +12,10 @@
 </div>
 
 ---
+
+<p align="center">
+  <img src="/intro/openhealth.gif" alt="Demo de OpenHealth">
+</p>
 
 ## 🌟 Descripción General
 

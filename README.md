@@ -17,6 +17,10 @@
 
 ---
 
+<p align="center">
+  <img src="/intro/openhealth.gif" alt="OpenHealth Demo">
+</p>
+
 ## 🌟 Overview
 
 > OpenHealth helps you **take charge of your health data**. By leveraging AI and your personal health information,

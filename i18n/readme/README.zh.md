@@ -4,6 +4,10 @@
 
 ---
 
+<p align="center">
+  <img src="/intro/openhealth.gif" alt="OpenHealth 演示">
+</p>
+
 ## 🌟 概述
 
 OpenHealth帮助您**掌控健康数据**。通过利用AI和您的个人健康信息，

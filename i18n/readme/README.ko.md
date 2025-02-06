@@ -4,6 +4,10 @@
 
 ---
 
+<p align="center">
+  <img src="/intro/openhealth.gif" alt="OpenHealth 데모">
+</p>
+
 ## 🌟 개요
 
 OpenHealth는 **당신의 건강 데이터를 관리**하도록 도와줍니다. AI와 개인 건강 정보를 활용하여,
