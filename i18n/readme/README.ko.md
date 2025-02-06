@@ -55,51 +55,25 @@ OpenHealth는 건강을 더 잘 이해하고 관리할 수 있도록 도와주�
 
 ## ⚙️ OpenHealth 실행 방법
 
-이 프로젝트는 Node.js를 사용하여 구축되었습니다. 아래 단계를 따라 OpenHealth를 로컬에서 설정하고 실행하세요:
-
 1. **저장소 클론:**
-
    ```bash
    git clone https://github.com/OpenHealthForAll/open-health.git
    cd open-health
    ```
 
-2. **의존성 설치:**
-
+2. **설정 및 실행:**
    ```bash
-   npm install
+   # 환경 설정 파일 복사
+   cp .env.example .env
+
+   # Docker Compose로 애플리케이션 시작
+   docker compose --env-file .env up
    ```
 
-3. **.env 파일 설정:**
-
-   프로젝트 루트에 `.env` 파일을 생성하고 다음 내용을 입력하세요:
-   ```bash
-   DATABASE_URL="postgres://postgres:mysecretpassword@localhost:5432/open-health"
-   OPENAI_API_KEY="your-openai-api-key"
-   ```
-
-4. **PostgreSQL 설정:**
-
-   Docker를 사용하여 PostgreSQL을 실행하세요:
-
-   ```bash
-   # PostgreSQL Docker 컨테이너 실행
-   docker run -p 5432:5432 --name open-health -e POSTGRES_PASSWORD=mysecretpassword -d postgres
-   ```
-
-   컨테이너 상태 확인:
-   ```bash
-   docker ps
-   ```
-
-5. **애플리케이션 시작:**
-
-   ```bash
-   npm run dev
-   ```
-
-6. **OpenHealth 접속:**
+3. **OpenHealth 접속:**
    브라우저를 열고 `http://localhost:3000`으로 이동하여 OpenHealth 사용을 시작하세요.
+
+> **참고:** Docker에서 Ollama를 사용하는 경우, Ollama API 엔드포인트를 다음과 같이 설정하세요: `http://docker.for.mac.localhost:11434/`
 
 ---
 

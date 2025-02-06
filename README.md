@@ -123,37 +123,19 @@ graph LR
    cd open-health
    ```
 
-2. **Install Dependencies:**
+2. **Setup and Run:**
    ```bash
-   npm install
+   # Copy environment file
+   cp .env.example .env
+
+   # Start the application using Docker Compose
+   docker compose --env-file .env up
    ```
 
-3. **Set up .env File:**
-   Create a `.env` file in the project root with the following content:
-   ```bash
-   DATABASE_URL="postgres://postgres:mysecretpassword@localhost:5432/open-health"
-   OPENAI_API_KEY="your-openai-api-key"
-   ```
-
-4. **Set up PostgreSQL:**
-   Run PostgreSQL using Docker:
-   ```bash
-   # Run PostgreSQL Docker container
-   docker run -p 5432:5432 --name open-health -e POSTGRES_PASSWORD=mysecretpassword -d postgres
-   ```
-
-   Check container status:
-   ```bash
-   docker ps
-   ```
-
-5. **Start the Application:**
-   ```bash
-   npm run dev
-   ```
-
-6. **Access OpenHealth:**
+3. **Access OpenHealth:**
    Open your browser and navigate to `http://localhost:3000` to begin using OpenHealth.
+
+> **Note:** If you're using Ollama with Docker, make sure to set the Ollama API endpoint to: `http://docker.for.mac.localhost:11434/`
 
 </details>
 

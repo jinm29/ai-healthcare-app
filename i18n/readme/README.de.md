@@ -86,45 +86,26 @@ Gesundheitsdaten-Eingabe --> Parsing-Modul --> Strukturierte Datendateien --> GP
 
 > **Hinweis:** Die Datenanalyse-Funktionalität ist derzeit in einem separaten Python-Server implementiert und soll in Zukunft zu TypeScript migriert werden.
 
-## ⚙️ OpenHealth Ausführen
+## ⚙️ OpenHealth ausführen
 
-<details open>
-<summary><b>Installationsanweisungen</b></summary>
-
-1. **Repository Klonen:**
+1. **Repository klonen:**
    ```bash
    git clone https://github.com/OpenHealthForAll/open-health.git
    cd open-health
    ```
 
-2. **Abhängigkeiten Installieren:**
+2. **Einrichtung und Start:**
    ```bash
-   npm install
+   # Umgebungsdatei kopieren
+   cp .env.example .env
+
+   # Anwendung mit Docker Compose starten
+   docker compose --env-file .env up
    ```
 
-3. **Einrichtung der .env-Datei:**
+3. **Zugriff auf OpenHealth:**
+   Öffnen Sie Ihren Browser und navigieren Sie zu `http://localhost:3000`, um OpenHealth zu nutzen.
 
-   Erstellen Sie eine `.env`-Datei im Projektstamm und fügen Sie folgendes hinzu:
-   ```bash
-   DATABASE_URL="postgres://postgres:mysecretpassword@localhost:5432/open-health"
-   OPENAI_API_KEY="your-openai-api-key"
-   ```
+> **Hinweis:** Wenn Sie Ollama mit Docker verwenden, stellen Sie sicher, dass der Ollama-API-Endpunkt auf `http://docker.for.mac.localhost:11434/` eingestellt ist.
 
-4. **PostgreSQL-Konfiguration:**
-
-   Starten Sie PostgreSQL mit Docker:
-
-   ```bash
-   # PostgreSQL-Container starten
-   docker run -p 5432:5432 --name open-health -e POSTGRES_PASSWORD=mysecretpassword -d postgres
-   ```
-
-   Container-Status überprüfen:
-   ```bash
-   docker ps
-   ```
-
-5. **Anwendung starten:**
-   ```bash
-   npm run dev
-   ```
+---

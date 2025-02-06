@@ -55,51 +55,25 @@ OpenHealthはプライベートでローカルで実行されるアシスタン�
 
 ## ⚙️ OpenHealthの実行方法
 
-このプロジェクトはNode.jsを使用して構築されています。以下の手順に従って、OpenHealthをローカルで設定し実行してください：
-
-1. **リポジトリのクローン：**
-
+1. **リポジトリのクローン:**
    ```bash
    git clone https://github.com/OpenHealthForAll/open-health.git
    cd open-health
    ```
 
-2. **依存関係のインストール：**
-
+2. **セットアップと起動:**
    ```bash
-   npm install
+   # 環境設定ファイルをコピー
+   cp .env.example .env
+
+   # Docker Composeでアプリケーションを起動
+   docker compose --env-file .env up
    ```
 
-3. **.envファイルの設定:**
+3. **OpenHealthへのアクセス:**
+   ブラウザを開き、`http://localhost:3000`にアクセスしてOpenHealthの使用を開始します。
 
-   プロジェクトのルートに`.env`ファイルを作成し、以下の内容を追加してください:
-   ```bash
-   DATABASE_URL="postgres://postgres:mysecretpassword@localhost:5432/open-health"
-   OPENAI_API_KEY="your-openai-api-key"
-   ```
-
-4. **PostgreSQLの設定:**
-
-   Dockerを使用してPostgreSQLを実行します:
-
-   ```bash
-   # PostgreSQLコンテナの起動
-   docker run -p 5432:5432 --name open-health -e POSTGRES_PASSWORD=mysecretpassword -d postgres
-   ```
-
-   コンテナの状態を確認:
-   ```bash
-   docker ps
-   ```
-
-5. **アプリケーションの起動:**
-
-   ```bash
-   npm run dev
-   ```
-
-4. **OpenHealthへのアクセス：**
-   ブラウザを開き、`http://localhost:3000`にアクセスしてOpenHealthの使用を開始してください。
+> **注意:** DockerでOllamaを使用する場合、Ollama APIエンドポイントを以下のように設定してください: `http://docker.for.mac.localhost:11434/`
 
 ---
 

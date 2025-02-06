@@ -89,53 +89,27 @@ Entrée de données de santé --> Module d'analyse --> Fichiers de données stru
 
 ## Commencer
 
-## ⚙️ Comment Exécuter OpenHealth
+## ⚙️ Comment exécuter OpenHealth
 
-<details open>
-<summary><b>Instructions d'Installation</b></summary>
-
-1. **Cloner le Dépôt :**
+1. **Cloner le dépôt :**
    ```bash
    git clone https://github.com/OpenHealthForAll/open-health.git
    cd open-health
    ```
 
-2. **Installer les Dépendances :**
+2. **Configuration et lancement :**
    ```bash
-   npm install
+   # Copier le fichier d'environnement
+   cp .env.example .env
+
+   # Démarrer l'application avec Docker Compose
+   docker compose --env-file .env up
    ```
 
-3. **Configuration du fichier .env:**
-
-   Créez un fichier `.env` à la racine du projet et ajoutez le contenu suivant:
-   ```bash
-   DATABASE_URL="postgres://postgres:mysecretpassword@localhost:5432/open-health"
-   OPENAI_API_KEY="your-openai-api-key"
-   ```
-
-4. **Configuration PostgreSQL:**
-
-   Exécutez PostgreSQL avec Docker:
-
-   ```bash
-   # Lancer le conteneur PostgreSQL
-   docker run -p 5432:5432 --name open-health -e POSTGRES_PASSWORD=mysecretpassword -d postgres
-   ```
-
-   Vérifier l'état du conteneur:
-   ```bash
-   docker ps
-   ```
-
-5. **Démarrer l'application:**
-   ```bash
-   npm run dev
-   ```
-
-4. **Accéder à OpenHealth :**
+3. **Accéder à OpenHealth :**
    Ouvrez votre navigateur et accédez à `http://localhost:3000` pour commencer à utiliser OpenHealth.
 
-</details>
+> **Note :** Si vous utilisez Ollama avec Docker, assurez-vous de définir le point de terminaison de l'API Ollama sur : `http://docker.for.mac.localhost:11434/`
 
 ---
 

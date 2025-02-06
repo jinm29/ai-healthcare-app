@@ -53,53 +53,27 @@ OpenHealth提供私密且本地运行的助手，帮助您更好地理解和管�
 
 ## 开始使用
 
-## ⚙️ 如何运行OpenHealth
-
-本项目使用Node.js构建。按照以下步骤在本地设置和运行OpenHealth：
+## ⚙️ 如何运行 OpenHealth
 
 1. **克隆仓库：**
-
    ```bash
    git clone https://github.com/OpenHealthForAll/open-health.git
    cd open-health
    ```
 
-2. **安装依赖：**
-
+2. **设置和运行：**
    ```bash
-   npm install
+   # 复制环境配置文件
+   cp .env.example .env
+
+   # 使用 Docker Compose 启动应用
+   docker compose --env-file .env up
    ```
 
-3. **配置.env文件:**
+3. **访问 OpenHealth：**
+   打开浏览器并访问 `http://localhost:3000` 开始使用 OpenHealth。
 
-   在项目根目录创建`.env`文件，并添加以下内容：
-   ```bash
-   DATABASE_URL="postgres://postgres:mysecretpassword@localhost:5432/open-health"
-   OPENAI_API_KEY="your-openai-api-key"
-   ```
-
-4. **PostgreSQL配置:**
-
-   使用Docker运行PostgreSQL：
-
-   ```bash
-   # 启动PostgreSQL容器
-   docker run -p 5432:5432 --name open-health -e POSTGRES_PASSWORD=mysecretpassword -d postgres
-   ```
-
-   检查容器状态：
-   ```bash
-   docker ps
-   ```
-
-5. **启动应用：**
-
-   ```bash
-   npm run dev
-   ```
-
-4. **访问OpenHealth：**
-   打开浏览器并访问 `http://localhost:3000` 开始使用OpenHealth。
+> **注意：** 如果您在 Docker 中使用 Ollama，请确保将 Ollama API 端点设置为：`http://docker.for.mac.localhost:11434/`
 
 ---
 
