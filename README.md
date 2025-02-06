@@ -128,12 +128,31 @@ graph LR
    npm install
    ```
 
-3. **Start the Application:**
+3. **Set up .env File:**
+   Create a `.env` file in the project root with the following content:
+   ```bash
+   DATABASE_URL="postgres://postgres:mysecretpassword@localhost:5432/open-health"
+   OPENAI_API_KEY="your-openai-api-key"
+   ```
+
+4. **Set up PostgreSQL:**
+   Run PostgreSQL using Docker:
+   ```bash
+   # Run PostgreSQL Docker container
+   docker run -p 5432:5432 --name open-health -e POSTGRES_PASSWORD=mysecretpassword -d postgres
+   ```
+
+   Check container status:
+   ```bash
+   docker ps
+   ```
+
+5. **Start the Application:**
    ```bash
    npm run dev
    ```
 
-4. **Access OpenHealth:**
+6. **Access OpenHealth:**
    Open your browser and navigate to `http://localhost:3000` to begin using OpenHealth.
 
 </details>
