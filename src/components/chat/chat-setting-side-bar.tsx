@@ -220,20 +220,23 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
                                 onChange={(e) => onLLMProviderChange({apiURL: e.target.value})}
                             />
                         )}
-                        <div className="relative">
-                            <Input
-                                type={showApiKey ? "text" : "password"}
-                                placeholder="Enter API key"
-                                value={selectedLLMProvider?.apiKey || ''}
-                                onChange={(e) => onLLMProviderChange({apiKey: e.target.value})}
-                            />
-                            <button
-                                className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-sm text-gray-500 hover:text-gray-700"
-                                onClick={() => setShowApiKey(!showApiKey)}
-                            >
-                                {showApiKey ? "Hide" : "Show"}
-                            </button>
-                        </div>
+                        {selectedLLMProvider?.id !== 'ollama' && (
+                            <div className="relative">
+                                <Input
+                                    type={showApiKey ? "text" : "password"}
+                                    placeholder="Enter API key"
+                                    value={selectedLLMProvider?.apiKey || ''}
+                                    onChange={(e) => onLLMProviderChange({apiKey: e.target.value})}
+                                    className="pr-16"
+                                />
+                                <button
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-sm text-gray-500 hover:text-gray-700"
+                                    onClick={() => setShowApiKey(!showApiKey)}
+                                >
+                                    {showApiKey ? "Hide" : "Show"}
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
 

@@ -45,6 +45,8 @@ OpenHealth는 건강을 더 잘 이해하고 관리할 수 있도록 도와주�
 건강 데이터 입력  -->  데이터 파싱 모듈  -->  구조화된 데이터 파일  -->  GPT 통합
 ```
 
+> **참고:** 현재 데이터 파싱 기능은 별도의 Python 서버에서 구현되어 있으며, 추후 TypeScript로 마이그레이션될 예정입니다.
+
 ## 시작하기
 
 ## ⚙️ OpenHealth 실행 방법
@@ -64,13 +66,35 @@ OpenHealth는 건강을 더 잘 이해하고 관리할 수 있도록 도와주�
    npm install
    ```
 
-3. **애플리케이션 시작:**
+3. **.env 파일 설정:**
+
+   프로젝트 루트에 `.env` 파일을 생성하고 다음 내용을 입력하세요:
+   ```bash
+   DATABASE_URL="postgres://postgres:mysecretpassword@localhost:5432/open-health"
+   OPENAI_API_KEY="your-openai-api-key"
+   ```
+
+4. **PostgreSQL 설정:**
+
+   Docker를 사용하여 PostgreSQL을 실행하세요:
+
+   ```bash
+   # PostgreSQL Docker 컨테이너 실행
+   docker run -p 5432:5432 --name open-health -e POSTGRES_PASSWORD=mysecretpassword -d postgres
+   ```
+
+   컨테이너 상태 확인:
+   ```bash
+   docker ps
+   ```
+
+5. **애플리케이션 시작:**
 
    ```bash
    npm run dev
    ```
 
-4. **OpenHealth 접속:**
+6. **OpenHealth 접속:**
    브라우저를 열고 `http://localhost:3000`으로 이동하여 OpenHealth 사용을 시작하세요.
 
 ---

@@ -66,7 +66,7 @@
 
 ## 🗺️ Diagrama del Proyecto
 
-```mermaid
+
 graph LR
     A[Entrada de Datos] --> B[Procesamiento y Análisis]
     B --> C[Base de Datos Local]
@@ -80,7 +80,13 @@ graph LR
     style D fill:#ffa07a,stroke:#ff4500,stroke-width:2px
     style E fill:#dda0dd,stroke:#9370db,stroke-width:2px
     style F fill:#f0e68c,stroke:#bdb76b,stroke-width:2px
-```
+
+
+Entrada de datos de salud --> Módulo de análisis --> Archivos de datos estructurados --> Integración GPT
+
+> **Nota:** La funcionalidad de análisis de datos está actualmente implementada en un servidor Python separado y está planificada su migración a TypeScript en el futuro.
+
+## Comenzando
 
 ## ⚙️ Cómo Ejecutar OpenHealth
 
@@ -88,32 +94,39 @@ graph LR
 <summary><b>Instrucciones de Instalación</b></summary>
 
 1. **Clonar el Repositorio:**
-   ```bash
+   
    git clone https://github.com/OpenHealthForAll/open-health.git
    cd open-health
-   ```
+   
 
 2. **Instalar Dependencias:**
-   ```bash
+   
    npm install
-   ```
+   
 
-3. **Iniciar la Aplicación:**
-   ```bash
+3. **Configuración del archivo .env:**
+
+   Cree un archivo `.env` en la raíz del proyecto y agregue el siguiente contenido:
+   
+   DATABASE_URL="postgres://postgres:mysecretpassword@localhost:5432/open-health"
+   OPENAI_API_KEY="your-openai-api-key"
+   
+
+4. **Configuración de PostgreSQL:**
+
+   Ejecute PostgreSQL usando Docker:
+
+   
+   # Iniciar el contenedor de PostgreSQL
+   docker run -p 5432:5432 --name open-health -e POSTGRES_PASSWORD=mysecretpassword -d postgres
+   
+
+   Verificar el estado del contenedor:
+   
+   docker ps
+   
+
+5. **Iniciar la aplicación:**
+   
    npm run dev
-   ```
-
-4. **Acceder a OpenHealth:**
-   Abra su navegador y vaya a `http://localhost:3000` para comenzar a usar OpenHealth.
-
-</details>
-
----
-
-## 🌐 Comunidad y Soporte
-
-<div align="center">
-
-[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
-
-</div> 
+</details>   ```

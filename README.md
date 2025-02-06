@@ -104,6 +104,8 @@ graph LR
     classDef default color:#000
 ```
 
+> **Note:** The data parsing functionality is currently implemented in a separate Python server and is planned to be migrated to TypeScript in the future.
+
 ## Getting Started
 
 ## ⚙️ How to Run OpenHealth
