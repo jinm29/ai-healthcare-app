@@ -5,7 +5,7 @@
 ---
 
 <p align="center">
-  <img src="/intro/openhealth.gif" alt="OpenHealth 演示">
+  <img src="/intro/openhealth.avif" alt="OpenHealth 演示">
 </p>
 
 ## 🌟 概述
