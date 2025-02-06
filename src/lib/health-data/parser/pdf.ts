@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import OpenAI from "openai";
 import {fromBuffer as pdf2picFromBuffer} from 'pdf2pic'
 import {zodResponseFormat} from "openai/helpers/zod";

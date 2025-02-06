@@ -1,5 +1,5 @@
 // TODO typesafe the form data
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-explicit-any,@typescript-eslint/no-unused-vars */
 'use client';
 
 import {Document, Page, pdfjs} from 'react-pdf';
@@ -429,7 +429,7 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
             focusedWords = getFocusedWords(page, result.value);
         } else {
             focusedWords = Object.entries(currentPageTestResults).map(([_, value]) => {
-                return getFocusedWords(page, value.value);
+                return getFocusedWords(page, (value as any).value);
             }).flat();
         }
 

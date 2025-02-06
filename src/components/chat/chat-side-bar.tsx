@@ -1,10 +1,12 @@
+/* eslint-disable @typescript-eslint/no-unused-vars,@typescript-eslint/no-explicit-any */
 'use client';
 
 import React, {useMemo, useState} from "react";
 import useSWR from "swr";
 import {ChatRoom, ChatRoomListResponse} from "@/app/api/chat-rooms/route";
 import {Button} from "@/components/ui/button";
-import {Files, FileText, MessageCircle, Download, Copy, Trash2} from "lucide-react";import Link from "next/link";
+import {Files, FileText, MessageCircle, Download, Copy, Trash2} from "lucide-react";
+import Link from "next/link";
 import {useRouter} from "next/navigation";
 import {HealthDataListResponse} from "@/app/api/health-data/route";
 import dayjs from "@/lib/dayjs";
@@ -62,11 +64,20 @@ export default function ChatSideBar({
         const cleanedData = {
             sources: healthDataList.map(({data, type}) => ({
                 type,
-                data: typeof data === 'object' && data !== null ? 
+                data: typeof data === 'object' && data !== null ?
                     (() => {
-                        const { parsingLogs: _, id: __, filePath: ___, fileType: ____, status: _____, updatedAt: ______, createdAt: _______, ...cleanedContent } = data as any;
+                        const {
+                            parsingLogs: _,
+                            id: __,
+                            filePath: ___,
+                            fileType: ____,
+                            status: _____,
+                            updatedAt: ______,
+                            createdAt: _______,
+                            ...cleanedContent
+                        } = data as any;
                         return cleanedContent;
-                    })() 
+                    })()
                     : data
             }))
         };
@@ -77,15 +88,24 @@ export default function ChatSideBar({
         const cleanedData = {
             sources: healthDataList.map(({data, type}) => ({
                 type,
-                data: typeof data === 'object' && data !== null ? 
+                data: typeof data === 'object' && data !== null ?
                     (() => {
-                        const { parsingLogs: _, id: __, filePath: ___, fileType: ____, status: _____, updatedAt: ______, createdAt: _______, ...cleanedContent } = data as any;
+                        const {
+                            parsingLogs: _,
+                            id: __,
+                            filePath: ___,
+                            fileType: ____,
+                            status: _____,
+                            updatedAt: ______,
+                            createdAt: _______,
+                            ...cleanedContent
+                        } = data as any;
                         return cleanedContent;
-                    })() 
+                    })()
                     : data
             }))
         };
-        const blob = new Blob([JSON.stringify(cleanedData, null, 2)], { type: 'application/json' });
+        const blob = new Blob([JSON.stringify(cleanedData, null, 2)], {type: 'application/json'});
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
@@ -104,14 +124,14 @@ export default function ChatSideBar({
 
     const confirmDelete = async () => {
         if (!chatToDelete) return;
-        
+
         await fetch(`/api/chat-rooms/${chatToDelete}`, {
             method: 'DELETE'
         });
-        
+
         const updatedChatRooms = chatRooms.filter(room => room.id !== chatToDelete);
         await chatRoomMutate({chatRooms: updatedChatRooms}, false);
-        
+
         if (chatRoomId === chatToDelete) {
             router.push('/');
         }
@@ -140,7 +160,8 @@ export default function ChatSideBar({
                                     <TooltipProvider>
                                         <Tooltip>
                                             <TooltipTrigger asChild>
-                                                <Button size="sm" variant="ghost" onClick={() => setJsonViewerOpen(true)}
+                                                <Button size="sm" variant="ghost"
+                                                        onClick={() => setJsonViewerOpen(true)}
                                                         className="h-7 hover:bg-gray-100">
                                                     <FileText className="w-3 h-3"/>
                                                 </Button>
@@ -200,7 +221,7 @@ export default function ChatSideBar({
                                     className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 h-7 w-7"
                                     onClick={(e) => handleDeleteChat(chatRoom.id, e)}
                                 >
-                                    <Trash2 className="h-4 w-4 text-gray-500 hover:text-red-500" />
+                                    <Trash2 className="h-4 w-4 text-gray-500 hover:text-red-500"/>
                                 </Button>
                             </Link>
                         ))}
@@ -225,11 +246,11 @@ export default function ChatSideBar({
                     <DialogTitle>Aggregated Sources</DialogTitle>
                     <div className="flex justify-end gap-2">
                         <Button size="sm" variant="outline" onClick={handleCopyToClipboard}>
-                            <Copy className="w-4 h-4 mr-2" />
+                            <Copy className="w-4 h-4 mr-2"/>
                             Copy
                         </Button>
                         <Button size="sm" variant="outline" onClick={handleDownload}>
-                            <Download className="w-4 h-4 mr-2" />
+                            <Download className="w-4 h-4 mr-2"/>
                             Download
                         </Button>
                     </div>
@@ -239,15 +260,25 @@ export default function ChatSideBar({
                         data={{
                             sources: healthDataList.map(({data, type}) => ({
                                 type,
-                                data: typeof data === 'object' && data !== null ? 
+                                data: typeof data === 'object' && data !== null ?
                                     (() => {
-                                        const { parsingLogs: _, id: __, filePath: ___, fileType: ____, status: _____, updatedAt: ______, createdAt: _______, ...cleanedContent } = data as any;
+                                        const {
+                                            parsingLogs: _,
+                                            id: __,
+                                            filePath: ___,
+                                            fileType: ____,
+                                            status: _____,
+                                            updatedAt: ______,
+                                            createdAt: _______,
+                                            ...cleanedContent
+                                        } = data as any;
                                         return cleanedContent;
-                                    })() 
+                                    })()
                                     : data
                             }))
                         }}
-                        onSave={() => {}}
+                        onSave={() => {
+                        }}
                         isEditable={false}
                     />
                 </div>

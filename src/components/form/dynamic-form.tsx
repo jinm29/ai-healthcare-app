@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 
 interface Field {
@@ -12,7 +13,7 @@ interface Field {
 
 interface DynamicFormProps {
     fields: Field[];
-    data: Record<string, unknown>;
+    data: Record<string, any>;
     onChange: (key: string, value: string | number | readonly string[] | undefined) => void;
 }
 
