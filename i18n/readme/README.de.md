@@ -1,10 +1,6 @@
 # 🚀 **OpenHealth**
 
-<div align="center">
-
-**KI-Gesundheitsassistent | Betrieben durch Ihre Daten, Lokal Ausgeführt**
-
-</div>
+**KI-Gesundheitsassistent | Betrieben mit Ihren Daten, Lokal ausgeführt**
 
 ---
 
@@ -16,6 +12,10 @@
 </div>
 
 ---
+
+<p align="center">
+  <img src="/intro/openhealth.gif" alt="OpenHealth Demo">
+</p>
 
 ## 🌟 Überblick
 
@@ -82,6 +82,10 @@ graph LR
     style F fill:#f0e68c,stroke:#daa520,stroke-width:2px
 ```
 
+Gesundheitsdaten-Eingabe --> Parsing-Modul --> Strukturierte Datendateien --> GPT-Integration
+
+> **Hinweis:** Die Datenanalyse-Funktionalität ist derzeit in einem separaten Python-Server implementiert und soll in Zukunft zu TypeScript migriert werden.
+
 ## ⚙️ OpenHealth Ausführen
 
 <details open>
@@ -98,22 +102,29 @@ graph LR
    npm install
    ```
 
-3. **Anwendung Starten:**
+3. **Einrichtung der .env-Datei:**
+
+   Erstellen Sie eine `.env`-Datei im Projektstamm und fügen Sie folgendes hinzu:
+   ```bash
+   DATABASE_URL="postgres://postgres:mysecretpassword@localhost:5432/open-health"
+   OPENAI_API_KEY="your-openai-api-key"
+   ```
+
+4. **PostgreSQL-Konfiguration:**
+
+   Starten Sie PostgreSQL mit Docker:
+
+   ```bash
+   # PostgreSQL-Container starten
+   docker run -p 5432:5432 --name open-health -e POSTGRES_PASSWORD=mysecretpassword -d postgres
+   ```
+
+   Container-Status überprüfen:
+   ```bash
+   docker ps
+   ```
+
+5. **Anwendung starten:**
    ```bash
    npm run dev
    ```
-
-4. **Zugriff auf OpenHealth:**
-   Öffnen Sie Ihren Browser und navigieren Sie zu `http://localhost:3000`, um OpenHealth zu nutzen.
-
-</details>
-
----
-
-## 🌐 Community und Support
-
-<div align="center">
-
-[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
-
-</div> 

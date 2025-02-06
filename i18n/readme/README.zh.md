@@ -4,6 +4,10 @@
 
 ---
 
+<p align="center">
+  <img src="/intro/openhealth.gif" alt="OpenHealth 演示">
+</p>
+
 ## 🌟 概述
 
 OpenHealth帮助您**掌控健康数据**。通过利用AI和您的个人健康信息，
@@ -42,8 +46,10 @@ OpenHealth提供私密且本地运行的助手，帮助您更好地理解和管�
 ## 🗺️ 项目图示
 
 ```plaintext
-健康数据输入  -->  数据解析模块  -->  结构化数据文件  -->  GPT集成
+健康数据输入 --> 数据解析模块 --> 结构化数据文件 --> GPT集成
 ```
+
+> **注意：** 数据解析功能目前在独立的Python服务器中实现，计划未来迁移到TypeScript。
 
 ## 开始使用
 
@@ -64,7 +70,29 @@ OpenHealth提供私密且本地运行的助手，帮助您更好地理解和管�
    npm install
    ```
 
-3. **启动应用：**
+3. **配置.env文件:**
+
+   在项目根目录创建`.env`文件，并添加以下内容：
+   ```bash
+   DATABASE_URL="postgres://postgres:mysecretpassword@localhost:5432/open-health"
+   OPENAI_API_KEY="your-openai-api-key"
+   ```
+
+4. **PostgreSQL配置:**
+
+   使用Docker运行PostgreSQL：
+
+   ```bash
+   # 启动PostgreSQL容器
+   docker run -p 5432:5432 --name open-health -e POSTGRES_PASSWORD=mysecretpassword -d postgres
+   ```
+
+   检查容器状态：
+   ```bash
+   docker ps
+   ```
+
+5. **启动应用：**
 
    ```bash
    npm run dev

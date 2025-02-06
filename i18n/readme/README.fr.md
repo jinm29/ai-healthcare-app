@@ -1,10 +1,6 @@
 # 🚀 **OpenHealth**
 
-<div align="center">
-
-**Assistant de Santé IA | Alimenté par Vos Données, Exécution Locale**
-
-</div>
+**Assistant de santé IA | Alimenté par vos données, exécuté localement**
 
 ---
 
@@ -16,6 +12,10 @@
 </div>
 
 ---
+
+<p align="center">
+  <img src="/intro/openhealth.gif" alt="Démo OpenHealth">
+</p>
 
 ## 🌟 Aperçu
 
@@ -83,6 +83,12 @@ graph LR
     style F fill:#f0e68c,stroke:#bdb76b,stroke-width:2px
 ```
 
+Entrée de données de santé --> Module d'analyse --> Fichiers de données structurées --> Intégration GPT
+
+> **Remarque :** La fonctionnalité d'analyse des données est actuellement implémentée dans un serveur Python séparé et sera migrée vers TypeScript à l'avenir.
+
+## Commencer
+
 ## ⚙️ Comment Exécuter OpenHealth
 
 <details open>
@@ -99,7 +105,29 @@ graph LR
    npm install
    ```
 
-3. **Démarrer l'Application :**
+3. **Configuration du fichier .env:**
+
+   Créez un fichier `.env` à la racine du projet et ajoutez le contenu suivant:
+   ```bash
+   DATABASE_URL="postgres://postgres:mysecretpassword@localhost:5432/open-health"
+   OPENAI_API_KEY="your-openai-api-key"
+   ```
+
+4. **Configuration PostgreSQL:**
+
+   Exécutez PostgreSQL avec Docker:
+
+   ```bash
+   # Lancer le conteneur PostgreSQL
+   docker run -p 5432:5432 --name open-health -e POSTGRES_PASSWORD=mysecretpassword -d postgres
+   ```
+
+   Vérifier l'état du conteneur:
+   ```bash
+   docker ps
+   ```
+
+5. **Démarrer l'application:**
    ```bash
    npm run dev
    ```
