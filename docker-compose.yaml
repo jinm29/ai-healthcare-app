@@ -22,7 +22,7 @@ services:
     depends_on:
       - database
     volumes:
-      - app_data:/app/
+      - app_data:/app/public/uploads
     ports:
       - "3000:3000"
     restart: always
