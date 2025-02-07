@@ -63,17 +63,28 @@ OpenHealth提供私密且本地运行的助手，帮助您更好地理解和管�
 
 2. **设置和运行：**
    ```bash
-   # 复制环境配置文件
+   # 复制环境文件
    cp .env.example .env
 
-   # 使用 Docker Compose 启动应用
+   # 在.env文件中添加API密钥：
+   # UPSTAGE_API_KEY - 用于解析（在 https://www.upstage.ai 注册即可获得$10免费额度，无需绑定信用卡）
+   # OPENAI_API_KEY - 用于增强解析功能
+
+   # 使用Docker Compose启动应用
    docker compose --env-file .env up
    ```
 
-3. **访问 OpenHealth：**
-   打开浏览器并访问 `http://localhost:3000` 开始使用 OpenHealth。
+   对于现有用户：
+   ```bash
+   docker compose --env-file .env up --build
+   ```
 
-> **注意：** 如果您在 Docker 中使用 Ollama，请确保将 Ollama API 端点设置为：`http://docker.for.mac.localhost:11434/`
+3. **访问OpenHealth：**
+   打开浏览器并访问 `http://localhost:3000` 开始使用OpenHealth。
+
+> **注意：** 系统由解析和LLM两个主要组件组成。目前，解析使用Upstage和OpenAI API（在我们的测试中表现最佳），本地解析器即将推出。LLM组件可以使用Ollama在本地完全运行。
+
+> **注意：** 如果您使用Docker运行Ollama，请确保将Ollama API端点设置为：`http://docker.for.mac.localhost:11434/`
 
 ---
 

@@ -61,19 +61,30 @@ OpenHealthはプライベートでローカルで実行されるアシスタン�
    cd open-health
    ```
 
-2. **セットアップと起動:**
+2. **セットアップと実行:**
    ```bash
    # 環境設定ファイルをコピー
    cp .env.example .env
+
+   # .envファイルにAPIキーを追加:
+   # UPSTAGE_API_KEY - パース用（https://www.upstage.ai でカード登録なしで$10のクレジットが取得可能）
+   # OPENAI_API_KEY - 高度なパース機能のため
 
    # Docker Composeでアプリケーションを起動
    docker compose --env-file .env up
    ```
 
-3. **OpenHealthへのアクセス:**
-   ブラウザを開き、`http://localhost:3000`にアクセスしてOpenHealthの使用を開始します。
+   既存ユーザーの場合:
+   ```bash
+   docker compose --env-file .env up --build
+   ```
 
-> **注意:** DockerでOllamaを使用する場合、Ollama APIエンドポイントを以下のように設定してください: `http://docker.for.mac.localhost:11434/`
+3. **OpenHealthへのアクセス:**
+   ブラウザで `http://localhost:3000` にアクセスしてOpenHealthを開始します。
+
+> **注意:** システムはパースとLLMの2つの主要コンポーネントで構成されています。現在、パースはUpstageとOpenAI APIを使用しており（テストで最高のパフォーマンスを示しました）、ローカルパーサーも近日追加予定です。LLMコンポーネントはOllamaを使用して完全にローカルで実行できます。
+
+> **注意:** DockerでOllamaを使用する場合、Ollama APIエンドポイントを次のように設定してください: `http://docker.for.mac.localhost:11434/`
 
 ---
 
