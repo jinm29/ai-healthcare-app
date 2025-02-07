@@ -3,6 +3,8 @@ LABEL authors="OpenHealth"
 
 ARG DATABASE_URL=${DATABASE_URL}
 
+RUN apt-get update && apt-get install -y graphicsmagick
+
 WORKDIR /app
 COPY . /app
 
