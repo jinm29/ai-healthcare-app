@@ -2,7 +2,8 @@ import prisma, {Prisma} from "@/lib/prisma";
 import {NextRequest, NextResponse} from "next/server";
 
 import fs from 'fs'
-import cuid from "cuid";
+import {parseHealthDataFromPDF} from "@/lib/health-data/parser/pdf";
+import crypto from "node:crypto";
 
 export interface HealthData extends Prisma.HealthDataGetPayload<{
     select: {
@@ -62,13 +63,15 @@ export async function POST(
 
         // Save files
         if (file instanceof File) {
-            const filename = `${cuid()}.${file.name.split('.').pop()}`
+            const hash = crypto.createHash('md5')
+            hash.update(Buffer.from(await file.arrayBuffer()))
+            const fileHash = hash.digest('hex')
+            const extension = file.name.split('.').pop()
+            const filename = `${fileHash}.${extension}`;
             fs.writeFileSync(`./public/uploads/${filename}`, Buffer.from(await file.arrayBuffer()))
             fileType = file.type
             filePath = `/uploads/${filename}`
-            baseData = {
-                fileName: file.name
-            }
+            baseData = {fileName: file.name}
         }
 
         // Create parsing data
@@ -90,18 +93,7 @@ export async function POST(
             if (!(file instanceof File)) return NextResponse.json(healthData);
 
             // Process file
-            const formData = new FormData();
-            formData.append('files', file, file.name);
-            formData.append('strategy', 'ocr_with_gpt_vision_merge')
-            formData.append('user_id', '')
-            formData.append('dynamic_extract_fields', 'false')
-            formData.append('run_in_background', 'false')
-
-            const response = await fetch('https://equation.zazz.buzz/api/upload/health-checkup-report', {
-                method: 'POST',
-                body: formData
-            })
-            const {data, pages, ocrResults} = await response.json();
+            const {data, pages, ocrResults} = await parseHealthDataFromPDF({file: `./public${filePath}`})
 
             // Update health data with parsed data
             healthData = await prisma.healthData.update({
