@@ -97,19 +97,30 @@ Entrée de données de santé --> Module d'analyse --> Fichiers de données stru
    cd open-health
    ```
 
-2. **Configuration et lancement :**
+2. **Configuration et Exécution:**
    ```bash
    # Copier le fichier d'environnement
    cp .env.example .env
+
+   # Ajouter les clés API dans le fichier .env:
+   # UPSTAGE_API_KEY - Pour l'analyse (Obtenez un crédit de 10$ sans inscription de carte sur https://www.upstage.ai)
+   # OPENAI_API_KEY - Pour des capacités d'analyse améliorées
 
    # Démarrer l'application avec Docker Compose
    docker compose --env-file .env up
    ```
 
-3. **Accéder à OpenHealth :**
+   Pour les utilisateurs existants:
+   ```bash
+   docker compose --env-file .env up --build
+   ```
+
+3. **Accéder à OpenHealth:**
    Ouvrez votre navigateur et accédez à `http://localhost:3000` pour commencer à utiliser OpenHealth.
 
-> **Note :** Si vous utilisez Ollama avec Docker, assurez-vous de définir le point de terminaison de l'API Ollama sur : `http://docker.for.mac.localhost:11434/`
+> **Note:** Le système est composé de deux composants principaux: l'analyse et le LLM. Actuellement, l'analyse utilise les API Upstage et OpenAI (qui ont montré les meilleures performances lors de nos tests), avec un analyseur local à venir prochainement, tandis que le composant LLM peut fonctionner entièrement en local avec Ollama.
+
+> **Note:** Si vous utilisez Ollama avec Docker, assurez-vous de définir le point de terminaison de l'API Ollama sur: `http://docker.for.mac.localhost:11434/`
 
 ---
 

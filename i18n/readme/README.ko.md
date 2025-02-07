@@ -61,17 +61,28 @@ OpenHealth는 건강을 더 잘 이해하고 관리할 수 있도록 도와주�
    cd open-health
    ```
 
-2. **설정 및 실행:**
+2. **설치 및 실행:**
    ```bash
    # 환경 설정 파일 복사
    cp .env.example .env
+
+   # .env 파일에 API 키 추가:
+   # UPSTAGE_API_KEY - 파싱용 (https://www.upstage.ai 에서 회원가입 시 카드등록 없이 $10 크레딧을 받을 수 있습니다)
+   # OPENAI_API_KEY - 향상된 파싱 기능을 위해 필요
 
    # Docker Compose로 애플리케이션 시작
    docker compose --env-file .env up
    ```
 
+   기존 사용자의 경우:
+   ```bash
+   docker compose --env-file .env up --build
+   ```
+
 3. **OpenHealth 접속:**
-   브라우저를 열고 `http://localhost:3000`으로 이동하여 OpenHealth 사용을 시작하세요.
+   브라우저에서 `http://localhost:3000`에 접속하여 OpenHealth를 시작하세요.
+
+> **참고:** 시스템은 파싱과 LLM 두 가지 주요 구성 요소로 이루어져 있습니다. 현재 파싱은 Upstage와 OpenAI API를 사용하고 있으며(테스트 결과 가장 좋은 성능을 보였습니다), 곧 로컬 파서가 추가될 예정입니다. LLM 구성 요소는 Ollama를 사용하여 완전히 로컬에서 실행할 수 있습니다.
 
 > **참고:** Docker에서 Ollama를 사용하는 경우, Ollama API 엔드포인트를 다음과 같이 설정하세요: `http://docker.for.mac.localhost:11434/`
 

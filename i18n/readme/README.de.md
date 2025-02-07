@@ -94,17 +94,28 @@ Gesundheitsdaten-Eingabe --> Parsing-Modul --> Strukturierte Datendateien --> GP
    cd open-health
    ```
 
-2. **Einrichtung und Start:**
+2. **Einrichtung und Ausführung:**
    ```bash
    # Umgebungsdatei kopieren
    cp .env.example .env
+
+   # API-Schlüssel zur .env-Datei hinzufügen:
+   # UPSTAGE_API_KEY - Für das Parsing (Erhalten Sie $10 Guthaben ohne Kartenregistrierung bei https://www.upstage.ai)
+   # OPENAI_API_KEY - Für erweiterte Parsing-Funktionen
 
    # Anwendung mit Docker Compose starten
    docker compose --env-file .env up
    ```
 
+   Für bestehende Benutzer:
+   ```bash
+   docker compose --env-file .env up --build
+   ```
+
 3. **Zugriff auf OpenHealth:**
    Öffnen Sie Ihren Browser und navigieren Sie zu `http://localhost:3000`, um OpenHealth zu nutzen.
+
+> **Hinweis:** Das System besteht aus zwei Hauptkomponenten: Parsing und LLM. Derzeit verwendet das Parsing Upstage- und OpenAI-APIs (die in unseren Tests die beste Leistung zeigten), wobei ein lokaler Parser in Kürze hinzugefügt wird. Die LLM-Komponente kann mit Ollama vollständig lokal ausgeführt werden.
 
 > **Hinweis:** Wenn Sie Ollama mit Docker verwenden, stellen Sie sicher, dass der Ollama-API-Endpunkt auf `http://docker.for.mac.localhost:11434/` eingestellt ist.
 
