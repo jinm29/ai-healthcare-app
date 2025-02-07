@@ -263,6 +263,25 @@ Follow these guidelines to extract all actual test results:
     }
 }
 
+async function processBatchWithConcurrency<T, R>(
+    items: T[],
+    processItem: (item: T) => Promise<R>,
+    concurrencyLimit: number
+): Promise<R[]> {
+    const results: R[] = [];
+
+    // Process items in batches
+    for (let i = 0; i < items.length; i += concurrencyLimit) {
+        const batch = items.slice(i, i + concurrencyLimit);
+        const batchResults = await Promise.all(
+            batch.map(item => processItem(item))
+        );
+        results.push(...batchResults);
+    }
+
+    return results;
+}
+
 async function healthCheckupOCRWithGPTVisionMergeReport(
     {file: filePath}: { file: string }
 ) {
@@ -297,7 +316,11 @@ async function healthCheckupOCRWithGPTVisionMergeReport(
     const ocrResults = await documentOCR({document: filePath})
 
     // prepare parse results
-    await Promise.all(imagePaths.map((path) => documentParse({document: path})))
+    await processBatchWithConcurrency(
+        imagePaths,
+        async (path) => documentParse({document: path}),
+        3
+    )
 
     const [
         {finalHealthCheckup: resultTotal, mergedTestResultPage: resultTotalPages},
