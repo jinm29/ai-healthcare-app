@@ -14,7 +14,7 @@
 ---
 
 <p align="center">
-  <img src="/intro/openhealth.gif" alt="Démo OpenHealth">
+  <img src="/intro/openhealth.avif" alt="Démo OpenHealth">
 </p>
 
 ## 🌟 Aperçu
