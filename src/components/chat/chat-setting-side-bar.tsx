@@ -212,10 +212,10 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
                                 )}
                             </SelectContent>
                         </Select>
-                        {selectedLLMProvider?.id === 'ollama' && (
+                        {selectedLLMProvider && (['ollama', 'openai'].includes(selectedLLMProvider.id)) && (
                             <Input
                                 type="text"
-                                placeholder="API endpoint (default: http://localhost:11434)"
+                                placeholder={`API endpoint (default: ${selectedLLMProvider?.id === 'ollama' ? 'http://localhost:11434' : 'https://api.openai.com/v1'})`}
                                 value={selectedLLMProvider?.apiURL}
                                 onChange={(e) => onLLMProviderChange({apiURL: e.target.value})}
                             />
