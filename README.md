@@ -152,10 +152,20 @@ graph LR
 
 ---
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=OpenHealthForAll/open-health&type=Date)](https://star-history.com/#OpenHealthForAll/open-health&Date)
+
+---
+
 ## 🌐 Community and Support
 
 <div align="center">
 
+### 💫 Share Your Story & Get Updated & Give Feedback
+[![AIDoctor Subreddit](https://img.shields.io/badge/r/AIDoctor-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/AIDoctor/)
+
+### 📬 Contact
 [![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
 
 </div>
