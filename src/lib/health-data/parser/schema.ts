@@ -1,4 +1,4 @@
-import { z } from "zod";
+import {z} from "zod";
 
 /**
  * HealthCheckup
@@ -2510,3 +2510,5 @@ export const HealthCheckupSchema = z.object({
         })
         .describe("Test results"),
 });
+
+export type HealthCheckupType = z.infer<typeof HealthCheckupSchema>;
