@@ -4,6 +4,8 @@ import {NextRequest, NextResponse} from "next/server";
 import fs from 'fs'
 import {parseHealthDataFromPDF} from "@/lib/health-data/parser/pdf";
 import crypto from "node:crypto";
+import {fileTypeFromBuffer} from "file-type";
+import gm from "gm";
 
 export interface HealthData extends Prisma.HealthDataGetPayload<{
     select: {
@@ -63,15 +65,38 @@ export async function POST(
 
         // Save files
         if (file instanceof File) {
+            const fileBuffer = Buffer.from(await file.arrayBuffer())
+            const result = await fileTypeFromBuffer(fileBuffer)
+            if (!result) return NextResponse.json({error: 'Failed to determine file type'}, {status: 400})
+
+            // Get file hash
             const hash = crypto.createHash('md5')
-            hash.update(Buffer.from(await file.arrayBuffer()))
+            hash.update(fileBuffer)
             const fileHash = hash.digest('hex')
-            const extension = file.name.split('.').pop()
-            const filename = `${fileHash}.${extension}`;
-            fs.writeFileSync(`./public/uploads/${filename}`, Buffer.from(await file.arrayBuffer()))
-            fileType = file.type
-            filePath = `/uploads/${filename}`
-            baseData = {fileName: file.name}
+
+            const {mime} = result
+            if (mime.startsWith('image/')) {
+                const imageMagick = gm.subClass({imageMagick: true});
+                const outputBuffer = await new Promise<Buffer>((resolve, reject) => {
+                    imageMagick(fileBuffer)
+                        .toBuffer('PNG', (err, buffer) => {
+                            if (err) reject(err);
+                            else resolve(buffer);
+                        });
+                });
+                const filename = `${fileHash}.png`;
+                fs.writeFileSync(`./public/uploads/${filename}`, outputBuffer)
+                fileType = file.type
+                filePath = `/uploads/${filename}`
+                baseData = {fileName: file.name}
+            } else {
+                const extension = file.name.split('.').pop()
+                const filename = `${fileHash}.${extension}`;
+                fs.writeFileSync(`./public/uploads/${filename}`, fileBuffer)
+                fileType = file.type
+                filePath = `/uploads/${filename}`
+                baseData = {fileName: file.name}
+            }
         }
 
         // Create parsing data
