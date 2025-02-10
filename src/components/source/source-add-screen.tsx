@@ -5,7 +5,7 @@
 import {Document, Page, pdfjs} from 'react-pdf';
 import React, {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
 import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Activity, FileText, Loader2, Plus, Trash2, User} from 'lucide-react';
+import {Activity, FileText, Loader2, Plus, Trash2, User, X} from 'lucide-react';
 import {Button} from "@/components/ui/button";
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,} from "@/components/ui/dialog";
 import useSWR from "swr";
@@ -19,6 +19,7 @@ import {FaChevronLeft, FaChevronRight} from 'react-icons/fa';
 import testItems from '@/lib/health-data/parser/test-items.json'
 import TextInput from "@/components/form/text-input";
 import Select from 'react-select';
+import {ChevronRight, ChevronLeft} from 'lucide-react';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
 
@@ -65,6 +66,26 @@ interface HealthDataPreviewProps {
     formData: Record<string, any>;
     setFormData: (data: Record<string, any>) => void;
     setHealthData?: (data: HealthData) => void;
+}
+
+interface ParsingSettings {
+    description: string;
+    visionModel: {
+        company: 'ollama' | 'google' | 'openai';
+        modelName: string;
+        apiKey?: string;
+    };
+    ocrModel: {
+        company: 'docling' | 'upstage';
+        modelName?: string;
+        apiKey?: string;
+    };
+}
+
+interface ParsingSettingsDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    onConfirm: (settings: ParsingSettings) => void;
 }
 
 const HealthDataType = {
@@ -145,10 +166,35 @@ const symptomsFields: Field[] = [
 
 const AddSourceDialog: React.FC<AddSourceDialogProps> = ({onFileUpload, onAddSymptoms}) => {
     const [open, setOpen] = useState(false);
+    const [showSettingsAlert, setShowSettingsAlert] = useState(false);
+    const [uploadStatus, setUploadStatus] = useState<string>('');
 
-    const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
-        onFileUpload(e);
-        setOpen(false);
+    const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files?.length) return;
+
+        try {
+            const settingsResponse = await fetch('/api/settings/parsing');
+            const settings = await settingsResponse.json();
+            
+            if (!settings?.visionModel?.apiKey && settings?.visionModel?.company !== 'ollama') {
+                setShowSettingsAlert(true);
+                return;
+            }
+            
+            if (!settings?.ocrModel?.apiKey && settings?.ocrModel?.company === 'upstage') {
+                setShowSettingsAlert(true);
+                return;
+            }
+
+            setUploadStatus('uploading');
+            onFileUpload(e);
+            setOpen(false);
+        } catch (error) {
+            console.error('Failed to check settings:', error);
+            setShowSettingsAlert(true);
+        } finally {
+            setUploadStatus('');
+        }
     };
 
     const handleAddSymptoms = () => {
@@ -158,50 +204,83 @@ const AddSourceDialog: React.FC<AddSourceDialogProps> = ({onFileUpload, onAddSym
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button variant="outline" className="w-full flex gap-2 items-center">
-                    <Plus className="w-4 h-4"/>
-                    Add Source
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Add New Source</DialogTitle>
-                </DialogHeader>
-                <div className="flex flex-col gap-4 min-w-[300px]">
-                    <label
-                        htmlFor="file-upload"
-                        className="flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50"
-                    >
-                        <FileText className="w-6 h-6 text-gray-500"/>
-                        <div className="flex-1">
-                            <h3 className="font-medium">Upload Files</h3>
-                            <p className="text-sm text-gray-500">Add images or PDF files</p>
-                        </div>
-                    </label>
-                    <input
-                        type="file"
-                        id="file-upload"
-                        multiple
-                        accept="image/*,.pdf"
-                        className="hidden"
-                        onChange={handleFileUpload}
-                    />
+        <>
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full flex gap-2 items-center">
+                        <Plus className="w-4 h-4"/>
+                        Add Source
+                    </Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Add New Source</DialogTitle>
+                    </DialogHeader>
+                    <div className="flex flex-col gap-4 min-w-[300px]">
+                        <label
+                            htmlFor="file-upload"
+                            className={cn(
+                                "flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50",
+                                uploadStatus === 'uploading' && "opacity-50 cursor-not-allowed"
+                            )}
+                        >
+                            {uploadStatus === 'uploading' ? (
+                                <Loader2 className="h-6 w-6 text-gray-500 animate-spin"/>
+                            ) : (
+                                <FileText className="w-6 h-6 text-gray-500"/>
+                            )}
+                            <div className="flex-1">
+                                <h3 className="font-medium">Upload Files</h3>
+                                <p className="text-sm text-gray-500">Add images or PDF files</p>
+                            </div>
+                        </label>
+                        <input
+                            type="file"
+                            id="file-upload"
+                            multiple
+                            accept="image/*,.pdf"
+                            className="hidden"
+                            onChange={handleFileUpload}
+                            disabled={uploadStatus === 'uploading'}
+                        />
 
-                    <button
-                        className="flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 w-full"
-                        onClick={handleAddSymptoms}
-                    >
-                        <Activity className="w-6 h-6 text-gray-500"/>
-                        <div className="flex-1 text-left">
-                            <h3 className="font-medium">New Symptoms</h3>
-                            <p className="text-sm text-gray-500">Record today&#39;s symptoms</p>
+                        <button
+                            className="flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 w-full"
+                            onClick={handleAddSymptoms}
+                        >
+                            <Activity className="w-6 h-6 text-gray-500"/>
+                            <div className="flex-1 text-left">
+                                <h3 className="font-medium">New Symptoms</h3>
+                                <p className="text-sm text-gray-500">Record today&#39;s symptoms</p>
+                            </div>
+                        </button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {showSettingsAlert && (
+                <Dialog open={showSettingsAlert} onOpenChange={setShowSettingsAlert}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Settings Required</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                            <p className="text-sm">Please configure the parsing settings before uploading files. You need to:</p>
+                            <ul className="list-disc pl-4 text-sm space-y-2">
+                                <li>Select your preferred Vision and OCR models</li>
+                                <li>Enter the required API keys</li>
+                            </ul>
+                            <p className="text-sm">You can find these settings in the Parsing Settings panel on the right.</p>
+                            <div className="flex justify-end">
+                                <Button onClick={() => setShowSettingsAlert(false)}>
+                                    OK
+                                </Button>
+                            </div>
                         </div>
-                    </button>
-                </div>
-            </DialogContent>
-        </Dialog>
+                    </DialogContent>
+                </Dialog>
+            )}
+        </>
     );
 };
 
@@ -796,81 +875,431 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
     );
 };
 
-export default function SourceAddScreen() {
-    const [selectedHealthData, setSelectedHealthData] = useState<HealthData>();
-    const [formData, setFormData] = useState<Record<string, any>>({});
+type VisionCompany = 'ollama' | 'google' | 'openai';
+type OcrCompany = 'docling' | 'upstage';
 
-    const {data, mutate: healthDataMutate} = useSWR<HealthDataListResponse>('/api/health-data', async (url: string) => {
-        const response = await fetch(url);
-        return await response.json();
-    });
-    const healthDataList = useMemo(() => data?.healthDataList || [], [data]);
+interface ModelOption {
+    name: string;
+    description: string;
+    models: { value: string; label: string; }[];
+}
 
-    useEffect(() => {
-        if (healthDataList.length > 0 && selectedHealthData === undefined) {
-            setSelectedHealthData(healthDataList[0]);
-            setFormData(JSON.parse(JSON.stringify(healthDataList[0].data)));
+type VisionModelOptions = Record<VisionCompany, ModelOption>;
+type OcrModelOptions = Record<OcrCompany, ModelOption>;
+
+const visionModelOptions: VisionModelOptions = {
+    ollama: {
+        name: 'Ollama',
+        description: 'Open source models running locally',
+        models: [
+            { value: 'llama-vision', label: 'Llama Vision' },
+            { value: 'bakllava', label: 'Bakllava' },
+        ]
+    },
+    google: {
+        name: 'Google',
+        description: 'Google AI models',
+        models: [
+            { value: 'gemini-pro-vision', label: 'Gemini Pro Vision' },
+        ]
+    },
+    openai: {
+        name: 'OpenAI',
+        description: 'OpenAI models',
+        models: [
+            { value: 'gpt-4-vision', label: 'GPT-4 Vision' },
+        ]
+    }
+};
+
+const ocrModelOptions: OcrModelOptions = {
+    docling: {
+        name: 'Docling',
+        description: 'Open source parsing model that runs locally',
+        models: [
+            { value: 'docling-local', label: 'Docling Local' },
+        ]
+    },
+    upstage: {
+        name: 'Upstage',
+        description: 'Best performing OCR model in our tests',
+        models: [
+            { value: 'doctr', label: 'DocTR' },
+        ]
+    }
+};
+
+const ParsingSettingsSideBar = () => {
+    const [settings, setSettings] = useState<ParsingSettings>({
+        description: '',
+        visionModel: {
+            company: 'ollama',
+            modelName: 'llama-vision'
+        },
+        ocrModel: {
+            company: 'docling',
+            modelName: 'docling-local'
         }
-    }, [healthDataList, selectedHealthData]);
+    });
+    const [isOpen, setIsOpen] = useState(true);
+
+    const handleSave = async () => {
+        try {
+            await fetch('/api/settings/parsing', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(settings)
+            });
+        } catch (error) {
+            console.error('Failed to save parsing settings:', error);
+        }
+    };
+
+    return (
+        <div className={cn(
+            "border-l transition-all duration-300 flex flex-col",
+            isOpen ? "w-96" : "w-12"
+        )}>
+            {isOpen ? (
+                <>
+                    <div className="h-12 px-4 flex items-center justify-between border-t">
+                        <h2 className="text-sm font-medium">Parsing Settings</h2>
+                        <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+                            <ChevronRight className="h-4 w-4" />
+                        </Button>
+                    </div>
+                    <div className="flex-1 overflow-y-auto">
+                        <div className="p-4 space-y-4">
+                            <p className="text-sm text-muted-foreground">
+                                Vision and OCR models are used together to enhance parsing performance.
+                            </p>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <h3 className="text-sm font-medium mb-2">Vision Model</h3>
+                                    <p className="text-sm text-muted-foreground mb-2">
+                                        Only models with vision capabilities can be used.
+                                    </p>
+                                    <div className="space-y-2">
+                                        <Select<{ value: VisionCompany; label: string; }>
+                                            className="basic-single text-sm"
+                                            classNamePrefix="select"
+                                            styles={{
+                                                control: (base) => ({
+                                                    ...base,
+                                                    fontSize: '0.875rem'
+                                                }),
+                                                option: (base) => ({
+                                                    ...base,
+                                                    fontSize: '0.875rem'
+                                                }),
+                                                menu: (base) => ({
+                                                    ...base,
+                                                    fontSize: '0.875rem'
+                                                })
+                                            }}
+                                            value={{
+                                                value: settings.visionModel.company,
+                                                label: visionModelOptions[settings.visionModel.company].name
+                                            }}
+                                            onChange={(selected) => {
+                                                if (selected) {
+                                                    const company = selected.value;
+                                                    setSettings({
+                                                        ...settings,
+                                                        visionModel: {
+                                                            company,
+                                                            modelName: visionModelOptions[company].models[0].value,
+                                                            apiKey: settings.visionModel.company === company ? settings.visionModel.apiKey : undefined
+                                                        }
+                                                    });
+                                                }
+                                            }}
+                                            options={Object.entries(visionModelOptions).map(([value, info]) => ({
+                                                value: value as VisionCompany,
+                                                label: info.name
+                                            }))}
+                                        />
+
+                                        <Select
+                                            className="basic-single text-sm"
+                                            classNamePrefix="select"
+                                            styles={{
+                                                control: (base) => ({
+                                                    ...base,
+                                                    fontSize: '0.875rem'
+                                                }),
+                                                option: (base) => ({
+                                                    ...base,
+                                                    fontSize: '0.875rem'
+                                                }),
+                                                menu: (base) => ({
+                                                    ...base,
+                                                    fontSize: '0.875rem'
+                                                })
+                                            }}
+                                            placeholder="Select model"
+                                            value={visionModelOptions[settings.visionModel.company].models.find(
+                                                m => m.value === settings.visionModel.modelName
+                                            )}
+                                            onChange={(selected) => selected && setSettings({
+                                                ...settings,
+                                                visionModel: {
+                                                    ...settings.visionModel,
+                                                    modelName: selected.value
+                                                }
+                                            })}
+                                            options={visionModelOptions[settings.visionModel.company].models}
+                                        />
+
+                                        {settings.visionModel.company !== 'ollama' && (
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">API Key</label>
+                                                <input
+                                                    type="password"
+                                                    placeholder="Enter your API key"
+                                                    className="w-full p-2 border rounded-md text-sm"
+                                                    value={settings.visionModel.apiKey || ''}
+                                                    onChange={(e) => setSettings({
+                                                        ...settings,
+                                                        visionModel: {
+                                                            ...settings.visionModel,
+                                                            apiKey: e.target.value
+                                                        }
+                                                    })}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 className="text-sm font-medium mb-2">OCR Model</h3>
+                                    <p className="text-sm text-muted-foreground mb-2">
+                                        <span className="block mb-2">
+                                            Docling is an open-source parsing model that runs locally.{' '}
+                                            <a href="https://github.com/DS4SD/docling" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
+                                                GitHub
+                                            </a>
+                                        </span>
+                                        <span className="block">
+                                            Upstage showed the best performance in our tests.{' '}
+                                            <a href="https://www.upstage.ai" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
+                                                Upstage
+                                            </a>
+                                            {' '}offers $10 free credit for new sign-ups, no card required.
+                                        </span>
+                                    </p>
+                                    <div className="space-y-2">
+                                        <Select<{ value: OcrCompany; label: string; }>
+                                            className="basic-single text-sm"
+                                            classNamePrefix="select"
+                                            styles={{
+                                                control: (base) => ({
+                                                    ...base,
+                                                    fontSize: '0.875rem'
+                                                }),
+                                                option: (base) => ({
+                                                    ...base,
+                                                    fontSize: '0.875rem'
+                                                }),
+                                                menu: (base) => ({
+                                                    ...base,
+                                                    fontSize: '0.875rem'
+                                                })
+                                            }}
+                                            value={{
+                                                value: settings.ocrModel.company,
+                                                label: ocrModelOptions[settings.ocrModel.company].name
+                                            }}
+                                            onChange={(selected) => {
+                                                if (selected) {
+                                                    const company = selected.value;
+                                                    setSettings({
+                                                        ...settings,
+                                                        ocrModel: {
+                                                            company,
+                                                            modelName: ocrModelOptions[company].models[0].value,
+                                                            apiKey: settings.ocrModel.company === company ? settings.ocrModel.apiKey : undefined
+                                                        }
+                                                    });
+                                                }
+                                            }}
+                                            options={Object.entries(ocrModelOptions).map(([value, info]) => ({
+                                                value: value as OcrCompany,
+                                                label: info.name
+                                            }))}
+                                        />
+
+                                        <Select
+                                            className="basic-single text-sm"
+                                            classNamePrefix="select"
+                                            styles={{
+                                                control: (base) => ({
+                                                    ...base,
+                                                    fontSize: '0.875rem'
+                                                }),
+                                                option: (base) => ({
+                                                    ...base,
+                                                    fontSize: '0.875rem'
+                                                }),
+                                                menu: (base) => ({
+                                                    ...base,
+                                                    fontSize: '0.875rem'
+                                                })
+                                            }}
+                                            placeholder="Select model"
+                                            value={ocrModelOptions[settings.ocrModel.company].models.find(
+                                                m => m.value === settings.ocrModel.modelName
+                                            )}
+                                            onChange={(selected) => selected && setSettings({
+                                                ...settings,
+                                                ocrModel: {
+                                                    ...settings.ocrModel,
+                                                    modelName: selected.value
+                                                }
+                                            })}
+                                            options={ocrModelOptions[settings.ocrModel.company].models}
+                                        />
+
+                                        {settings.ocrModel.company === 'upstage' && (
+                                            <div className="space-y-2">
+                                                <label className="text-sm font-medium">API Key</label>
+                                                <input
+                                                    type="password"
+                                                    placeholder="Enter your API key"
+                                                    className="w-full p-2 border rounded-md text-sm"
+                                                    value={settings.ocrModel.apiKey || ''}
+                                                    onChange={(e) => setSettings({
+                                                        ...settings,
+                                                        ocrModel: {
+                                                            ...settings.ocrModel,
+                                                            apiKey: e.target.value
+                                                        }
+                                                    })}
+                                                />
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="pt-4 border-t">
+                                <Button className="w-full" onClick={handleSave}>
+                                    Save Settings
+                                </Button>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            ) : (
+                <div className="h-12 flex items-center justify-center border-t">
+                    <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
+                        <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default function SourceAddScreen() {
+    const [selectedId, setSelectedId] = useState<string | null>(null);
+    const [formData, setFormData] = useState<Record<string, any>>({});
+    const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+    const [isOpen, setIsOpen] = useState(true);
+    const [settings, setSettings] = useState<ParsingSettings>({
+        description: '',
+        visionModel: {
+            company: 'ollama',
+            modelName: 'llama-vision'
+        },
+        ocrModel: {
+            company: 'docling',
+            modelName: 'docling-local'
+        }
+    });
+
+    const {data: healthDataList, mutate} = useSWR<HealthDataListResponse>(
+        '/api/health-data',
+        (url: string) => fetch(url).then((res) => res.json()),
+    );
 
     const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || []);
-        const oldHealthDataList = [...healthDataList];
-        let newHealthDataList = [...oldHealthDataList];
-        const uploadPromises = [];
+        if (!e.target.files?.length) return;
 
-        // Create temporary entries for all files first
-        const tempEntries = files.map(file => ({
-            id: cuid(),
-            type: HealthDataType.FILE.id,
-            data: {} as Record<string, any>,
-            status: 'PARSING',
-            filePath: null,
-            fileType: null,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        } as HealthData));
+        try {
+            const files = Array.from(e.target.files);
+            const settingsResponse = await fetch('/api/settings/parsing');
+            const settings = await settingsResponse.json();
 
-        // Add all temporary entries to the list first
-        newHealthDataList = [...newHealthDataList, ...tempEntries];
-        await healthDataMutate({healthDataList: newHealthDataList}, {revalidate: false});
+            console.log('Current parsing settings:', settings);
 
-        // Process all files in parallel
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            const tempEntry = tempEntries[i];
+            for (const file of files) {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('parsingSettings', JSON.stringify(settings));
 
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('id', tempEntry.id);
-            formData.append('type', tempEntry.type);
-            formData.append('data', JSON.stringify(tempEntry.data));
+                console.log('Uploading file:', file.name);
 
-            const uploadPromise = fetch(`/api/health-data`, {method: 'POST', body: formData})
-                .then(async response => {
-                    const newSource: HealthDataCreateResponse = await response.json();
-                    // Update the list with the actual data
-                    newHealthDataList = newHealthDataList.map(item =>
-                        item.id === tempEntry.id ? newSource : item
-                    );
-                    await healthDataMutate({healthDataList: newHealthDataList}, {revalidate: false});
-                    return newSource;
+                const response = await fetch('/api/health-data', {
+                    method: 'POST',
+                    body: formData,
                 });
 
-            uploadPromises.push(uploadPromise);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Failed to upload file:', {
+                        fileName: file.name,
+                        status: response.status,
+                        error: errorText
+                    });
+                    continue;
+                }
+
+                const data: HealthDataCreateResponse = await response.json();
+                console.log('File upload successful:', {
+                    fileName: file.name,
+                    response: data
+                });
+
+                // Start polling for parsing status
+                if (data.id) {
+                    let attempts = 0;
+                    const maxAttempts = 30; // 30 seconds timeout
+                    const pollInterval = setInterval(async () => {
+                        try {
+                            const statusResponse = await fetch(`/api/health-data/${data.id}`);
+                            const statusData = await statusResponse.json();
+                            console.log('Parsing status check:', {
+                                id: data.id,
+                                status: statusData.status,
+                                attempt: attempts + 1
+                            });
+
+                            if (statusData.status === 'COMPLETED' || statusData.status === 'ERROR' || attempts >= maxAttempts) {
+                                clearInterval(pollInterval);
+                                if (statusData.status === 'ERROR') {
+                                    console.error('Parsing failed:', statusData);
+                                } else if (statusData.status === 'COMPLETED') {
+                                    console.log('Parsing completed successfully:', statusData);
+                                }
+                                await mutate();
+                                setSelectedId(data.id);
+                            }
+                            attempts++;
+                        } catch (error) {
+                            console.error('Failed to check parsing status:', error);
+                            clearInterval(pollInterval);
+                        }
+                    }, 1000); // Check every second
+                }
+            }
+        } catch (error) {
+            console.error('Failed to upload files:', error);
         }
-
-        // Wait for all uploads to complete
-        const results = await Promise.all(uploadPromises);
-
-        // Select the first uploaded file
-        if (results.length > 0) {
-            setSelectedHealthData(results[0]);
-            setFormData(results[0].data as Record<string, any>);
-        }
-
-        // Final update of the list
-        await healthDataMutate({healthDataList: newHealthDataList});
     };
 
     const handleAddSymptoms = async (date: string) => {
@@ -913,131 +1342,345 @@ export default function SourceAddScreen() {
                 newSource = body;
             }
 
-            setSelectedHealthData(newSource);
+            setSelectedId(newSource.id);
             setFormData(newSource.data as Record<string, any>);
-            await healthDataMutate({healthDataList: [...healthDataList, newSource]});
+            await mutate({healthDataList: [...healthDataList?.healthDataList || [], newSource]});
         } catch (error) {
             console.error('Failed to add symptoms:', error);
             // Add the data anyway for better UX
-            setSelectedHealthData(body);
+            setSelectedId(body.id);
             setFormData(body.data as Record<string, any>);
-            await healthDataMutate({healthDataList: [...healthDataList, body]});
+            await mutate({healthDataList: [...healthDataList?.healthDataList || [], body]});
         }
     };
 
     const handleDeleteSource = async (id: string) => {
         await fetch(`/api/health-data/${id}`, {method: 'DELETE'});
 
-        const newSources = healthDataList.filter(s => s.id !== id);
-        await healthDataMutate({healthDataList: newSources});
+        const newSources = healthDataList?.healthDataList.filter(s => s.id !== id) || [];
+        await mutate({healthDataList: newSources});
 
-        if (selectedHealthData?.id === id) {
+        if (selectedId === id) {
             if (newSources.length > 0) {
-                setSelectedHealthData(newSources[0]);
+                setSelectedId(newSources[0].id);
                 setFormData(JSON.parse(JSON.stringify(newSources[0].data)));
             } else {
-                setSelectedHealthData(undefined);
+                setSelectedId(null);
                 setFormData({})
             }
         }
     };
 
     const onChangeHealthData = async (data: HealthData) => {
-        if (selectedHealthData) {
-            setSelectedHealthData(data);
+        if (selectedId) {
+            setSelectedId(data.id);
             setFormData(data.data as Record<string, any>);
-            await fetch(`/api/health-data/${selectedHealthData.id}`, {
+            await fetch(`/api/health-data/${selectedId}`, {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             });
-            await healthDataMutate({
-                healthDataList: healthDataList.map(s =>
-                    s.id === selectedHealthData.id
+            await mutate({
+                healthDataList: healthDataList?.healthDataList?.map(s =>
+                    s.id === selectedId
                         ? data
                         : s
-                )
+                ) || []
             });
         }
-    }
+    };
 
     const onChangeFormData = async (data: Record<string, any>) => {
-        if (selectedHealthData) {
+        if (selectedId) {
             setFormData(data);
-            await fetch(`/api/health-data/${selectedHealthData.id}`, {
+            await fetch(`/api/health-data/${selectedId}`, {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({data: data})
             });
-            await healthDataMutate({
-                healthDataList: healthDataList.map(s =>
-                    s.id === selectedHealthData.id
+            await mutate({
+                healthDataList: healthDataList?.healthDataList?.map(s =>
+                    s.id === selectedId
                         ? {...s, data: data}
                         : s
-                )
+                ) || []
             });
         }
-    }
+    };
 
     return (
-        <div className="w-full h-screen flex gap-4 p-4">
-            <div className="w-1/3 max-w-[500px] h-full">
-                <Card className="h-full flex flex-col">
-                    <CardHeader className="flex-shrink-0">
-                        <CardTitle>Sources</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex-1 overflow-y-auto space-y-4">
-                        <AddSourceDialog
-                            onFileUpload={handleFileUpload}
-                            onAddSymptoms={handleAddSymptoms}
+        <div className="flex flex-col h-screen">
+            <div className="h-14 border-b px-4 flex items-center justify-between">
+                <h1 className="text-base font-semibold">Source Management</h1>
+            </div>
+            <div className="flex flex-1 overflow-hidden">
+                <div className="w-80 border-r flex flex-col">
+                    <div className="p-4 flex flex-col gap-4">
+                <AddSourceDialog onFileUpload={handleFileUpload} onAddSymptoms={handleAddSymptoms}/>
+                <div className="flex-1 overflow-y-auto">
+                    {healthDataList?.healthDataList?.map((item) => (
+                        <HealthDataItem
+                            key={item.id}
+                            healthData={item}
+                            isSelected={selectedId === item.id}
+                            onClick={() => setSelectedId(item.id)}
+                            onDelete={handleDeleteSource}
                         />
-
-                        <div className="space-y-2">
-                            {healthDataList.map((healthData) => (
-                                <HealthDataItem
-                                    key={healthData.id}
-                                    healthData={healthData}
-                                    isSelected={selectedHealthData?.id === healthData.id}
-                                    onClick={() => {
-                                        setSelectedHealthData(healthData);
-                                        setFormData(JSON.parse(JSON.stringify(healthData.data)));
-                                    }}
-                                    onDelete={handleDeleteSource}
-                                />
-                            ))}
+                    ))}
                         </div>
-                    </CardContent>
-                </Card>
+                </div>
             </div>
 
-            <div className="w-2/3 flex-1 h-full">
-                <Card className="h-full flex flex-col">
-                    <CardHeader className="flex-shrink-0">
-                        <CardTitle>
-                            {selectedHealthData ? (
-                                selectedHealthData.type === HealthDataType.FILE.id ? formData.fileName || 'Untitled File' :
-                                    HealthDataType[selectedHealthData.type as keyof typeof HealthDataType]?.name || 'Unknown'
-                            ) : 'Select a source'}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex-1 overflow-y-auto">
-                        {selectedHealthData ? (
-                            <HealthDataPreview
-                                key={selectedHealthData.id}
-                                healthData={selectedHealthData}
-                                formData={formData}
-                                setFormData={onChangeFormData}
-                                setHealthData={onChangeHealthData}
-                            />
-                        ) : (
-                            <div className="h-full flex items-center justify-center text-gray-500">
-                                Select a source from the list
+            <div className="flex-1 p-4 overflow-y-auto">
+                {selectedId && healthDataList?.healthDataList && (
+                    <HealthDataPreview
+                        healthData={healthDataList.healthDataList.find(s => s.id === selectedId) as HealthData}
+                        formData={formData}
+                        setFormData={onChangeFormData}
+                        setHealthData={onChangeHealthData}
+                    />
+                )}
+            </div>
+
+                <div className={cn(
+                    "border-l transition-all duration-300 flex flex-col",
+                    isOpen ? "w-96" : "w-12"
+                )}>
+                    {isOpen ? (
+                        <>
+                            <div className="h-12 px-4 flex items-center justify-between border-t">
+                                <h2 className="text-sm font-medium">Parsing Settings</h2>
+                                <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+                                    <ChevronRight className="h-4 w-4" />
+                                </Button>
                             </div>
-                        )}
-                    </CardContent>
-                </Card>
+                            <div className="flex-1 overflow-y-auto">
+                                <div className="p-4 space-y-4">
+                                    <p className="text-sm text-muted-foreground">
+                                        Vision and OCR models are used together to enhance parsing performance.
+                                    </p>
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <h3 className="text-sm font-medium mb-2">Vision Model</h3>
+                                            <p className="text-sm text-muted-foreground mb-2">
+                                                Only models with vision capabilities can be used.
+                                            </p>
+                                            <div className="space-y-2">
+                                                <Select<{ value: VisionCompany; label: string; }>
+                                                    className="basic-single text-sm"
+                                                    classNamePrefix="select"
+                                                    styles={{
+                                                        control: (base) => ({
+                                                            ...base,
+                                                            fontSize: '0.875rem'
+                                                        }),
+                                                        option: (base) => ({
+                                                            ...base,
+                                                            fontSize: '0.875rem'
+                                                        }),
+                                                        menu: (base) => ({
+                                                            ...base,
+                                                            fontSize: '0.875rem'
+                                                        })
+                                                    }}
+                                                    value={{
+                                                        value: settings.visionModel.company,
+                                                        label: visionModelOptions[settings.visionModel.company].name
+                                                    }}
+                                                    onChange={(selected) => {
+                                                        if (selected) {
+                                                            const company = selected.value;
+                                                            setSettings({
+                                                                ...settings,
+                                                                visionModel: {
+                                                                    company,
+                                                                    modelName: visionModelOptions[company].models[0].value,
+                                                                    apiKey: settings.visionModel.company === company ? settings.visionModel.apiKey : undefined
+                                                                }
+                                                            });
+                                                        }
+                                                    }}
+                                                    options={Object.entries(visionModelOptions).map(([value, info]) => ({
+                                                        value: value as VisionCompany,
+                                                        label: info.name
+                                                    }))}
+                                                />
+
+                                                <Select
+                                                    className="basic-single text-sm"
+                                                    classNamePrefix="select"
+                                                    styles={{
+                                                        control: (base) => ({
+                                                            ...base,
+                                                            fontSize: '0.875rem'
+                                                        }),
+                                                        option: (base) => ({
+                                                            ...base,
+                                                            fontSize: '0.875rem'
+                                                        }),
+                                                        menu: (base) => ({
+                                                            ...base,
+                                                            fontSize: '0.875rem'
+                                                        })
+                                                    }}
+                                                    placeholder="Select model"
+                                                    value={visionModelOptions[settings.visionModel.company].models.find(
+                                                        m => m.value === settings.visionModel.modelName
+                                                    )}
+                                                    onChange={(selected) => selected && setSettings({
+                                                        ...settings,
+                                                        visionModel: {
+                                                            ...settings.visionModel,
+                                                            modelName: selected.value
+                                                        }
+                                                    })}
+                                                    options={visionModelOptions[settings.visionModel.company].models}
+                                                />
+
+                                                {settings.visionModel.company !== 'ollama' && (
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium">API Key</label>
+                                                        <input
+                                                            type="password"
+                                                            placeholder="Enter your API key"
+                                                            className="w-full p-2 border rounded-md text-sm"
+                                                            value={settings.visionModel.apiKey || ''}
+                                                            onChange={(e) => setSettings({
+                                                                ...settings,
+                                                                visionModel: {
+                                                                    ...settings.visionModel,
+                                                                    apiKey: e.target.value
+                                                                }
+                                                            })}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <h3 className="text-sm font-medium mb-2">OCR Model</h3>
+                                            <p className="text-sm text-muted-foreground mb-2">
+                                                <span className="block mb-2">
+                                                    Docling is an open-source parsing model that runs locally.{' '}
+                                                    <a href="https://github.com/DS4SD/docling" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
+                                                        GitHub
+                                                    </a>
+                                                </span>
+                                                <span className="block">
+                                                    Upstage showed the best performance in our tests.{' '}
+                                                    <a href="https://www.upstage.ai" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
+                                                        Upstage
+                                                    </a>
+                                                    {' '}offers $10 free credit for new sign-ups, no card required.
+                                                </span>
+                                            </p>
+                                            <div className="space-y-2">
+                                                <Select<{ value: OcrCompany; label: string; }>
+                                                    className="basic-single text-sm"
+                                                    classNamePrefix="select"
+                                                    styles={{
+                                                        control: (base) => ({
+                                                            ...base,
+                                                            fontSize: '0.875rem'
+                                                        }),
+                                                        option: (base) => ({
+                                                            ...base,
+                                                            fontSize: '0.875rem'
+                                                        }),
+                                                        menu: (base) => ({
+                                                            ...base,
+                                                            fontSize: '0.875rem'
+                                                        })
+                                                    }}
+                                                    value={{
+                                                        value: settings.ocrModel.company,
+                                                        label: ocrModelOptions[settings.ocrModel.company].name
+                                                    }}
+                                                    onChange={(selected) => {
+                                                        if (selected) {
+                                                            const company = selected.value;
+                                                            setSettings({
+                                                                ...settings,
+                                                                ocrModel: {
+                                                                    company,
+                                                                    modelName: ocrModelOptions[company].models[0].value,
+                                                                    apiKey: settings.ocrModel.company === company ? settings.ocrModel.apiKey : undefined
+                                                                }
+                                                            });
+                                                        }
+                                                    }}
+                                                    options={Object.entries(ocrModelOptions).map(([value, info]) => ({
+                                                        value: value as OcrCompany,
+                                                        label: info.name
+                                                    }))}
+                                                />
+
+                                                <Select
+                                                    className="basic-single text-sm"
+                                                    classNamePrefix="select"
+                                                    styles={{
+                                                        control: (base) => ({
+                                                            ...base,
+                                                            fontSize: '0.875rem'
+                                                        }),
+                                                        option: (base) => ({
+                                                            ...base,
+                                                            fontSize: '0.875rem'
+                                                        }),
+                                                        menu: (base) => ({
+                                                            ...base,
+                                                            fontSize: '0.875rem'
+                                                        })
+                                                    }}
+                                                    placeholder="Select model"
+                                                    value={ocrModelOptions[settings.ocrModel.company].models.find(
+                                                        m => m.value === settings.ocrModel.modelName
+                                                    )}
+                                                    onChange={(selected) => selected && setSettings({
+                                                        ...settings,
+                                                        ocrModel: {
+                                                            ...settings.ocrModel,
+                                                            modelName: selected.value
+                                                        }
+                                                    })}
+                                                    options={ocrModelOptions[settings.ocrModel.company].models}
+                                                />
+
+                                                {settings.ocrModel.company === 'upstage' && (
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium">API Key</label>
+                                                        <input
+                                                            type="password"
+                                                            placeholder="Enter your API key"
+                                                            className="w-full p-2 border rounded-md text-sm"
+                                                            value={settings.ocrModel.apiKey || ''}
+                                                            onChange={(e) => setSettings({
+                                                                ...settings,
+                                                                ocrModel: {
+                                                                    ...settings.ocrModel,
+                                                                    apiKey: e.target.value
+                                                                }
+                                                            })}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="h-12 flex items-center justify-center border-t">
+                            <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
+                                <ChevronLeft className="h-4 w-4" />
+                            </Button>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
 }
-;
