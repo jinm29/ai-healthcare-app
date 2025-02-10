@@ -4,8 +4,7 @@
 
 import {Document, Page, pdfjs} from 'react-pdf';
 import React, {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Activity, FileText, Loader2, Plus, Trash2, User, X} from 'lucide-react';
+import {Activity, ChevronLeft, ChevronRight, FileText, Loader2, Plus, Trash2, User} from 'lucide-react';
 import {Button} from "@/components/ui/button";
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,} from "@/components/ui/dialog";
 import useSWR from "swr";
@@ -18,8 +17,9 @@ import Image from "next/image";
 import {FaChevronLeft, FaChevronRight} from 'react-icons/fa';
 import testItems from '@/lib/health-data/parser/test-items.json'
 import TextInput from "@/components/form/text-input";
-import Select from 'react-select';
-import {ChevronRight, ChevronLeft} from 'lucide-react';
+import dynamic from "next/dynamic";
+
+const Select = dynamic(() => import('react-select'), {ssr: false});
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
 
@@ -175,12 +175,12 @@ const AddSourceDialog: React.FC<AddSourceDialogProps> = ({onFileUpload, onAddSym
         try {
             const settingsResponse = await fetch('/api/settings/parsing');
             const settings = await settingsResponse.json();
-            
+
             if (!settings?.visionModel?.apiKey && settings?.visionModel?.company !== 'ollama') {
                 setShowSettingsAlert(true);
                 return;
             }
-            
+
             if (!settings?.ocrModel?.apiKey && settings?.ocrModel?.company === 'upstage') {
                 setShowSettingsAlert(true);
                 return;
@@ -265,12 +265,14 @@ const AddSourceDialog: React.FC<AddSourceDialogProps> = ({onFileUpload, onAddSym
                             <DialogTitle>Settings Required</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4">
-                            <p className="text-sm">Please configure the parsing settings before uploading files. You need to:</p>
+                            <p className="text-sm">Please configure the parsing settings before uploading files. You
+                                need to:</p>
                             <ul className="list-disc pl-4 text-sm space-y-2">
                                 <li>Select your preferred Vision and OCR models</li>
                                 <li>Enter the required API keys</li>
                             </ul>
-                            <p className="text-sm">You can find these settings in the Parsing Settings panel on the right.</p>
+                            <p className="text-sm">You can find these settings in the Parsing Settings panel on the
+                                right.</p>
                             <div className="flex justify-end">
                                 <Button onClick={() => setShowSettingsAlert(false)}>
                                     OK
@@ -892,22 +894,22 @@ const visionModelOptions: VisionModelOptions = {
         name: 'Ollama',
         description: 'Open source models running locally',
         models: [
-            { value: 'llama-vision', label: 'Llama Vision' },
-            { value: 'bakllava', label: 'Bakllava' },
+            {value: 'llama-vision', label: 'Llama Vision'},
+            {value: 'bakllava', label: 'Bakllava'},
         ]
     },
     google: {
         name: 'Google',
         description: 'Google AI models',
         models: [
-            { value: 'gemini-pro-vision', label: 'Gemini Pro Vision' },
+            {value: 'gemini-pro-vision', label: 'Gemini Pro Vision'},
         ]
     },
     openai: {
         name: 'OpenAI',
         description: 'OpenAI models',
         models: [
-            { value: 'gpt-4-vision', label: 'GPT-4 Vision' },
+            {value: 'gpt-4-vision', label: 'GPT-4 Vision'},
         ]
     }
 };
@@ -917,292 +919,16 @@ const ocrModelOptions: OcrModelOptions = {
         name: 'Docling',
         description: 'Open source parsing model that runs locally',
         models: [
-            { value: 'docling-local', label: 'Docling Local' },
+            {value: 'docling-local', label: 'Docling Local'},
         ]
     },
     upstage: {
         name: 'Upstage',
         description: 'Best performing OCR model in our tests',
         models: [
-            { value: 'doctr', label: 'DocTR' },
+            {value: 'doctr', label: 'DocTR'},
         ]
     }
-};
-
-const ParsingSettingsSideBar = () => {
-    const [settings, setSettings] = useState<ParsingSettings>({
-        description: '',
-        visionModel: {
-            company: 'ollama',
-            modelName: 'llama-vision'
-        },
-        ocrModel: {
-            company: 'docling',
-            modelName: 'docling-local'
-        }
-    });
-    const [isOpen, setIsOpen] = useState(true);
-
-    const handleSave = async () => {
-        try {
-            await fetch('/api/settings/parsing', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(settings)
-            });
-        } catch (error) {
-            console.error('Failed to save parsing settings:', error);
-        }
-    };
-
-    return (
-        <div className={cn(
-            "border-l transition-all duration-300 flex flex-col",
-            isOpen ? "w-96" : "w-12"
-        )}>
-            {isOpen ? (
-                <>
-                    <div className="h-12 px-4 flex items-center justify-between border-t">
-                        <h2 className="text-sm font-medium">Parsing Settings</h2>
-                        <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
-                            <ChevronRight className="h-4 w-4" />
-                        </Button>
-                    </div>
-                    <div className="flex-1 overflow-y-auto">
-                        <div className="p-4 space-y-4">
-                            <p className="text-sm text-muted-foreground">
-                                Vision and OCR models are used together to enhance parsing performance.
-                            </p>
-
-                            <div className="space-y-4">
-                                <div>
-                                    <h3 className="text-sm font-medium mb-2">Vision Model</h3>
-                                    <p className="text-sm text-muted-foreground mb-2">
-                                        Only models with vision capabilities can be used.
-                                    </p>
-                                    <div className="space-y-2">
-                                        <Select<{ value: VisionCompany; label: string; }>
-                                            className="basic-single text-sm"
-                                            classNamePrefix="select"
-                                            styles={{
-                                                control: (base) => ({
-                                                    ...base,
-                                                    fontSize: '0.875rem'
-                                                }),
-                                                option: (base) => ({
-                                                    ...base,
-                                                    fontSize: '0.875rem'
-                                                }),
-                                                menu: (base) => ({
-                                                    ...base,
-                                                    fontSize: '0.875rem'
-                                                })
-                                            }}
-                                            value={{
-                                                value: settings.visionModel.company,
-                                                label: visionModelOptions[settings.visionModel.company].name
-                                            }}
-                                            onChange={(selected) => {
-                                                if (selected) {
-                                                    const company = selected.value;
-                                                    setSettings({
-                                                        ...settings,
-                                                        visionModel: {
-                                                            company,
-                                                            modelName: visionModelOptions[company].models[0].value,
-                                                            apiKey: settings.visionModel.company === company ? settings.visionModel.apiKey : undefined
-                                                        }
-                                                    });
-                                                }
-                                            }}
-                                            options={Object.entries(visionModelOptions).map(([value, info]) => ({
-                                                value: value as VisionCompany,
-                                                label: info.name
-                                            }))}
-                                        />
-
-                                        <Select
-                                            className="basic-single text-sm"
-                                            classNamePrefix="select"
-                                            styles={{
-                                                control: (base) => ({
-                                                    ...base,
-                                                    fontSize: '0.875rem'
-                                                }),
-                                                option: (base) => ({
-                                                    ...base,
-                                                    fontSize: '0.875rem'
-                                                }),
-                                                menu: (base) => ({
-                                                    ...base,
-                                                    fontSize: '0.875rem'
-                                                })
-                                            }}
-                                            placeholder="Select model"
-                                            value={visionModelOptions[settings.visionModel.company].models.find(
-                                                m => m.value === settings.visionModel.modelName
-                                            )}
-                                            onChange={(selected) => selected && setSettings({
-                                                ...settings,
-                                                visionModel: {
-                                                    ...settings.visionModel,
-                                                    modelName: selected.value
-                                                }
-                                            })}
-                                            options={visionModelOptions[settings.visionModel.company].models}
-                                        />
-
-                                        {settings.visionModel.company !== 'ollama' && (
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium">API Key</label>
-                                                <input
-                                                    type="password"
-                                                    placeholder="Enter your API key"
-                                                    className="w-full p-2 border rounded-md text-sm"
-                                                    value={settings.visionModel.apiKey || ''}
-                                                    onChange={(e) => setSettings({
-                                                        ...settings,
-                                                        visionModel: {
-                                                            ...settings.visionModel,
-                                                            apiKey: e.target.value
-                                                        }
-                                                    })}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <h3 className="text-sm font-medium mb-2">OCR Model</h3>
-                                    <p className="text-sm text-muted-foreground mb-2">
-                                        <span className="block mb-2">
-                                            Docling is an open-source parsing model that runs locally.{' '}
-                                            <a href="https://github.com/DS4SD/docling" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
-                                                GitHub
-                                            </a>
-                                        </span>
-                                        <span className="block">
-                                            Upstage showed the best performance in our tests.{' '}
-                                            <a href="https://www.upstage.ai" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
-                                                Upstage
-                                            </a>
-                                            {' '}offers $10 free credit for new sign-ups, no card required.
-                                        </span>
-                                    </p>
-                                    <div className="space-y-2">
-                                        <Select<{ value: OcrCompany; label: string; }>
-                                            className="basic-single text-sm"
-                                            classNamePrefix="select"
-                                            styles={{
-                                                control: (base) => ({
-                                                    ...base,
-                                                    fontSize: '0.875rem'
-                                                }),
-                                                option: (base) => ({
-                                                    ...base,
-                                                    fontSize: '0.875rem'
-                                                }),
-                                                menu: (base) => ({
-                                                    ...base,
-                                                    fontSize: '0.875rem'
-                                                })
-                                            }}
-                                            value={{
-                                                value: settings.ocrModel.company,
-                                                label: ocrModelOptions[settings.ocrModel.company].name
-                                            }}
-                                            onChange={(selected) => {
-                                                if (selected) {
-                                                    const company = selected.value;
-                                                    setSettings({
-                                                        ...settings,
-                                                        ocrModel: {
-                                                            company,
-                                                            modelName: ocrModelOptions[company].models[0].value,
-                                                            apiKey: settings.ocrModel.company === company ? settings.ocrModel.apiKey : undefined
-                                                        }
-                                                    });
-                                                }
-                                            }}
-                                            options={Object.entries(ocrModelOptions).map(([value, info]) => ({
-                                                value: value as OcrCompany,
-                                                label: info.name
-                                            }))}
-                                        />
-
-                                        <Select
-                                            className="basic-single text-sm"
-                                            classNamePrefix="select"
-                                            styles={{
-                                                control: (base) => ({
-                                                    ...base,
-                                                    fontSize: '0.875rem'
-                                                }),
-                                                option: (base) => ({
-                                                    ...base,
-                                                    fontSize: '0.875rem'
-                                                }),
-                                                menu: (base) => ({
-                                                    ...base,
-                                                    fontSize: '0.875rem'
-                                                })
-                                            }}
-                                            placeholder="Select model"
-                                            value={ocrModelOptions[settings.ocrModel.company].models.find(
-                                                m => m.value === settings.ocrModel.modelName
-                                            )}
-                                            onChange={(selected) => selected && setSettings({
-                                                ...settings,
-                                                ocrModel: {
-                                                    ...settings.ocrModel,
-                                                    modelName: selected.value
-                                                }
-                                            })}
-                                            options={ocrModelOptions[settings.ocrModel.company].models}
-                                        />
-
-                                        {settings.ocrModel.company === 'upstage' && (
-                                            <div className="space-y-2">
-                                                <label className="text-sm font-medium">API Key</label>
-                                                <input
-                                                    type="password"
-                                                    placeholder="Enter your API key"
-                                                    className="w-full p-2 border rounded-md text-sm"
-                                                    value={settings.ocrModel.apiKey || ''}
-                                                    onChange={(e) => setSettings({
-                                                        ...settings,
-                                                        ocrModel: {
-                                                            ...settings.ocrModel,
-                                                            apiKey: e.target.value
-                                                        }
-                                                    })}
-                                                />
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="pt-4 border-t">
-                                <Button className="w-full" onClick={handleSave}>
-                                    Save Settings
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </>
-            ) : (
-                <div className="h-12 flex items-center justify-center border-t">
-                    <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
-                        <ChevronLeft className="h-4 w-4" />
-                    </Button>
-                </div>
-            )}
-        </div>
-    );
 };
 
 export default function SourceAddScreen() {
@@ -1416,31 +1142,31 @@ export default function SourceAddScreen() {
             <div className="flex flex-1 overflow-hidden">
                 <div className="w-80 border-r flex flex-col">
                     <div className="p-4 flex flex-col gap-4">
-                <AddSourceDialog onFileUpload={handleFileUpload} onAddSymptoms={handleAddSymptoms}/>
-                <div className="flex-1 overflow-y-auto">
-                    {healthDataList?.healthDataList?.map((item) => (
-                        <HealthDataItem
-                            key={item.id}
-                            healthData={item}
-                            isSelected={selectedId === item.id}
-                            onClick={() => setSelectedId(item.id)}
-                            onDelete={handleDeleteSource}
-                        />
-                    ))}
+                        <AddSourceDialog onFileUpload={handleFileUpload} onAddSymptoms={handleAddSymptoms}/>
+                        <div className="flex-1 overflow-y-auto">
+                            {healthDataList?.healthDataList?.map((item) => (
+                                <HealthDataItem
+                                    key={item.id}
+                                    healthData={item}
+                                    isSelected={selectedId === item.id}
+                                    onClick={() => setSelectedId(item.id)}
+                                    onDelete={handleDeleteSource}
+                                />
+                            ))}
                         </div>
+                    </div>
                 </div>
-            </div>
 
-            <div className="flex-1 p-4 overflow-y-auto">
-                {selectedId && healthDataList?.healthDataList && (
-                    <HealthDataPreview
-                        healthData={healthDataList.healthDataList.find(s => s.id === selectedId) as HealthData}
-                        formData={formData}
-                        setFormData={onChangeFormData}
-                        setHealthData={onChangeHealthData}
-                    />
-                )}
-            </div>
+                <div className="flex-1 p-4 overflow-y-auto">
+                    {selectedId && healthDataList?.healthDataList && (
+                        <HealthDataPreview
+                            healthData={healthDataList.healthDataList.find(s => s.id === selectedId) as HealthData}
+                            formData={formData}
+                            setFormData={onChangeFormData}
+                            setHealthData={onChangeHealthData}
+                        />
+                    )}
+                </div>
 
                 <div className={cn(
                     "border-l transition-all duration-300 flex flex-col",
@@ -1451,7 +1177,7 @@ export default function SourceAddScreen() {
                             <div className="h-12 px-4 flex items-center justify-between border-t">
                                 <h2 className="text-sm font-medium">Parsing Settings</h2>
                                 <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
-                                    <ChevronRight className="h-4 w-4" />
+                                    <ChevronRight className="h-4 w-4"/>
                                 </Button>
                             </div>
                             <div className="flex-1 overflow-y-auto">
@@ -1467,7 +1193,7 @@ export default function SourceAddScreen() {
                                                 Only models with vision capabilities can be used.
                                             </p>
                                             <div className="space-y-2">
-                                                <Select<{ value: VisionCompany; label: string; }>
+                                                <Select
                                                     className="basic-single text-sm"
                                                     classNamePrefix="select"
                                                     styles={{
@@ -1564,20 +1290,24 @@ export default function SourceAddScreen() {
                                             <p className="text-sm text-muted-foreground mb-2">
                                                 <span className="block mb-2">
                                                     Docling is an open-source parsing model that runs locally.{' '}
-                                                    <a href="https://github.com/DS4SD/docling" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
+                                                    <a href="https://github.com/DS4SD/docling"
+                                                       className="text-primary hover:underline" target="_blank"
+                                                       rel="noopener noreferrer">
                                                         GitHub
                                                     </a>
                                                 </span>
                                                 <span className="block">
                                                     Upstage showed the best performance in our tests.{' '}
-                                                    <a href="https://www.upstage.ai" className="text-primary hover:underline" target="_blank" rel="noopener noreferrer">
+                                                    <a href="https://www.upstage.ai"
+                                                       className="text-primary hover:underline" target="_blank"
+                                                       rel="noopener noreferrer">
                                                         Upstage
                                                     </a>
                                                     {' '}offers $10 free credit for new sign-ups, no card required.
                                                 </span>
                                             </p>
                                             <div className="space-y-2">
-                                                <Select<{ value: OcrCompany; label: string; }>
+                                                <Select
                                                     className="basic-single text-sm"
                                                     classNamePrefix="select"
                                                     styles={{
@@ -1675,7 +1405,7 @@ export default function SourceAddScreen() {
                     ) : (
                         <div className="h-12 flex items-center justify-center border-t">
                             <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
-                                <ChevronLeft className="h-4 w-4" />
+                                <ChevronLeft className="h-4 w-4"/>
                             </Button>
                         </div>
                     )}
