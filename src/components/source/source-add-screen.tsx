@@ -934,7 +934,6 @@ const ocrModelOptions: OcrModelOptions = {
 export default function SourceAddScreen() {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [formData, setFormData] = useState<Record<string, any>>({});
-    const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
     const [isOpen, setIsOpen] = useState(true);
     const [settings, setSettings] = useState<ParsingSettings>({
         description: '',
@@ -1149,7 +1148,10 @@ export default function SourceAddScreen() {
                                     key={item.id}
                                     healthData={item}
                                     isSelected={selectedId === item.id}
-                                    onClick={() => setSelectedId(item.id)}
+                                    onClick={() => {
+                                        setSelectedId(item.id)
+                                        setFormData(item.data as Record<string, any>)
+                                    }}
                                     onDelete={handleDeleteSource}
                                 />
                             ))}
@@ -1160,6 +1162,7 @@ export default function SourceAddScreen() {
                 <div className="flex-1 p-4 overflow-y-auto">
                     {selectedId && healthDataList?.healthDataList && (
                         <HealthDataPreview
+                            key={selectedId}
                             healthData={healthDataList.healthDataList.find(s => s.id === selectedId) as HealthData}
                             formData={formData}
                             setFormData={onChangeFormData}
