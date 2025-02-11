@@ -1,12 +1,12 @@
-FROM node:lts
+FROM node:lts-alpine
 LABEL authors="OpenHealth"
 
 ARG DATABASE_URL=${DATABASE_URL}
 
-RUN apt-get update && apt-get install -y graphicsmagick
+RUN apk add graphicsmagick
 
 WORKDIR /app
-COPY . /app
+COPY . .
 
 RUN npm install
 RUN npm run build
