@@ -1,14 +1,22 @@
-FROM node:lts
+FROM node:lts-alpine
 LABEL authors="OpenHealth"
 
 ARG DATABASE_URL=${DATABASE_URL}
 
-RUN apt-get update && apt-get install -y graphicsmagick
+RUN apk add -U graphicsmagick
 
 WORKDIR /app
-COPY . /app
+
+COPY package.json prisma/ .
 
 RUN npm install
-RUN npm run build
 
-CMD ["sh", "-c", "npx prisma db push --accept-data-loss && npx prisma db seed && npm start"]
+COPY . .
+
+RUN npm run build && \
+    adduser --disabled-password ohuser && \
+    chown -R ohuser .
+
+USER ohuser
+EXPOSE 3000
+ENTRYPOINT ["sh", "-c", "npx prisma db push --accept-data-loss && npx prisma db seed && npm start"]
