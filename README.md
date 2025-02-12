@@ -140,6 +140,7 @@ graph LR
    ```bash
    docker compose --env-file .env up --build
    ```
+   to rebuild the image. Run this also if you make any modifications to the .env file.
 
 3. **Access OpenHealth:**
    Open your browser and navigate to `http://localhost:3000` to begin using OpenHealth.
