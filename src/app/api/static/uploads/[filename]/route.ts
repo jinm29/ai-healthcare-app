@@ -7,7 +7,7 @@ export async function GET(
 ) {
     const {filename} = await params
 
-    if (!filename.match(/^[a-zA-Z0-9-_]+\.pdf$/)) {
+    if (!filename.match(/^[a-zA-Z0-9-_]+\.(pdf|png)$/)) {
         return new Response('Invalid filename', {status: 400})
     }
 
