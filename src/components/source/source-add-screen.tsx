@@ -596,7 +596,7 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
                             healthData?.fileType?.includes('image') && healthData?.filePath ? (
                                 <div className="p-4">
                                     <Image
-                                        src={healthData.filePath}
+                                        src={`/api/static/${healthData.filePath}`}
                                         alt="Preview"
                                         className="w-full h-auto"
                                         width={800}
