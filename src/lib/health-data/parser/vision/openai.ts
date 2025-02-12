@@ -3,7 +3,11 @@ import {ChatOpenAI} from "@langchain/openai";
 import {HealthCheckupSchema} from "@/lib/health-data/parser/schema";
 import {ChatPromptTemplate} from "@langchain/core/prompts";
 
-class OpenAIVisionParser extends BaseVisionParser {
+export class OpenAIVisionParser extends BaseVisionParser {
+
+    get name(): string {
+        return "OpenAI";
+    }
 
     async models(): Promise<VisionParserModel[]> {
         return [
@@ -15,8 +19,8 @@ class OpenAIVisionParser extends BaseVisionParser {
     }
 
     async parse(options: VisionParseOptions) {
-        const llm = new ChatOpenAI({model: options.model.id})
-        const messages = ChatPromptTemplate.fromMessages(options.messages || []);
+        const llm = new ChatOpenAI({model: options.model.id, apiKey: options.apiKey})
+        const messages = options.messages || ChatPromptTemplate.fromMessages([]);
         const chain = messages.pipe(llm.withStructuredOutput(HealthCheckupSchema, {
             method: 'functionCalling',
         }))
