@@ -920,8 +920,10 @@ export default function SourceAddScreen() {
             const files = Array.from(e.target.files);
 
             for (const file of files) {
+                const id = cuid();
                 const formData = new FormData();
                 formData.append('file', file);
+                formData.append('id', id);
 
                 // Vision Parser
                 if (visionParser?.value) formData.append('visionParser', visionParser.value);
@@ -932,6 +934,24 @@ export default function SourceAddScreen() {
                 if (documentParser?.value) formData.append('documentParser', documentParser.value);
                 if (documentParserModel?.value) formData.append('documentParserModel', documentParserModel.value);
                 if (documentParserApiKey) formData.append('documentParserApiKey', documentParserApiKey);
+
+                // Add temporary entries to the list first
+                await mutate({
+                    healthDataList: [
+                        ...healthDataList?.healthDataList || [],
+                        {
+                            id: id,
+                            type: HealthDataType.FILE.id,
+                            data: {fileName: file.name} as Record<string, any>,
+                            metadata: {} as Record<string, any>,
+                            status: 'PARSING',
+                            filePath: null,
+                            fileType: file.type,
+                            createdAt: new Date(),
+                            updatedAt: new Date()
+                        }
+                    ]
+                }, {revalidate: false});
 
                 // Request
                 const response = await fetch('/api/health-data', {method: 'POST', body: formData});
@@ -1128,6 +1148,7 @@ export default function SourceAddScreen() {
                                     healthData={item}
                                     isSelected={selectedId === item.id}
                                     onClick={() => {
+                                        if (item.status === 'PARSING') return;
                                         setSelectedId(item.id)
                                         setFormData(item.data as Record<string, any>)
                                     }}

@@ -56,6 +56,7 @@ export async function POST(
     } else {
         const formData = await req.formData()
         const file = formData.get('file')
+        const id = formData.get('id')
 
         // Vision Parser
         const visionParser = formData.get('visionParser')
@@ -112,6 +113,7 @@ export async function POST(
         try {
             healthData = await prisma.healthData.create({
                 data: {
+                    id: id ? id as string : undefined,
                     type: 'FILE',
                     status: 'PARSING',
                     filePath: filePath,
