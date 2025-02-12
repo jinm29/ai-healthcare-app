@@ -56,9 +56,16 @@ export async function POST(
     } else {
         const formData = await req.formData()
         const file = formData.get('file')
+
+        // Vision Parser
         const visionParser = formData.get('visionParser')
         const visionParserModel = formData.get('visionParserModel')
         const visionParserApiKey = formData.get('visionParserApiKey')
+
+        // Document Parser
+        const documentParser = formData.get('documentParser')
+        const documentParserModel = formData.get('documentParserModel')
+        const documentParserApiKey = formData.get('documentParserApiKey')
 
         let filePath: string | undefined
         let fileType: string | undefined
@@ -124,6 +131,11 @@ export async function POST(
                     parser: visionParser as string,
                     model: visionParserModel as string,
                     apiKey: visionParserApiKey as string
+                } : undefined,
+                documentParser: documentParser ? {
+                    parser: documentParser as string,
+                    model: documentParserModel as string,
+                    apiKey: documentParserApiKey as string
                 } : undefined
             })
 

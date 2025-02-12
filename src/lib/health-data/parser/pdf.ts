@@ -1,17 +1,21 @@
 /* eslint-disable */
 import * as fsPromise from "node:fs/promises";
-import fs from 'node:fs';
 import {fromBuffer as pdf2picFromBuffer} from 'pdf2pic'
 import {ChatPromptTemplate} from "@langchain/core/prompts";
 import {HealthCheckupSchema, HealthCheckupType} from "@/lib/health-data/parser/schema";
-import FormData from "form-data";
-import fetch from "node-fetch";
 import {fileTypeFromBuffer} from 'file-type';
 import {getFileMd5, processBatchWithConcurrency, resolveUploadPath} from "@/lib/health-data/parser/util";
 import {getParsePrompt, MessagePayload} from "@/lib/health-data/parser/prompt";
 import visions from "@/lib/health-data/parser/vision";
+import documents from "@/lib/health-data/parser/document";
 
 interface VisionParserOptions {
+    parser: string;
+    model: string;
+    apiKey: string;
+}
+
+interface DocumentParserOptions {
     parser: string;
     model: string;
     apiKey: string;
@@ -20,7 +24,7 @@ interface VisionParserOptions {
 interface SourceParseOptions {
     file: string;
     visionParser?: VisionParserOptions
-    ocr?: 'upstage' | 'docling'
+    documentParser?: DocumentParserOptions
 }
 
 interface InferenceOptions {
@@ -28,9 +32,10 @@ interface InferenceOptions {
     excludeImage: boolean,
     excludeText: boolean,
     visionParser: VisionParserOptions
+    documentParser: DocumentParserOptions
 }
 
-async function documentOCR({document}: { document: string }) {
+async function documentOCR({document, documentParser}: { document: string, documentParser: DocumentParserOptions }) {
     const documentFile = await fsPromise.readFile(document)
     const filename = await getFileMd5(documentFile)
     const path = `./public/uploads/${filename}_ocr.json`
@@ -39,26 +44,25 @@ async function documentOCR({document}: { document: string }) {
     const fileExists = await fsPromise.access(path).then(() => true).catch(() => false)
     if (fileExists) return JSON.parse(await fsPromise.readFile(path, 'utf-8'))
 
-    const formData = new FormData();
-    formData.append('document', fs.createReadStream(document));
-    formData.append("schema", "oac");
-    formData.append("model", "ocr-2.2.1");
+    // Get the document parser
+    const parser = documents.find(e => e.name === documentParser.parser)
+    if (!parser) throw new Error('Invalid document parser')
 
-    const response = await fetch('https://api.upstage.ai/v1/document-ai/ocr', {
-        method: 'POST',
-        body: formData,
-        headers: {Authorization: `Bearer ${process.env.UPSTAGE_API_KEY}`}
-    });
+    // Get the ocr result
+    const models = await parser.models()
+    const model = models.find(e => e.id === documentParser.model)
+    if (!model) throw new Error('Invalid document parser model')
 
-    const result = await response.json()
+    // Get the ocr result
+    const {ocr} = await parser.ocr({input: document, model: model, apiKey: documentParser.apiKey})
 
     // Save the result
-    await fsPromise.writeFile(path, JSON.stringify(result))
+    await fsPromise.writeFile(path, JSON.stringify(ocr))
 
-    return result
+    return ocr
 }
 
-async function documentParse({document}: { document: string }) {
+async function documentParse({document, documentParser}: { document: string, documentParser: DocumentParserOptions }) {
     const documentFile = await fsPromise.readFile(document)
     const filename = await getFileMd5(documentFile)
     const path = `./public/uploads/${filename}.json`
@@ -67,20 +71,17 @@ async function documentParse({document}: { document: string }) {
     const fileExists = await fsPromise.access(path).then(() => true).catch(() => false)
     if (fileExists) return JSON.parse(await fsPromise.readFile(path, 'utf-8'))
 
-    const formData = new FormData();
-    formData.append('document', fs.createReadStream(document));
-    formData.append('ocr', 'force')
-    formData.append('output_formats', JSON.stringify(["markdown"]))
-    formData.append("coordinates", "true");
-    formData.append("model", "document-parse");
+    // Get the document parser
+    const parser = documents.find(e => e.name === documentParser.parser)
+    if (!parser) throw new Error('Invalid document parser')
 
-    const response = await fetch('https://api.upstage.ai/v1/document-ai/document-parse', {
-        method: 'POST',
-        body: formData,
-        headers: {Authorization: `Bearer ${process.env.UPSTAGE_API_KEY}`}
-    })
+    // Get the ocr result
+    const models = await parser.models()
+    const model = models.find(e => e.id === documentParser.model)
+    if (!model) throw new Error('Invalid document parser model')
 
-    const result = await response.json()
+    // Get the parse result
+    const {document: result} = await parser.parse({input: document, model: model, apiKey: documentParser.apiKey})
 
     // Save the result
     await fsPromise.writeFile(path, JSON.stringify(result))
@@ -89,13 +90,19 @@ async function documentParse({document}: { document: string }) {
 }
 
 async function inference(inferenceOptions: InferenceOptions) {
-    const {imagePaths, excludeImage, excludeText, visionParser: visionParserOptions} = inferenceOptions
+    const {
+        imagePaths,
+        excludeImage,
+        excludeText,
+        visionParser: visionParserOptions,
+        documentParser: documentParserOptions
+    } = inferenceOptions
 
     // Extract text data if not excluding text
     const pageDataList: { page_content: string }[] | undefined = !excludeText ? await processBatchWithConcurrency(
         imagePaths,
         async (path) => {
-            const {content} = await documentParse({document: path})
+            const {content} = await documentParse({document: path, documentParser: documentParserOptions})
             const {markdown} = content
             return {page_content: markdown}
         },
@@ -249,19 +256,6 @@ async function documentToImages({file: filePath}: Pick<SourceParseOptions, 'file
 export async function parseHealthData(options: SourceParseOptions) {
     const {file: filePath} = options
 
-    // prepare images
-    const imagePaths = await documentToImages({file: filePath})
-
-    // prepare ocr results
-    const ocrResults = await documentOCR({document: filePath})
-
-    // prepare parse results
-    await processBatchWithConcurrency(
-        imagePaths,
-        async (path) => documentParse({document: path}),
-        3
-    )
-
     // VisionParser
     const visionParser = options.visionParser || {
         parser: 'OpenAI',
@@ -269,8 +263,31 @@ export async function parseHealthData(options: SourceParseOptions) {
         apiKey: process.env.OPENAI_API as string
     }
 
+    // Document Parser
+    const documentParser = options.documentParser || {
+        parser: 'Upstage',
+        model: 'document-parse',
+        apiKey: process.env.UPSTAGE_API_KEY as string
+    }
+
+    // prepare images
+    const imagePaths = await documentToImages({file: filePath})
+
+    // prepare ocr results
+    const ocrResults = await documentOCR({
+        document: filePath,
+        documentParser: documentParser
+    })
+
+    // prepare parse results
+    await processBatchWithConcurrency(
+        imagePaths,
+        async (path) => documentParse({document: path, documentParser: documentParser}),
+        3
+    )
+
     // Merge the results
-    const baseInferenceOptions = {imagePaths, visionParser}
+    const baseInferenceOptions = {imagePaths, visionParser, documentParser}
     const [
         {finalHealthCheckup: resultTotal, mergedTestResultPage: resultTotalPages},
         {finalHealthCheckup: resultText, mergedTestResultPage: resultTextPages},

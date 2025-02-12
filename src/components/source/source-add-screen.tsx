@@ -20,6 +20,7 @@ import TextInput from "@/components/form/text-input";
 import dynamic from "next/dynamic";
 import {HealthDataParserVisionListResponse} from "@/app/api/health-data-parser/visions/route";
 import {HealthDataGetResponse} from "@/app/api/health-data/[id]/route";
+import {HealthDataParserDocumentListResponse} from "@/app/api/health-data-parser/documents/route";
 
 const Select = dynamic(() => import('react-select'), {ssr: false});
 
@@ -55,6 +56,7 @@ interface AddSourceDialogProps {
     onFileUpload: (e: ChangeEvent<HTMLInputElement>) => void;
     onAddSymptoms: (date: string) => void;
     isSetUpVisionParser: boolean;
+    isSetUpDocumentParser: boolean;
 }
 
 interface HealthDataItemProps {
@@ -169,6 +171,7 @@ const symptomsFields: Field[] = [
 
 const AddSourceDialog: React.FC<AddSourceDialogProps> = ({
                                                              isSetUpVisionParser,
+                                                             isSetUpDocumentParser,
                                                              onFileUpload,
                                                              onAddSymptoms
                                                          }) => {
@@ -180,7 +183,7 @@ const AddSourceDialog: React.FC<AddSourceDialogProps> = ({
         if (!e.target.files?.length) return;
 
         try {
-            if (!isSetUpVisionParser) {
+            if (!isSetUpVisionParser || !isSetUpDocumentParser) {
                 setShowSettingsAlert(true);
                 return;
             }
@@ -880,33 +883,6 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
     );
 };
 
-type OcrCompany = 'docling' | 'upstage';
-
-interface ModelOption {
-    name: string;
-    description: string;
-    models: { value: string; label: string; }[];
-}
-
-type OcrModelOptions = Record<OcrCompany, ModelOption>;
-
-const ocrModelOptions: OcrModelOptions = {
-    docling: {
-        name: 'Docling',
-        description: 'Open source parsing model that runs locally',
-        models: [
-            {value: 'docling-local', label: 'Docling Local'},
-        ]
-    },
-    upstage: {
-        name: 'Upstage',
-        description: 'Best performing OCR model in our tests',
-        models: [
-            {value: 'doctr', label: 'DocTR'},
-        ]
-    }
-};
-
 export default function SourceAddScreen() {
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [formData, setFormData] = useState<Record<string, any>>({});
@@ -917,6 +893,11 @@ export default function SourceAddScreen() {
     const [visionParserModel, setVisionParserModel] = useState<{ value: string; label: string }>()
     const [visionParserApiKey, setVisionParserApiKey] = useState<string>('')
 
+    // Document Parser
+    const [documentParser, setDocumentParser] = useState<{ value: string; label: string }>()
+    const [documentParserModel, setDocumentParserModel] = useState<{ value: string; label: string }>()
+    const [documentParserApiKey, setDocumentParserApiKey] = useState<string>('')
+
     const {data: healthDataList, mutate} = useSWR<HealthDataListResponse>(
         '/api/health-data',
         (url: string) => fetch(url).then((res) => res.json()),
@@ -924,6 +905,11 @@ export default function SourceAddScreen() {
 
     const {data: visionDataList} = useSWR<HealthDataParserVisionListResponse>(
         '/api/health-data-parser/visions',
+        (url: string) => fetch(url).then((res) => res.json()),
+    )
+
+    const {data: documentDataList} = useSWR<HealthDataParserDocumentListResponse>(
+        '/api/health-data-parser/documents',
         (url: string) => fetch(url).then((res) => res.json()),
     )
 
@@ -941,6 +927,11 @@ export default function SourceAddScreen() {
                 if (visionParser?.value) formData.append('visionParser', visionParser.value);
                 if (visionParserModel?.value) formData.append('visionParserModel', visionParserModel.value);
                 if (visionParserApiKey) formData.append('visionParserApiKey', visionParserApiKey);
+
+                // Document Parser
+                if (documentParser?.value) formData.append('documentParser', documentParser.value);
+                if (documentParserModel?.value) formData.append('documentParserModel', documentParserModel.value);
+                if (documentParserApiKey) formData.append('documentParserApiKey', documentParserApiKey);
 
                 // Request
                 const response = await fetch('/api/health-data', {method: 'POST', body: formData});
@@ -1109,6 +1100,14 @@ export default function SourceAddScreen() {
         }
     }, [visionDataList, visionParser]);
 
+    useEffect(() => {
+        if (documentDataList?.documents && documentParser === undefined) {
+            const {name, models} = documentDataList.documents[0];
+            setDocumentParser({value: name, label: name})
+            setDocumentParserModel({value: models[0].id, label: models[0].name})
+        }
+    }, [documentDataList, documentParser]);
+
     return (
         <div className="flex flex-col h-screen">
             <div className="h-14 border-b px-4 flex items-center justify-between">
@@ -1118,8 +1117,8 @@ export default function SourceAddScreen() {
                 <div className="w-80 border-r flex flex-col">
                     <div className="p-4 flex flex-col gap-4">
                         <AddSourceDialog
-                            key={`vision-${visionParser !== undefined && visionParserModel !== undefined && visionParserApiKey.length > 0}`}
                             isSetUpVisionParser={visionParser !== undefined && visionParserModel !== undefined && visionParserApiKey.length > 0}
+                            isSetUpDocumentParser={documentParser !== undefined && documentParserModel !== undefined && documentParserApiKey.length > 0}
                             onFileUpload={handleFileUpload}
                             onAddSymptoms={handleAddSymptoms}/>
                         <div className="flex-1 overflow-y-auto">
@@ -1225,119 +1224,71 @@ export default function SourceAddScreen() {
                                             </div>
                                         </div>
 
-                                        {/*<div>*/}
-                                        {/*    <h3 className="text-sm font-medium mb-2">OCR Model</h3>*/}
-                                        {/*    <p className="text-sm text-muted-foreground mb-2">*/}
-                                        {/*        <span className="block mb-2">*/}
-                                        {/*            Docling is an open-source parsing model that runs locally.{' '}*/}
-                                        {/*            <a href="https://github.com/DS4SD/docling"*/}
-                                        {/*               className="text-primary hover:underline" target="_blank"*/}
-                                        {/*               rel="noopener noreferrer">*/}
-                                        {/*                GitHub*/}
-                                        {/*            </a>*/}
-                                        {/*        </span>*/}
-                                        {/*        <span className="block">*/}
-                                        {/*            Upstage showed the best performance in our tests.{' '}*/}
-                                        {/*            <a href="https://www.upstage.ai"*/}
-                                        {/*               className="text-primary hover:underline" target="_blank"*/}
-                                        {/*               rel="noopener noreferrer">*/}
-                                        {/*                Upstage*/}
-                                        {/*            </a>*/}
-                                        {/*            {' '}offers $10 free credit for new sign-ups, no card required.*/}
-                                        {/*        </span>*/}
-                                        {/*    </p>*/}
-                                        {/*    <div className="space-y-2">*/}
-                                        {/*        <Select*/}
-                                        {/*            className="basic-single text-sm"*/}
-                                        {/*            classNamePrefix="select"*/}
-                                        {/*            styles={{*/}
-                                        {/*                control: (base) => ({*/}
-                                        {/*                    ...base,*/}
-                                        {/*                    fontSize: '0.875rem'*/}
-                                        {/*                }),*/}
-                                        {/*                option: (base) => ({*/}
-                                        {/*                    ...base,*/}
-                                        {/*                    fontSize: '0.875rem'*/}
-                                        {/*                }),*/}
-                                        {/*                menu: (base) => ({*/}
-                                        {/*                    ...base,*/}
-                                        {/*                    fontSize: '0.875rem'*/}
-                                        {/*                })*/}
-                                        {/*            }}*/}
-                                        {/*            value={{*/}
-                                        {/*                value: settings.ocrModel.company,*/}
-                                        {/*                label: ocrModelOptions[settings.ocrModel.company].name*/}
-                                        {/*            }}*/}
-                                        {/*            onChange={(selected) => {*/}
-                                        {/*                if (selected) {*/}
-                                        {/*                    const company = selected.value;*/}
-                                        {/*                    setSettings({*/}
-                                        {/*                        ...settings,*/}
-                                        {/*                        ocrModel: {*/}
-                                        {/*                            company,*/}
-                                        {/*                            modelName: ocrModelOptions[company].models[0].value,*/}
-                                        {/*                            apiKey: settings.ocrModel.company === company ? settings.ocrModel.apiKey : undefined*/}
-                                        {/*                        }*/}
-                                        {/*                    });*/}
-                                        {/*                }*/}
-                                        {/*            }}*/}
-                                        {/*            options={Object.entries(ocrModelOptions).map(([value, info]) => ({*/}
-                                        {/*                value: value as OcrCompany,*/}
-                                        {/*                label: info.name*/}
-                                        {/*            }))}*/}
-                                        {/*        />*/}
+                                        <div>
+                                            <h3 className="text-sm font-medium mb-2">Document Model</h3>
+                                            <p className="text-sm text-muted-foreground mb-2">
+                                                {/*<span className="block mb-2">*/}
+                                                {/*    Docling is an open-source parsing model that runs locally.{' '}*/}
+                                                {/*    <a href="https://github.com/DS4SD/docling"*/}
+                                                {/*       className="text-primary hover:underline" target="_blank"*/}
+                                                {/*       rel="noopener noreferrer">*/}
+                                                {/*        GitHub*/}
+                                                {/*    </a>*/}
+                                                {/*</span>*/}
+                                                <span className="block">
+                                                        Upstage showed the best performance in our tests.{' '}
+                                                    <a href="https://www.upstage.ai"
+                                                       className="text-primary hover:underline" target="_blank"
+                                                       rel="noopener noreferrer">
+                                                            Upstage
+                                                        </a>
+                                                    {' '}offers $10 free credit for new sign-ups, no card required.
+                                                    </span>
+                                            </p>
+                                            <div className="space-y-2">
+                                                <Select
+                                                    className="basic-single text-sm"
+                                                    classNamePrefix="select"
+                                                    isSearchable={false}
+                                                    value={documentParser}
+                                                    onChange={(selected: any) => {
+                                                        setDocumentParser(selected)
+                                                    }}
+                                                    options={documentDataList?.documents?.map((document) => ({
+                                                        value: document.name,
+                                                        label: document.name
+                                                    }))}
+                                                />
 
-                                        {/*        <Select*/}
-                                        {/*            className="basic-single text-sm"*/}
-                                        {/*            classNamePrefix="select"*/}
-                                        {/*            styles={{*/}
-                                        {/*                control: (base) => ({*/}
-                                        {/*                    ...base,*/}
-                                        {/*                    fontSize: '0.875rem'*/}
-                                        {/*                }),*/}
-                                        {/*                option: (base) => ({*/}
-                                        {/*                    ...base,*/}
-                                        {/*                    fontSize: '0.875rem'*/}
-                                        {/*                }),*/}
-                                        {/*                menu: (base) => ({*/}
-                                        {/*                    ...base,*/}
-                                        {/*                    fontSize: '0.875rem'*/}
-                                        {/*                })*/}
-                                        {/*            }}*/}
-                                        {/*            placeholder="Select model"*/}
-                                        {/*            value={ocrModelOptions[settings.ocrModel.company].models.find(*/}
-                                        {/*                m => m.value === settings.ocrModel.modelName*/}
-                                        {/*            )}*/}
-                                        {/*            onChange={(selected) => selected && setSettings({*/}
-                                        {/*                ...settings,*/}
-                                        {/*                ocrModel: {*/}
-                                        {/*                    ...settings.ocrModel,*/}
-                                        {/*                    modelName: selected.value*/}
-                                        {/*                }*/}
-                                        {/*            })}*/}
-                                        {/*            options={ocrModelOptions[settings.ocrModel.company].models}*/}
-                                        {/*        />*/}
+                                                <Select
+                                                    className="basic-single text-sm"
+                                                    classNamePrefix="select"
+                                                    isSearchable={false}
+                                                    placeholder="Select model"
+                                                    value={documentParserModel}
+                                                    onChange={(selected: any) => {
+                                                        setDocumentParserModel(selected)
+                                                    }}
+                                                    options={documentDataList?.documents?.find(v => v.name === documentParser?.value)?.models.map((model) => ({
+                                                        value: model.id,
+                                                        label: model.name
+                                                    }))}
+                                                />
 
-                                        {/*        {settings.ocrModel.company === 'upstage' && (*/}
-                                        {/*            <div className="space-y-2">*/}
-                                        {/*                <label className="text-sm font-medium">API Key</label>*/}
-                                        {/*                <input*/}
-                                        {/*                    type="password"*/}
-                                        {/*                    placeholder="Enter your API key"*/}
-                                        {/*                    className="w-full p-2 border rounded-md text-sm"*/}
-                                        {/*                    value={settings.ocrModel.apiKey || ''}*/}
-                                        {/*                    onChange={(e) => setSettings({*/}
-                                        {/*                        ...settings,*/}
-                                        {/*                        ocrModel: {*/}
-                                        {/*                            ...settings.ocrModel,*/}
-                                        {/*                            apiKey: e.target.value*/}
-                                        {/*                        }*/}
-                                        {/*                    })}*/}
-                                        {/*                />*/}
-                                        {/*            </div>*/}
-                                        {/*        )}*/}
-                                        {/*    </div>*/}
-                                        {/*</div>*/}
+                                                {documentDataList?.documents?.find(v => v.name === documentParser?.value)?.apiKeyRequired && (
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium">API Key</label>
+                                                        <input
+                                                            type="password"
+                                                            placeholder="Enter your API key"
+                                                            className="w-full p-2 border rounded-md text-sm"
+                                                            value={documentParserApiKey}
+                                                            onChange={(e) => setDocumentParserApiKey(e.target.value)}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
