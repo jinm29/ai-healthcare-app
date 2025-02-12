@@ -608,7 +608,7 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
                             ) : (
                                 <div className="bg-gray-50 p-4 rounded-lg relative flex flex-row h-full">
                                     <div id="pdf" className="w-[60%] overflow-y-auto h-full">
-                                        <Document file={`/api/static/${healthData.filePath}`}
+                                        <Document file={`/api/static${healthData.filePath}`}
                                                   className="w-full"
                                                   onLoadSuccess={onDocumentLoadSuccess}>
                                             {Array.from(new Array(numPages), (_, index) => {
