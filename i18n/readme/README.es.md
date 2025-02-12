@@ -67,19 +67,43 @@
 ## 🗺️ Diagrama del Proyecto
 
 
+```mermaid
 graph LR
-    A[Entrada de Datos] --> B[Procesamiento y Análisis]
-    B --> C[Base de Datos Local]
-    C --> D[Motor de IA]
-    D --> E[Asistente de Salud]
-    E --> F[Recomendaciones]
-    F --> A
-    style A fill:#ff7eb6,stroke:#ff2d7e,stroke-width:2px
-    style B fill:#7afcff,stroke:#00b4ff,stroke-width:2px
-    style C fill:#98fb98,stroke:#32cd32,stroke-width:2px
-    style D fill:#ffa07a,stroke:#ff4500,stroke-width:2px
-    style E fill:#dda0dd,stroke:#9370db,stroke-width:2px
-    style F fill:#f0e68c,stroke:#bdb76b,stroke-width:2px
+    subgraph Fuentes de Datos de Salud
+        A1[Registros Clínicos<br>Análisis de Sangre/Diagnósticos/<br>Recetas/Imágenes]
+        A2[Plataformas de Salud<br>Apple Health/Google Fit]
+        A3[Dispositivos Portátiles<br>Oura/Whoop/Garmin]
+        A4[Registros Personales<br>Dieta/Síntomas/<br>Historia Familiar]
+    end
+
+    subgraph Procesamiento de Datos
+        B1[Analizador y Estandarización<br>de Datos]
+        B2[Formato Unificado de<br>Datos de Salud]
+    end
+
+    subgraph Integración de IA
+        C1[Procesamiento LLM<br>Modelos Comerciales y Locales]
+        C2[Métodos de Interacción<br>RAG/Cache/Agentes]
+    end
+
+    A1 & A2 & A3 & A4 --> B1
+    B1 --> B2
+    B2 --> C1
+    C1 --> C2
+
+    style A1 fill:#e6b3cc,stroke:#cc6699,stroke-width:2px,color:#000
+    style A2 fill:#b3d9ff,stroke:#3399ff,stroke-width:2px,color:#000
+    style A3 fill:#c2d6d6,stroke:#669999,stroke-width:2px,color:#000
+    style A4 fill:#d9c3e6,stroke:#9966cc,stroke-width:2px,color:#000
+    
+    style B1 fill:#c6ecd9,stroke:#66b399,stroke-width:2px,color:#000
+    style B2 fill:#c6ecd9,stroke:#66b399,stroke-width:2px,color:#000
+    
+    style C1 fill:#ffe6cc,stroke:#ff9933,stroke-width:2px,color:#000
+    style C2 fill:#ffe6cc,stroke:#ff9933,stroke-width:2px,color:#000
+
+    classDef default color:#000
+```
 
 
 Entrada de datos de salud --> Módulo de análisis --> Archivos de datos estructurados --> Integración GPT
