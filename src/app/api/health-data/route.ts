@@ -2,7 +2,7 @@ import prisma, {Prisma} from "@/lib/prisma";
 import {NextRequest, NextResponse} from "next/server";
 
 import fs from 'fs'
-import {parseHealthDataFromPDF} from "@/lib/health-data/parser/pdf";
+import {parseHealthData} from "@/lib/health-data/parser/pdf";
 import crypto from "node:crypto";
 import {fileTypeFromBuffer} from "file-type";
 import gm from "gm";
@@ -55,9 +55,10 @@ export async function POST(
         return NextResponse.json<HealthDataCreateResponse>(healthData)
     } else {
         const formData = await req.formData()
-        const type = formData.get('type')
-        const id = formData.get('id')
         const file = formData.get('file')
+        const visionParser = formData.get('visionParser')
+        const visionParserModel = formData.get('visionParserModel')
+        const visionParserApiKey = formData.get('visionParserApiKey')
 
         let filePath: string | undefined
         let fileType: string | undefined
@@ -104,8 +105,7 @@ export async function POST(
         try {
             healthData = await prisma.healthData.create({
                 data: {
-                    id: id as string,
-                    type: type as string,
+                    type: 'FILE',
                     status: 'PARSING',
                     filePath: filePath,
                     fileType: fileType,
@@ -118,11 +118,18 @@ export async function POST(
             if (!(file instanceof File)) return NextResponse.json(healthData);
 
             // Process file
-            const {data, pages, ocrResults} = await parseHealthDataFromPDF({file: `./public${filePath}`})
+            const {data, pages, ocrResults} = await parseHealthData({
+                file: `./public${filePath}`,
+                visionParser: visionParser ? {
+                    parser: visionParser as string,
+                    model: visionParserModel as string,
+                    apiKey: visionParserApiKey as string
+                } : undefined
+            })
 
             // Update health data with parsed data
             healthData = await prisma.healthData.update({
-                where: {id: id as string},
+                where: {id: healthData.id},
                 data: {
                     status: 'COMPLETED',
                     metadata: {
@@ -140,7 +147,7 @@ export async function POST(
             // If there's an error, update the health data with error logs
             if (healthData) {
                 healthData = await prisma.healthData.update({
-                    where: {id: id as string},
+                    where: {id: healthData.id},
                     data: {
                         status: 'COMPLETED',
                         data: {...baseData, parsingLogs},

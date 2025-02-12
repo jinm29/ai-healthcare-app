@@ -4,8 +4,7 @@
 
 import {Document, Page, pdfjs} from 'react-pdf';
 import React, {ChangeEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
-import {Card, CardContent, CardHeader, CardTitle} from "@/components/ui/card";
-import {Activity, FileText, Loader2, Plus, Trash2, User} from 'lucide-react';
+import {Activity, ChevronLeft, ChevronRight, FileText, Loader2, Plus, Trash2, User} from 'lucide-react';
 import {Button} from "@/components/ui/button";
 import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,} from "@/components/ui/dialog";
 import useSWR from "swr";
@@ -18,7 +17,11 @@ import Image from "next/image";
 import {FaChevronLeft, FaChevronRight} from 'react-icons/fa';
 import testItems from '@/lib/health-data/parser/test-items.json'
 import TextInput from "@/components/form/text-input";
-import Select from 'react-select';
+import dynamic from "next/dynamic";
+import {HealthDataParserVisionListResponse} from "@/app/api/health-data-parser/visions/route";
+import {HealthDataGetResponse} from "@/app/api/health-data/[id]/route";
+
+const Select = dynamic(() => import('react-select'), {ssr: false});
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
 
@@ -51,6 +54,7 @@ interface Field {
 interface AddSourceDialogProps {
     onFileUpload: (e: ChangeEvent<HTMLInputElement>) => void;
     onAddSymptoms: (date: string) => void;
+    isSetUpVisionParser: boolean;
 }
 
 interface HealthDataItemProps {
@@ -65,6 +69,26 @@ interface HealthDataPreviewProps {
     formData: Record<string, any>;
     setFormData: (data: Record<string, any>) => void;
     setHealthData?: (data: HealthData) => void;
+}
+
+interface ParsingSettings {
+    description: string;
+    visionModel: {
+        company: 'ollama' | 'google' | 'openai';
+        modelName: string;
+        apiKey?: string;
+    };
+    ocrModel: {
+        company: 'docling' | 'upstage';
+        modelName?: string;
+        apiKey?: string;
+    };
+}
+
+interface ParsingSettingsDialogProps {
+    open: boolean;
+    onOpenChange: (open: boolean) => void;
+    onConfirm: (settings: ParsingSettings) => void;
 }
 
 const HealthDataType = {
@@ -143,12 +167,33 @@ const symptomsFields: Field[] = [
 ];
 
 
-const AddSourceDialog: React.FC<AddSourceDialogProps> = ({onFileUpload, onAddSymptoms}) => {
+const AddSourceDialog: React.FC<AddSourceDialogProps> = ({
+                                                             isSetUpVisionParser,
+                                                             onFileUpload,
+                                                             onAddSymptoms
+                                                         }) => {
     const [open, setOpen] = useState(false);
+    const [showSettingsAlert, setShowSettingsAlert] = useState(false);
+    const [uploadStatus, setUploadStatus] = useState<string>('');
 
-    const handleFileUpload = (e: ChangeEvent<HTMLInputElement>) => {
-        onFileUpload(e);
-        setOpen(false);
+    const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+        if (!e.target.files?.length) return;
+
+        try {
+            if (!isSetUpVisionParser) {
+                setShowSettingsAlert(true);
+                return;
+            }
+
+            setUploadStatus('uploading');
+            onFileUpload(e);
+            setOpen(false);
+        } catch (error) {
+            console.error('Failed to check settings:', error);
+            setShowSettingsAlert(true);
+        } finally {
+            setUploadStatus('');
+        }
     };
 
     const handleAddSymptoms = () => {
@@ -158,50 +203,85 @@ const AddSourceDialog: React.FC<AddSourceDialogProps> = ({onFileUpload, onAddSym
     };
 
     return (
-        <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-                <Button variant="outline" className="w-full flex gap-2 items-center">
-                    <Plus className="w-4 h-4"/>
-                    Add Source
-                </Button>
-            </DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>Add New Source</DialogTitle>
-                </DialogHeader>
-                <div className="flex flex-col gap-4 min-w-[300px]">
-                    <label
-                        htmlFor="file-upload"
-                        className="flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50"
-                    >
-                        <FileText className="w-6 h-6 text-gray-500"/>
-                        <div className="flex-1">
-                            <h3 className="font-medium">Upload Files</h3>
-                            <p className="text-sm text-gray-500">Add images or PDF files</p>
-                        </div>
-                    </label>
-                    <input
-                        type="file"
-                        id="file-upload"
-                        multiple
-                        accept="image/*,.pdf"
-                        className="hidden"
-                        onChange={handleFileUpload}
-                    />
+        <>
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full flex gap-2 items-center">
+                        <Plus className="w-4 h-4"/>
+                        Add Source
+                    </Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Add New Source</DialogTitle>
+                    </DialogHeader>
+                    <div className="flex flex-col gap-4 min-w-[300px]">
+                        <label
+                            htmlFor="file-upload"
+                            className={cn(
+                                "flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50",
+                                uploadStatus === 'uploading' && "opacity-50 cursor-not-allowed"
+                            )}
+                        >
+                            {uploadStatus === 'uploading' ? (
+                                <Loader2 className="h-6 w-6 text-gray-500 animate-spin"/>
+                            ) : (
+                                <FileText className="w-6 h-6 text-gray-500"/>
+                            )}
+                            <div className="flex-1">
+                                <h3 className="font-medium">Upload Files</h3>
+                                <p className="text-sm text-gray-500">Add images or PDF files</p>
+                            </div>
+                        </label>
+                        <input
+                            type="file"
+                            id="file-upload"
+                            multiple
+                            accept="image/*,.pdf"
+                            className="hidden"
+                            onChange={handleFileUpload}
+                            disabled={uploadStatus === 'uploading'}
+                        />
 
-                    <button
-                        className="flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 w-full"
-                        onClick={handleAddSymptoms}
-                    >
-                        <Activity className="w-6 h-6 text-gray-500"/>
-                        <div className="flex-1 text-left">
-                            <h3 className="font-medium">New Symptoms</h3>
-                            <p className="text-sm text-gray-500">Record today&#39;s symptoms</p>
+                        <button
+                            className="flex items-center gap-4 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 w-full"
+                            onClick={handleAddSymptoms}
+                        >
+                            <Activity className="w-6 h-6 text-gray-500"/>
+                            <div className="flex-1 text-left">
+                                <h3 className="font-medium">New Symptoms</h3>
+                                <p className="text-sm text-gray-500">Record today&#39;s symptoms</p>
+                            </div>
+                        </button>
+                    </div>
+                </DialogContent>
+            </Dialog>
+
+            {showSettingsAlert && (
+                <Dialog open={showSettingsAlert} onOpenChange={setShowSettingsAlert}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Settings Required</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                            <p className="text-sm">Please configure the parsing settings before uploading files. You
+                                need to:</p>
+                            <ul className="list-disc pl-4 text-sm space-y-2">
+                                <li>Select your preferred Vision and OCR models</li>
+                                <li>Enter the required API keys</li>
+                            </ul>
+                            <p className="text-sm">You can find these settings in the Parsing Settings panel on the
+                                right.</p>
+                            <div className="flex justify-end">
+                                <Button onClick={() => setShowSettingsAlert(false)}>
+                                    OK
+                                </Button>
+                            </div>
                         </div>
-                    </button>
-                </div>
-            </DialogContent>
-        </Dialog>
+                    </DialogContent>
+                </Dialog>
+            )}
+        </>
     );
 };
 
@@ -288,7 +368,7 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
         [key: string]: { page: number }
     } | null>(null);
 
-    const {ocr, dataPerPage: sourceDataPerPage} = (healthData.metadata || {}) as {
+    const {ocr, dataPerPage: sourceDataPerPage} = (healthData?.metadata || {}) as {
         ocr?: any,
         dataPerPage?: any
     };
@@ -504,7 +584,7 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
             <div className="flex flex-col gap-4 h-full">
                 <div className="h-[40%] min-h-[300px]">
                     <div className="bg-white h-full overflow-y-auto rounded-lg border">
-                        {(healthData.type === HealthDataType.PERSONAL_INFO.id || healthData.type === HealthDataType.SYMPTOMS.id) ? (
+                        {(healthData?.type === HealthDataType.PERSONAL_INFO.id || healthData?.type === HealthDataType.SYMPTOMS.id) ? (
                             <div className="p-4">
                                 <DynamicForm
                                     fields={getFields()}
@@ -512,11 +592,11 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
                                     onChange={handleFormChange}
                                 />
                             </div>
-                        ) : healthData.type === HealthDataType.FILE.id ? (
-                            healthData.fileType?.includes('image') && healthData.filePath ? (
+                        ) : healthData?.type === HealthDataType.FILE.id ? (
+                            healthData?.fileType?.includes('image') && healthData?.filePath ? (
                                 <div className="p-4">
                                     <Image
-                                        src={healthData.filePath}
+                                        src={`/api/static/${healthData.filePath}`}
                                         alt="Preview"
                                         className="w-full h-auto"
                                         width={800}
@@ -528,7 +608,7 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
                             ) : (
                                 <div className="bg-gray-50 p-4 rounded-lg relative flex flex-row h-full">
                                     <div id="pdf" className="w-[60%] overflow-y-auto h-full">
-                                        <Document file={`/api/static/${healthData.filePath}`}
+                                        <Document file={`/api/static${healthData.filePath}`}
                                                   className="w-full"
                                                   onLoadSuccess={onDocumentLoadSuccess}>
                                             {Array.from(new Array(numPages), (_, index) => {
@@ -661,10 +741,10 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
                             <JSONEditor
                                 data={formData}
                                 onSave={handleJSONSave}
-                                isEditable={healthData.type === HealthDataType.FILE.id && healthData.status === 'COMPLETED'}
+                                isEditable={healthData?.type === HealthDataType.FILE.id && healthData?.status === 'COMPLETED'}
                             />
                         </div>
-                        {healthData.type === HealthDataType.FILE.id && formData.parsingLogs && (
+                        {healthData?.type === HealthDataType.FILE.id && formData.parsingLogs && (
                             <div className="border-t">
                                 <div className="p-4">
                                     <h3 className="text-sm font-medium mb-2">Processing Log</h3>
@@ -708,7 +788,11 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
                         value={showAddFieldName}
                         onChange={(selectedOption) => {
                             if (selectedOption) {
-                                setShowAddFieldName(selectedOption);
+                                setShowAddFieldName(selectedOption as {
+                                    value: string;
+                                    label: string;
+                                    isDisabled?: boolean
+                                });
                             } else {
                                 setShowAddFieldName(undefined);
                             }
@@ -796,81 +880,119 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
     );
 };
 
+type OcrCompany = 'docling' | 'upstage';
+
+interface ModelOption {
+    name: string;
+    description: string;
+    models: { value: string; label: string; }[];
+}
+
+type OcrModelOptions = Record<OcrCompany, ModelOption>;
+
+const ocrModelOptions: OcrModelOptions = {
+    docling: {
+        name: 'Docling',
+        description: 'Open source parsing model that runs locally',
+        models: [
+            {value: 'docling-local', label: 'Docling Local'},
+        ]
+    },
+    upstage: {
+        name: 'Upstage',
+        description: 'Best performing OCR model in our tests',
+        models: [
+            {value: 'doctr', label: 'DocTR'},
+        ]
+    }
+};
+
 export default function SourceAddScreen() {
-    const [selectedHealthData, setSelectedHealthData] = useState<HealthData>();
+    const [selectedId, setSelectedId] = useState<string | null>(null);
     const [formData, setFormData] = useState<Record<string, any>>({});
+    const [isOpen, setIsOpen] = useState(true);
 
-    const {data, mutate: healthDataMutate} = useSWR<HealthDataListResponse>('/api/health-data', async (url: string) => {
-        const response = await fetch(url);
-        return await response.json();
-    });
-    const healthDataList = useMemo(() => data?.healthDataList || [], [data]);
+    // Vision Parser
+    const [visionParser, setVisionParser] = useState<{ value: string; label: string }>()
+    const [visionParserModel, setVisionParserModel] = useState<{ value: string; label: string }>()
+    const [visionParserApiKey, setVisionParserApiKey] = useState<string>('')
 
-    useEffect(() => {
-        if (healthDataList.length > 0 && selectedHealthData === undefined) {
-            setSelectedHealthData(healthDataList[0]);
-            setFormData(JSON.parse(JSON.stringify(healthDataList[0].data)));
-        }
-    }, [healthDataList, selectedHealthData]);
+    const {data: healthDataList, mutate} = useSWR<HealthDataListResponse>(
+        '/api/health-data',
+        (url: string) => fetch(url).then((res) => res.json()),
+    );
+
+    const {data: visionDataList} = useSWR<HealthDataParserVisionListResponse>(
+        '/api/health-data-parser/visions',
+        (url: string) => fetch(url).then((res) => res.json()),
+    )
 
     const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || []);
-        const oldHealthDataList = [...healthDataList];
-        let newHealthDataList = [...oldHealthDataList];
-        const uploadPromises = [];
+        if (!e.target.files?.length) return;
 
-        // Create temporary entries for all files first
-        const tempEntries = files.map(file => ({
-            id: cuid(),
-            type: HealthDataType.FILE.id,
-            data: {} as Record<string, any>,
-            status: 'PARSING',
-            filePath: null,
-            fileType: null,
-            createdAt: new Date(),
-            updatedAt: new Date()
-        } as HealthData));
+        try {
+            const files = Array.from(e.target.files);
 
-        // Add all temporary entries to the list first
-        newHealthDataList = [...newHealthDataList, ...tempEntries];
-        await healthDataMutate({healthDataList: newHealthDataList}, {revalidate: false});
+            for (const file of files) {
+                const formData = new FormData();
+                formData.append('file', file);
 
-        // Process all files in parallel
-        for (let i = 0; i < files.length; i++) {
-            const file = files[i];
-            const tempEntry = tempEntries[i];
+                // Vision Parser
+                if (visionParser?.value) formData.append('visionParser', visionParser.value);
+                if (visionParserModel?.value) formData.append('visionParserModel', visionParserModel.value);
+                if (visionParserApiKey) formData.append('visionParserApiKey', visionParserApiKey);
 
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('id', tempEntry.id);
-            formData.append('type', tempEntry.type);
-            formData.append('data', JSON.stringify(tempEntry.data));
+                // Request
+                const response = await fetch('/api/health-data', {method: 'POST', body: formData});
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Failed to upload file:', {
+                        fileName: file.name,
+                        status: response.status,
+                        error: errorText
+                    });
+                    continue;
+                }
 
-            const uploadPromise = fetch(`/api/health-data`, {method: 'POST', body: formData})
-                .then(async response => {
-                    const newSource: HealthDataCreateResponse = await response.json();
-                    // Update the list with the actual data
-                    newHealthDataList = newHealthDataList.map(item =>
-                        item.id === tempEntry.id ? newSource : item
-                    );
-                    await healthDataMutate({healthDataList: newHealthDataList}, {revalidate: false});
-                    return newSource;
-                });
+                const data: HealthDataCreateResponse = await response.json();
+                console.log('File upload successful:', {fileName: file.name, response: data});
 
-            uploadPromises.push(uploadPromise);
+                // Start polling for parsing status
+                if (data.id) {
+                    let attempts = 0;
+                    const maxAttempts = 30; // 30 seconds timeout
+                    const pollInterval = setInterval(async () => {
+                        try {
+                            const statusResponse = await fetch(`/api/health-data/${data.id}`);
+                            const {healthData: statusData}: HealthDataGetResponse = await statusResponse.json();
+                            console.log('Parsing status check:', {
+                                id: data.id,
+                                status: statusData.status,
+                                attempt: attempts + 1
+                            });
+
+                            if (statusData.status === 'COMPLETED' || statusData.status === 'ERROR' || attempts >= maxAttempts) {
+                                clearInterval(pollInterval);
+                                if (statusData.status === 'ERROR') {
+                                    console.error('Parsing failed:', statusData);
+                                } else if (statusData.status === 'COMPLETED') {
+                                    console.log('Parsing completed successfully:', statusData);
+                                }
+                                await mutate();
+                                setSelectedId(data.id);
+                                setFormData(statusData.data as Record<string, any>);
+                            }
+                            attempts++;
+                        } catch (error) {
+                            console.error('Failed to check parsing status:', error);
+                            clearInterval(pollInterval);
+                        }
+                    }, 1000); // Check every second
+                }
+            }
+        } catch (error) {
+            console.error('Failed to upload files:', error);
         }
-
-        // Wait for all uploads to complete
-        const results = await Promise.all(uploadPromises);
-
-        // Select the first uploaded file
-        if (results.length > 0) {
-            setSelectedHealthData(results[0]);
-            setFormData(results[0].data as Record<string, any>);
-        }
-
-        // Final update of the list
-        await healthDataMutate({healthDataList: newHealthDataList});
     };
 
     const handleAddSymptoms = async (date: string) => {
@@ -913,131 +1035,322 @@ export default function SourceAddScreen() {
                 newSource = body;
             }
 
-            setSelectedHealthData(newSource);
+            setSelectedId(newSource.id);
             setFormData(newSource.data as Record<string, any>);
-            await healthDataMutate({healthDataList: [...healthDataList, newSource]});
+            await mutate({healthDataList: [...healthDataList?.healthDataList || [], newSource]});
         } catch (error) {
             console.error('Failed to add symptoms:', error);
             // Add the data anyway for better UX
-            setSelectedHealthData(body);
+            setSelectedId(body.id);
             setFormData(body.data as Record<string, any>);
-            await healthDataMutate({healthDataList: [...healthDataList, body]});
+            await mutate({healthDataList: [...healthDataList?.healthDataList || [], body]});
         }
     };
 
     const handleDeleteSource = async (id: string) => {
         await fetch(`/api/health-data/${id}`, {method: 'DELETE'});
 
-        const newSources = healthDataList.filter(s => s.id !== id);
-        await healthDataMutate({healthDataList: newSources});
+        const newSources = healthDataList?.healthDataList.filter(s => s.id !== id) || [];
+        await mutate({healthDataList: newSources});
 
-        if (selectedHealthData?.id === id) {
+        if (selectedId === id) {
             if (newSources.length > 0) {
-                setSelectedHealthData(newSources[0]);
-                setFormData(JSON.parse(JSON.stringify(newSources[0].data)));
+                setSelectedId(newSources[0].id);
+                setFormData(newSources[0].data as Record<string, any>);
             } else {
-                setSelectedHealthData(undefined);
+                setSelectedId(null);
                 setFormData({})
             }
         }
     };
 
     const onChangeHealthData = async (data: HealthData) => {
-        if (selectedHealthData) {
-            setSelectedHealthData(data);
+        if (selectedId) {
+            setSelectedId(data.id);
             setFormData(data.data as Record<string, any>);
-            await fetch(`/api/health-data/${selectedHealthData.id}`, {
+            await fetch(`/api/health-data/${selectedId}`, {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(data)
             });
-            await healthDataMutate({
-                healthDataList: healthDataList.map(s =>
-                    s.id === selectedHealthData.id
+            await mutate({
+                healthDataList: healthDataList?.healthDataList?.map(s =>
+                    s.id === selectedId
                         ? data
                         : s
-                )
+                ) || []
             });
         }
-    }
+    };
 
     const onChangeFormData = async (data: Record<string, any>) => {
-        if (selectedHealthData) {
+        if (selectedId) {
             setFormData(data);
-            await fetch(`/api/health-data/${selectedHealthData.id}`, {
+            await fetch(`/api/health-data/${selectedId}`, {
                 method: 'PATCH',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({data: data})
             });
-            await healthDataMutate({
-                healthDataList: healthDataList.map(s =>
-                    s.id === selectedHealthData.id
+            await mutate({
+                healthDataList: healthDataList?.healthDataList?.map(s =>
+                    s.id === selectedId
                         ? {...s, data: data}
                         : s
-                )
+                ) || []
             });
         }
-    }
+    };
+
+    useEffect(() => {
+        if (visionDataList?.visions && visionParser === undefined) {
+            const {name, models} = visionDataList.visions[0];
+            setVisionParser({value: name, label: name})
+            setVisionParserModel({value: models[0].id, label: models[0].name})
+        }
+    }, [visionDataList, visionParser]);
 
     return (
-        <div className="w-full h-screen flex gap-4 p-4">
-            <div className="w-1/3 max-w-[500px] h-full">
-                <Card className="h-full flex flex-col">
-                    <CardHeader className="flex-shrink-0">
-                        <CardTitle>Sources</CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex-1 overflow-y-auto space-y-4">
+        <div className="flex flex-col h-screen">
+            <div className="h-14 border-b px-4 flex items-center justify-between">
+                <h1 className="text-base font-semibold">Source Management</h1>
+            </div>
+            <div className="flex flex-1 overflow-hidden">
+                <div className="w-80 border-r flex flex-col">
+                    <div className="p-4 flex flex-col gap-4">
                         <AddSourceDialog
+                            key={`vision-${visionParser !== undefined && visionParserModel !== undefined && visionParserApiKey.length > 0}`}
+                            isSetUpVisionParser={visionParser !== undefined && visionParserModel !== undefined && visionParserApiKey.length > 0}
                             onFileUpload={handleFileUpload}
-                            onAddSymptoms={handleAddSymptoms}
-                        />
-
-                        <div className="space-y-2">
-                            {healthDataList.map((healthData) => (
+                            onAddSymptoms={handleAddSymptoms}/>
+                        <div className="flex-1 overflow-y-auto">
+                            {healthDataList?.healthDataList?.map((item) => (
                                 <HealthDataItem
-                                    key={healthData.id}
-                                    healthData={healthData}
-                                    isSelected={selectedHealthData?.id === healthData.id}
+                                    key={item.id}
+                                    healthData={item}
+                                    isSelected={selectedId === item.id}
                                     onClick={() => {
-                                        setSelectedHealthData(healthData);
-                                        setFormData(JSON.parse(JSON.stringify(healthData.data)));
+                                        setSelectedId(item.id)
+                                        setFormData(item.data as Record<string, any>)
                                     }}
                                     onDelete={handleDeleteSource}
                                 />
                             ))}
                         </div>
-                    </CardContent>
-                </Card>
-            </div>
+                    </div>
+                </div>
 
-            <div className="w-2/3 flex-1 h-full">
-                <Card className="h-full flex flex-col">
-                    <CardHeader className="flex-shrink-0">
-                        <CardTitle>
-                            {selectedHealthData ? (
-                                selectedHealthData.type === HealthDataType.FILE.id ? formData.fileName || 'Untitled File' :
-                                    HealthDataType[selectedHealthData.type as keyof typeof HealthDataType]?.name || 'Unknown'
-                            ) : 'Select a source'}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="flex-1 overflow-y-auto">
-                        {selectedHealthData ? (
-                            <HealthDataPreview
-                                key={selectedHealthData.id}
-                                healthData={selectedHealthData}
-                                formData={formData}
-                                setFormData={onChangeFormData}
-                                setHealthData={onChangeHealthData}
-                            />
-                        ) : (
-                            <div className="h-full flex items-center justify-center text-gray-500">
-                                Select a source from the list
+                <div className="flex-1 p-4 overflow-y-auto">
+                    {selectedId && healthDataList?.healthDataList && (
+                        <HealthDataPreview
+                            key={selectedId}
+                            healthData={healthDataList.healthDataList.find(s => s.id === selectedId) as HealthData}
+                            formData={formData}
+                            setFormData={onChangeFormData}
+                            setHealthData={onChangeHealthData}
+                        />
+                    )}
+                </div>
+
+                <div className={cn(
+                    "border-l transition-all duration-300 flex flex-col",
+                    isOpen ? "w-96" : "w-12"
+                )}>
+                    {isOpen ? (
+                        <>
+                            <div className="h-12 px-4 flex items-center justify-between border-t">
+                                <h2 className="text-sm font-medium">Parsing Settings</h2>
+                                <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+                                    <ChevronRight className="h-4 w-4"/>
+                                </Button>
                             </div>
-                        )}
-                    </CardContent>
-                </Card>
+                            <div className="flex-1 overflow-y-auto">
+                                <div className="p-4 space-y-4">
+                                    <p className="text-sm text-muted-foreground">
+                                        Vision and OCR models are used together to enhance parsing performance.
+                                    </p>
+
+                                    <div className="space-y-4">
+                                        <div>
+                                            <h3 className="text-sm font-medium mb-2">Vision Model</h3>
+                                            <p className="text-sm text-muted-foreground mb-2">
+                                                Only models with vision capabilities can be used.
+                                            </p>
+                                            <div className="space-y-2">
+                                                <Select
+                                                    className="basic-single text-sm"
+                                                    classNamePrefix="select"
+                                                    isSearchable={false}
+                                                    value={visionParser}
+                                                    onChange={(selected: any) => {
+                                                        const model = visionDataList?.visions?.find(v => v.name === selected.value)?.models[0]
+                                                        setVisionParser(selected)
+                                                        setVisionParserModel(model && {
+                                                            value: model.id,
+                                                            label: model.name
+                                                        })
+                                                    }}
+                                                    options={visionDataList?.visions?.map((vision) => ({
+                                                        value: vision.name,
+                                                        label: vision.name
+                                                    }))}
+                                                />
+
+                                                <Select
+                                                    className="basic-single text-sm"
+                                                    classNamePrefix="select"
+                                                    isSearchable={false}
+                                                    placeholder="Select model"
+                                                    value={visionParserModel}
+                                                    onChange={(selected: any) => setVisionParserModel(selected)}
+                                                    options={visionDataList?.visions?.find(v => v.name === visionParser?.value)?.models.map((model) => ({
+                                                        value: model.id,
+                                                        label: model.name
+                                                    }))}
+                                                />
+
+                                                {visionParser?.value !== 'ollama' && (
+                                                    <div className="space-y-2">
+                                                        <label className="text-sm font-medium">API Key</label>
+                                                        <input
+                                                            type="password"
+                                                            aria-autocomplete={'none'}
+                                                            autoComplete={'off'}
+                                                            placeholder="Enter your API key"
+                                                            className="w-full p-2 border rounded-md text-sm"
+                                                            value={visionParserApiKey}
+                                                            onChange={(e) => setVisionParserApiKey(e.target.value)}
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/*<div>*/}
+                                        {/*    <h3 className="text-sm font-medium mb-2">OCR Model</h3>*/}
+                                        {/*    <p className="text-sm text-muted-foreground mb-2">*/}
+                                        {/*        <span className="block mb-2">*/}
+                                        {/*            Docling is an open-source parsing model that runs locally.{' '}*/}
+                                        {/*            <a href="https://github.com/DS4SD/docling"*/}
+                                        {/*               className="text-primary hover:underline" target="_blank"*/}
+                                        {/*               rel="noopener noreferrer">*/}
+                                        {/*                GitHub*/}
+                                        {/*            </a>*/}
+                                        {/*        </span>*/}
+                                        {/*        <span className="block">*/}
+                                        {/*            Upstage showed the best performance in our tests.{' '}*/}
+                                        {/*            <a href="https://www.upstage.ai"*/}
+                                        {/*               className="text-primary hover:underline" target="_blank"*/}
+                                        {/*               rel="noopener noreferrer">*/}
+                                        {/*                Upstage*/}
+                                        {/*            </a>*/}
+                                        {/*            {' '}offers $10 free credit for new sign-ups, no card required.*/}
+                                        {/*        </span>*/}
+                                        {/*    </p>*/}
+                                        {/*    <div className="space-y-2">*/}
+                                        {/*        <Select*/}
+                                        {/*            className="basic-single text-sm"*/}
+                                        {/*            classNamePrefix="select"*/}
+                                        {/*            styles={{*/}
+                                        {/*                control: (base) => ({*/}
+                                        {/*                    ...base,*/}
+                                        {/*                    fontSize: '0.875rem'*/}
+                                        {/*                }),*/}
+                                        {/*                option: (base) => ({*/}
+                                        {/*                    ...base,*/}
+                                        {/*                    fontSize: '0.875rem'*/}
+                                        {/*                }),*/}
+                                        {/*                menu: (base) => ({*/}
+                                        {/*                    ...base,*/}
+                                        {/*                    fontSize: '0.875rem'*/}
+                                        {/*                })*/}
+                                        {/*            }}*/}
+                                        {/*            value={{*/}
+                                        {/*                value: settings.ocrModel.company,*/}
+                                        {/*                label: ocrModelOptions[settings.ocrModel.company].name*/}
+                                        {/*            }}*/}
+                                        {/*            onChange={(selected) => {*/}
+                                        {/*                if (selected) {*/}
+                                        {/*                    const company = selected.value;*/}
+                                        {/*                    setSettings({*/}
+                                        {/*                        ...settings,*/}
+                                        {/*                        ocrModel: {*/}
+                                        {/*                            company,*/}
+                                        {/*                            modelName: ocrModelOptions[company].models[0].value,*/}
+                                        {/*                            apiKey: settings.ocrModel.company === company ? settings.ocrModel.apiKey : undefined*/}
+                                        {/*                        }*/}
+                                        {/*                    });*/}
+                                        {/*                }*/}
+                                        {/*            }}*/}
+                                        {/*            options={Object.entries(ocrModelOptions).map(([value, info]) => ({*/}
+                                        {/*                value: value as OcrCompany,*/}
+                                        {/*                label: info.name*/}
+                                        {/*            }))}*/}
+                                        {/*        />*/}
+
+                                        {/*        <Select*/}
+                                        {/*            className="basic-single text-sm"*/}
+                                        {/*            classNamePrefix="select"*/}
+                                        {/*            styles={{*/}
+                                        {/*                control: (base) => ({*/}
+                                        {/*                    ...base,*/}
+                                        {/*                    fontSize: '0.875rem'*/}
+                                        {/*                }),*/}
+                                        {/*                option: (base) => ({*/}
+                                        {/*                    ...base,*/}
+                                        {/*                    fontSize: '0.875rem'*/}
+                                        {/*                }),*/}
+                                        {/*                menu: (base) => ({*/}
+                                        {/*                    ...base,*/}
+                                        {/*                    fontSize: '0.875rem'*/}
+                                        {/*                })*/}
+                                        {/*            }}*/}
+                                        {/*            placeholder="Select model"*/}
+                                        {/*            value={ocrModelOptions[settings.ocrModel.company].models.find(*/}
+                                        {/*                m => m.value === settings.ocrModel.modelName*/}
+                                        {/*            )}*/}
+                                        {/*            onChange={(selected) => selected && setSettings({*/}
+                                        {/*                ...settings,*/}
+                                        {/*                ocrModel: {*/}
+                                        {/*                    ...settings.ocrModel,*/}
+                                        {/*                    modelName: selected.value*/}
+                                        {/*                }*/}
+                                        {/*            })}*/}
+                                        {/*            options={ocrModelOptions[settings.ocrModel.company].models}*/}
+                                        {/*        />*/}
+
+                                        {/*        {settings.ocrModel.company === 'upstage' && (*/}
+                                        {/*            <div className="space-y-2">*/}
+                                        {/*                <label className="text-sm font-medium">API Key</label>*/}
+                                        {/*                <input*/}
+                                        {/*                    type="password"*/}
+                                        {/*                    placeholder="Enter your API key"*/}
+                                        {/*                    className="w-full p-2 border rounded-md text-sm"*/}
+                                        {/*                    value={settings.ocrModel.apiKey || ''}*/}
+                                        {/*                    onChange={(e) => setSettings({*/}
+                                        {/*                        ...settings,*/}
+                                        {/*                        ocrModel: {*/}
+                                        {/*                            ...settings.ocrModel,*/}
+                                        {/*                            apiKey: e.target.value*/}
+                                        {/*                        }*/}
+                                        {/*                    })}*/}
+                                        {/*                />*/}
+                                        {/*            </div>*/}
+                                        {/*        )}*/}
+                                        {/*    </div>*/}
+                                        {/*</div>*/}
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="h-12 flex items-center justify-center border-t">
+                            <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
+                                <ChevronLeft className="h-4 w-4"/>
+                            </Button>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );
 }
-;
