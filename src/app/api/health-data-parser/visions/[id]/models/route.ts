@@ -15,8 +15,14 @@ export async function GET(
     const parser = visions.find(v => v.name === id)
     if (!parser) return NextResponse.json({error: 'Not found'}, {status: 404})
 
-    const models = await parser.models({
-        apiUrl: searchParams.get('apiUrl') || undefined,
-    });
+    let models: VisionParserModel[]
+    try {
+        models = await parser.models({
+            apiUrl: searchParams.get('apiUrl') || undefined,
+        });
+    } catch (e) {
+        console.error(e)
+        models = []
+    }
     return NextResponse.json({models})
 }

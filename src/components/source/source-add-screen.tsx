@@ -1138,11 +1138,11 @@ export default function SourceAddScreen() {
     }, [visionDataList, visionParser]);
 
     useEffect(() => {
-        if (visionModelDataList?.models && visionParserModel === undefined) {
+        if (visionModelDataList?.models && visionModelDataList.models.length > 0 && visionParserModel === undefined) {
             const {name} = visionModelDataList.models[0];
             setVisionParserModel({value: name, label: name})
         }
-    }, [visionModelDataList, visionParserModel]);
+    }, [visionModelDataList, visionParser, visionParserModel]);
 
     useEffect(() => {
         if (documentDataList?.documents && documentParser === undefined) {
