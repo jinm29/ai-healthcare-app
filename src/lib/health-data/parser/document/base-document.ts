@@ -10,12 +10,14 @@ export interface DocumentOCROptions {
     input: string; // File path
     model: DocumentParserModel;
     apiKey?: string;
+    apiUrl?: string;
 }
 
 export interface DocumentParseOptions {
     input: string; // File path
     model: DocumentParserModel;
     apiKey?: string;
+    apiUrl?: string;
 }
 
 export interface DocumentParserModel {
@@ -23,12 +25,16 @@ export interface DocumentParserModel {
     name: string;
 }
 
+export interface DocumentModelOptions {
+    apiUrl?: string;
+}
+
 export abstract class BaseDocumentParser {
     abstract get name(): string;
 
     abstract get apiKeyRequired(): boolean;
 
-    abstract models(): Promise<DocumentParserModel[]>
+    abstract models(options?: DocumentModelOptions): Promise<DocumentParserModel[]>
 
     abstract ocr(options: DocumentOCROptions): Promise<OCRParseResult>
 

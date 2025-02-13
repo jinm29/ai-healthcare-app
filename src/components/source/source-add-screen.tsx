@@ -22,6 +22,7 @@ import {HealthDataParserVisionListResponse} from "@/app/api/health-data-parser/v
 import {HealthDataGetResponse} from "@/app/api/health-data/[id]/route";
 import {HealthDataParserDocumentListResponse} from "@/app/api/health-data-parser/documents/route";
 import {HealthDataParserVisionModelListResponse} from "@/app/api/health-data-parser/visions/[id]/models/route";
+import {HealthDataParserDocumentModelListResponse} from "@/app/api/health-data-parser/documents/[id]/models/route";
 
 const Select = dynamic(() => import('react-select'), {ssr: false});
 
@@ -72,26 +73,6 @@ interface HealthDataPreviewProps {
     formData: Record<string, any>;
     setFormData: (data: Record<string, any>) => void;
     setHealthData?: (data: HealthData) => void;
-}
-
-interface ParsingSettings {
-    description: string;
-    visionModel: {
-        company: 'ollama' | 'google' | 'openai';
-        modelName: string;
-        apiKey?: string;
-    };
-    ocrModel: {
-        company: 'docling' | 'upstage';
-        modelName?: string;
-        apiKey?: string;
-    };
-}
-
-interface ParsingSettingsDialogProps {
-    open: boolean;
-    onOpenChange: (open: boolean) => void;
-    onConfirm: (settings: ParsingSettings) => void;
 }
 
 const HealthDataType = {
@@ -168,7 +149,6 @@ const symptomsFields: Field[] = [
     {key: 'date', label: 'Date', type: 'date'},
     {key: 'description', label: 'Description', type: 'textarea'}
 ];
-
 
 const AddSourceDialog: React.FC<AddSourceDialogProps> = ({
                                                              isSetUpVisionParser,
@@ -920,6 +900,11 @@ export default function SourceAddScreen() {
         (url: string) => fetch(url).then((res) => res.json()),
     )
 
+    const {data: documentModelDataList} = useSWR<HealthDataParserDocumentModelListResponse>(
+        `/api/health-data-parser/documents/${documentParser?.value}/models`,
+        (url: string) => fetch(url).then((res) => res.json()),
+    )
+
     const handleFileUpload = async (e: ChangeEvent<HTMLInputElement>) => {
         if (!e.target.files?.length) return;
 
@@ -1124,6 +1109,10 @@ export default function SourceAddScreen() {
         return visionDataList?.visions?.find(v => v.name === visionParser?.value)?.apiKeyRequired || false;
     }, [visionDataList, visionParser]);
 
+    const documentParserApiKeyRequired: boolean = useMemo(() => {
+        return documentDataList?.documents?.find(d => d.name === documentParser?.value)?.apiKeyRequired || false;
+    }, [documentDataList, documentParser]);
+
     const visionParserApiUrlRequired: boolean = useMemo(() => {
         return visionDataList?.visions?.find(v => v.name === visionParser?.value)?.apiUrlRequired || false;
     }, [visionDataList, visionParser]);
@@ -1146,11 +1135,18 @@ export default function SourceAddScreen() {
 
     useEffect(() => {
         if (documentDataList?.documents && documentParser === undefined) {
-            const {name, models} = documentDataList.documents[0];
+            const {name} = documentDataList.documents[0];
             setDocumentParser({value: name, label: name})
-            setDocumentParserModel({value: models[0].id, label: models[0].name})
+            setDocumentParserModel(undefined)
         }
     }, [documentDataList, documentParser]);
+
+    useEffect(() => {
+        if (documentModelDataList?.models && documentParserModel === undefined) {
+            const {id, name} = documentModelDataList.models[0];
+            setDocumentParserModel({value: id, label: name})
+        }
+    }, [documentModelDataList, documentParserModel]);
 
     return (
         <div className="flex flex-col h-screen">
@@ -1162,7 +1158,7 @@ export default function SourceAddScreen() {
                     <div className="p-4 flex flex-col gap-4">
                         <AddSourceDialog
                             isSetUpVisionParser={visionParser !== undefined && visionParserModel !== undefined && (!visionParserApiKeyRequired || visionParserApiKey.length > 0)}
-                            isSetUpDocumentParser={documentParser !== undefined && documentParserModel !== undefined && documentParserApiKey.length > 0}
+                            isSetUpDocumentParser={documentParser !== undefined && documentParserModel !== undefined && (!documentParserApiKeyRequired || documentParserApiKey.length > 0)}
                             onFileUpload={handleFileUpload}
                             onAddSymptoms={handleAddSymptoms}/>
                         <div className="flex-1 overflow-y-auto">
@@ -1293,14 +1289,14 @@ export default function SourceAddScreen() {
                                         <div>
                                             <h3 className="text-sm font-medium mb-2">Document Model</h3>
                                             <p className="text-sm text-muted-foreground mb-2">
-                                                {/*<span className="block mb-2">*/}
-                                                {/*    Docling is an open-source parsing model that runs locally.{' '}*/}
-                                                {/*    <a href="https://github.com/DS4SD/docling"*/}
-                                                {/*       className="text-primary hover:underline" target="_blank"*/}
-                                                {/*       rel="noopener noreferrer">*/}
-                                                {/*        GitHub*/}
-                                                {/*    </a>*/}
-                                                {/*</span>*/}
+                                                <span className="block mb-2">
+                                                    Docling is an open-source parsing model that runs locally.{' '}
+                                                    <a href="https://github.com/DS4SD/docling"
+                                                       className="text-primary hover:underline" target="_blank"
+                                                       rel="noopener noreferrer">
+                                                        GitHub
+                                                    </a>
+                                                </span>
                                                 <span className="block">
                                                         Upstage showed the best performance in our tests.{' '}
                                                     <a href="https://www.upstage.ai"
@@ -1335,7 +1331,7 @@ export default function SourceAddScreen() {
                                                     onChange={(selected: any) => {
                                                         setDocumentParserModel(selected)
                                                     }}
-                                                    options={documentDataList?.documents?.find(v => v.name === documentParser?.value)?.models.map((model) => ({
+                                                    options={documentModelDataList?.models?.map((model: any) => ({
                                                         value: model.id,
                                                         label: model.name
                                                     }))}

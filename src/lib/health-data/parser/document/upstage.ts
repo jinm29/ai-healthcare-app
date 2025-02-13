@@ -1,5 +1,5 @@
 import {
-    BaseDocumentParser,
+    BaseDocumentParser, DocumentModelOptions,
     DocumentOCROptions,
     DocumentParseOptions,
     DocumentParseResult,
@@ -20,7 +20,8 @@ export class UpstageDocumentParser extends BaseDocumentParser {
         return true
     }
 
-    async models(): Promise<DocumentParserModel[]> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    async models(options?: DocumentModelOptions): Promise<DocumentParserModel[]> {
         return [
             {id: 'document-parse', name: 'Document Parse'}
         ]
