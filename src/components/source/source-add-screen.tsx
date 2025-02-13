@@ -21,6 +21,7 @@ import dynamic from "next/dynamic";
 import {HealthDataParserVisionListResponse} from "@/app/api/health-data-parser/visions/route";
 import {HealthDataGetResponse} from "@/app/api/health-data/[id]/route";
 import {HealthDataParserDocumentListResponse} from "@/app/api/health-data-parser/documents/route";
+import {HealthDataParserVisionModelListResponse} from "@/app/api/health-data-parser/visions/[id]/models/route";
 
 const Select = dynamic(() => import('react-select'), {ssr: false});
 
@@ -892,6 +893,7 @@ export default function SourceAddScreen() {
     const [visionParser, setVisionParser] = useState<{ value: string; label: string }>()
     const [visionParserModel, setVisionParserModel] = useState<{ value: string; label: string }>()
     const [visionParserApiKey, setVisionParserApiKey] = useState<string>('')
+    const [visionParserApiUrl, setVisionParserApiUrl] = useState<string>('')
 
     // Document Parser
     const [documentParser, setDocumentParser] = useState<{ value: string; label: string }>()
@@ -905,6 +907,11 @@ export default function SourceAddScreen() {
 
     const {data: visionDataList} = useSWR<HealthDataParserVisionListResponse>(
         '/api/health-data-parser/visions',
+        (url: string) => fetch(url).then((res) => res.json()),
+    )
+
+    const {data: visionModelDataList} = useSWR<HealthDataParserVisionModelListResponse>(
+        `/api/health-data-parser/visions/${visionParser?.value}/models?apiUrl=${visionParserApiUrl}`,
         (url: string) => fetch(url).then((res) => res.json()),
     )
 
@@ -929,6 +936,7 @@ export default function SourceAddScreen() {
                 if (visionParser?.value) formData.append('visionParser', visionParser.value);
                 if (visionParserModel?.value) formData.append('visionParserModel', visionParserModel.value);
                 if (visionParserApiKey) formData.append('visionParserApiKey', visionParserApiKey);
+                if (visionParserApiUrlRequired) formData.append('visionParserApiUrl', visionParserApiUrl);
 
                 // Document Parser
                 if (documentParser?.value) formData.append('documentParser', documentParser.value);
@@ -1112,13 +1120,29 @@ export default function SourceAddScreen() {
         }
     };
 
+    const visionParserApiKeyRequired: boolean = useMemo(() => {
+        return visionDataList?.visions?.find(v => v.name === visionParser?.value)?.apiKeyRequired || false;
+    }, [visionDataList, visionParser]);
+
+    const visionParserApiUrlRequired: boolean = useMemo(() => {
+        return visionDataList?.visions?.find(v => v.name === visionParser?.value)?.apiUrlRequired || false;
+    }, [visionDataList, visionParser]);
+
     useEffect(() => {
         if (visionDataList?.visions && visionParser === undefined) {
-            const {name, models} = visionDataList.visions[0];
+            const {name} = visionDataList.visions[0];
             setVisionParser({value: name, label: name})
-            setVisionParserModel({value: models[0].id, label: models[0].name})
+            setVisionParserModel(undefined)
+            setVisionParserApiUrl('')
         }
     }, [visionDataList, visionParser]);
+
+    useEffect(() => {
+        if (visionModelDataList?.models && visionParserModel === undefined) {
+            const {name} = visionModelDataList.models[0];
+            setVisionParserModel({value: name, label: name})
+        }
+    }, [visionModelDataList, visionParserModel]);
 
     useEffect(() => {
         if (documentDataList?.documents && documentParser === undefined) {
@@ -1137,7 +1161,7 @@ export default function SourceAddScreen() {
                 <div className="w-80 border-r flex flex-col">
                     <div className="p-4 flex flex-col gap-4">
                         <AddSourceDialog
-                            isSetUpVisionParser={visionParser !== undefined && visionParserModel !== undefined && visionParserApiKey.length > 0}
+                            isSetUpVisionParser={visionParser !== undefined && visionParserModel !== undefined && (!visionParserApiKeyRequired || visionParserApiKey.length > 0)}
                             isSetUpDocumentParser={documentParser !== undefined && documentParserModel !== undefined && documentParserApiKey.length > 0}
                             onFileUpload={handleFileUpload}
                             onAddSymptoms={handleAddSymptoms}/>
@@ -1208,6 +1232,14 @@ export default function SourceAddScreen() {
                                                             value: model.id,
                                                             label: model.name
                                                         })
+
+                                                        // Update API Url
+                                                        const parser = visionDataList?.visions?.find(v => v.name === selected.value)
+                                                        if (parser?.apiUrlRequired && parser?.apiUrl) {
+                                                            setVisionParserApiUrl(parser.apiUrl)
+                                                        } else {
+                                                            setVisionParserApiUrl('')
+                                                        }
                                                     }}
                                                     options={visionDataList?.visions?.map((vision) => ({
                                                         value: vision.name,
@@ -1222,13 +1254,13 @@ export default function SourceAddScreen() {
                                                     placeholder="Select model"
                                                     value={visionParserModel}
                                                     onChange={(selected: any) => setVisionParserModel(selected)}
-                                                    options={visionDataList?.visions?.find(v => v.name === visionParser?.value)?.models.map((model) => ({
+                                                    options={visionModelDataList?.models?.map((model) => ({
                                                         value: model.id,
                                                         label: model.name
                                                     }))}
                                                 />
 
-                                                {visionParser?.value !== 'ollama' && (
+                                                {visionDataList?.visions?.find(v => v.name === visionParser?.value)?.apiKeyRequired && (
                                                     <div className="space-y-2">
                                                         <label className="text-sm font-medium">API Key</label>
                                                         <input
@@ -1239,6 +1271,19 @@ export default function SourceAddScreen() {
                                                             className="w-full p-2 border rounded-md text-sm"
                                                             value={visionParserApiKey}
                                                             onChange={(e) => setVisionParserApiKey(e.target.value)}
+                                                        />
+                                                    </div>
+                                                )}
+
+                                                {visionDataList?.visions?.find(v => v.name === visionParser?.value)?.apiUrlRequired && (
+                                                    <div className="space-y-2">
+                                                        <input
+                                                            aria-autocomplete={'none'}
+                                                            autoComplete={'off'}
+                                                            placeholder="Enter your API Url"
+                                                            className="w-full p-2 border rounded-md text-sm"
+                                                            value={visionParserApiUrl}
+                                                            onChange={(e) => setVisionParserApiUrl(e.target.value)}
                                                         />
                                                     </div>
                                                 )}

@@ -13,6 +13,7 @@ interface VisionParserOptions {
     parser: string;
     model: string;
     apiKey: string;
+    apiUrl?: string
 }
 
 interface DocumentParserOptions {

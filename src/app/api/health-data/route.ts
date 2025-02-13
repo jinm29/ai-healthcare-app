@@ -62,6 +62,7 @@ export async function POST(
         const visionParser = formData.get('visionParser')
         const visionParserModel = formData.get('visionParserModel')
         const visionParserApiKey = formData.get('visionParserApiKey')
+        const visionParserApiUrl = formData.get('visionParserApiUrl')
 
         // Document Parser
         const documentParser = formData.get('documentParser')
@@ -132,7 +133,8 @@ export async function POST(
                 visionParser: visionParser ? {
                     parser: visionParser as string,
                     model: visionParserModel as string,
-                    apiKey: visionParserApiKey as string
+                    apiKey: visionParserApiKey as string,
+                    apiUrl: visionParserApiUrl ? visionParserApiUrl as string : undefined
                 } : undefined,
                 documentParser: documentParser ? {
                     parser: documentParser as string,

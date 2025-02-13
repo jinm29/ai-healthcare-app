@@ -9,6 +9,10 @@ export class OpenAIVisionParser extends BaseVisionParser {
         return "OpenAI";
     }
 
+    get apiKeyRequired(): boolean {
+        return true
+    }
+
     async models(): Promise<VisionParserModel[]> {
         return [
             {id: 'gpt-4o-mini', name: 'gpt-4o-mini'},
