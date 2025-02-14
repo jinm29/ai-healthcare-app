@@ -10,6 +10,7 @@ import {ChatRoomGetResponse} from "@/app/api/chat-rooms/[id]/route";
 import {AssistantModePatchRequest} from "@/app/api/assistant-modes/[id]/route";
 import {LLMProvider, LLMProviderListResponse} from "@/app/api/llm-providers/route";
 import {LLMProviderModel, LLMProviderModelListResponse} from "@/app/api/llm-providers/[id]/models/route";
+import {cn} from "@/lib/utils";
 
 interface ChatSettingSideBarProps {
     isRightSidebarOpen: boolean;
@@ -189,7 +190,7 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
                             <SelectTrigger>
                                 <SelectValue placeholder="Select company"/>
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className={cn('bg-white')}>
                                 {llmProvidersData?.llmProviders.map((provider) => <SelectItem
                                     key={provider.id}
                                     value={provider.id}>{provider.name}</SelectItem>)}
@@ -200,7 +201,7 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
                             <SelectTrigger>
                                 <SelectValue placeholder="Select model"/>
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className={cn('bg-white')}>
                                 {llmProviderModels.map((model) => (
                                     <SelectItem key={model.id} value={model.id}>
                                         {model.name}
