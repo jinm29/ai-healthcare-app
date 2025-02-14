@@ -71,14 +71,16 @@ export async function POST() {
         });
 
         // If we have a last chat room, use its assistant mode, otherwise find the first one
-        const assistantModeId = lastChatRoom?.assistantModeId || (await prisma.assistantMode.findFirstOrThrow()).id;
+        const assistantModeId = lastChatRoom?.assistantModeId || (await prisma.assistantMode.findFirstOrThrow({
+            where: {authorId: user.id}
+        })).id;
 
         return prisma.chatRoom.create({
             data: {
                 authorId: user.id,
                 name: 'New Chat',
                 assistantModeId: assistantModeId,
-                llmProviderId: (await prisma.lLMProvider.findFirstOrThrow()).id,
+                llmProviderId: (await prisma.lLMProvider.findFirstOrThrow({where: {authorId: user.id}})).id,
             },
         });
     });

@@ -21,7 +21,7 @@ export async function GET(
         where: {id}
     });
 
-    if (llmProvider.id === 'openai') {
+    if (llmProvider.providerId === 'openai') {
         const results: LLMProviderModel[] = []
         const openAI = new OpenAI({apiKey: llmProvider.apiKey, baseURL: llmProvider.apiURL})
         const modelsPage = await openAI.models.list()
@@ -34,7 +34,7 @@ export async function GET(
         return NextResponse.json<LLMProviderModelListResponse>({
             llmProviderModels: results,
         })
-    } else if (llmProvider.id === 'anthropic') {
+    } else if (llmProvider.providerId === 'anthropic') {
         const results: LLMProviderModel[] = []
         const anthropic = new Anthropic({apiKey: llmProvider.apiKey, baseURL: llmProvider.apiURL});
         const modelsPage = await anthropic.models.list();
@@ -47,7 +47,7 @@ export async function GET(
         return NextResponse.json<LLMProviderModelListResponse>({
             llmProviderModels: results,
         })
-    } else if (llmProvider.id === 'google') {
+    } else if (llmProvider.providerId === 'google') {
         const url = new URL('https://generativelanguage.googleapis.com/v1beta/models');
         url.searchParams.append('key', llmProvider.apiKey);
         url.searchParams.append('pageSize', '1000');
@@ -61,7 +61,7 @@ export async function GET(
                 })
             ),
         })
-    } else if (llmProvider.id === 'ollama') {
+    } else if (llmProvider.providerId === 'ollama') {
         const apiURL = llmProvider.apiURL;
         const response = await fetch(`${apiURL}/api/tags`)
         const {models} = await response.json()

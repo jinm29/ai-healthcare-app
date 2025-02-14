@@ -17,6 +17,8 @@ model User {
 
   chatRooms      ChatRoom[]
   healthDataList HealthData[]
+  AssistantMode  AssistantMode[]
+  LLMProvider    LLMProvider[]
 }
 
 model HealthData {
@@ -66,22 +68,27 @@ model AssistantMode {
   name         String
   description  String
   systemPrompt String
+  authorId     String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   chatRoom ChatRoom[]
+  author   User?      @relation(fields: [authorId], references: [id])
 }
 
 model LLMProvider {
-  id        String   @id @default(cuid())
-  name      String
-  apiKey    String   @default("")
-  apiURL    String
-  order     Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  providerId String
+  name       String
+  apiKey     String   @default("")
+  apiURL     String
+  order      Int
+  authorId   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   chatRooms ChatRoom[]
+  author    User?      @relation(fields: [authorId], references: [id])
 }
 
 enum ChatRole {

@@ -213,15 +213,15 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
                                 )}
                             </SelectContent>
                         </Select>
-                        {selectedLLMProvider && (['ollama', 'openai'].includes(selectedLLMProvider.id)) && (
+                        {selectedLLMProvider && (['ollama', 'openai'].includes(selectedLLMProvider.providerId)) && (
                             <Input
                                 type="text"
-                                placeholder={`API endpoint (default: ${selectedLLMProvider?.id === 'ollama' ? 'http://localhost:11434' : 'https://api.openai.com/v1'})`}
+                                placeholder={`API endpoint (default: ${selectedLLMProvider?.providerId === 'ollama' ? 'http://localhost:11434' : 'https://api.openai.com/v1'})`}
                                 value={selectedLLMProvider?.apiURL}
                                 onChange={(e) => onLLMProviderChange({apiURL: e.target.value})}
                             />
                         )}
-                        {selectedLLMProvider?.id !== 'ollama' && (
+                        {selectedLLMProvider?.providerId !== 'ollama' && (
                             <div className="relative">
                                 <Input
                                     type={showApiKey ? "text" : "password"}

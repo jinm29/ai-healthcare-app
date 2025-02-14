@@ -103,7 +103,7 @@ export async function POST(
             let messageContent = '';
 
             try {
-                if (chatRoom.llmProviderId === 'ollama') {
+                if (llmProvider.providerId === 'ollama') {
                     const response = await fetch(`${llmProvider.apiURL}/api/chat`, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
@@ -138,7 +138,7 @@ export async function POST(
                             }
                         }
                     }
-                } else if (chatRoom.llmProviderId === 'openai') {
+                } else if (llmProvider.providerId === 'openai') {
                     // OpenAI API call
                     const openai = new OpenAI({apiKey: llmProvider.apiKey, baseURL: llmProvider.apiURL});
                     const llmProviderModelId = chatRoom.llmProviderModelId;
@@ -154,7 +154,7 @@ export async function POST(
                         if (deltaContent !== undefined) messageContent += deltaContent;
                         controller.enqueue(`${JSON.stringify({content: messageContent})}\n`);
                     }
-                } else if (chatRoom.llmProviderId === 'anthropic') {
+                } else if (llmProvider.providerId === 'anthropic') {
                     const anthropic = new Anthropic({apiKey: llmProvider.apiKey, baseURL: llmProvider.apiURL});
                     const llmProviderModelId = chatRoom.llmProviderModelId;
                     if (!llmProviderModelId) throw new Error('No LLM model ID provided');
@@ -182,7 +182,7 @@ export async function POST(
                                 reject(error);
                             });
                     })
-                } else if (chatRoom.llmProviderId == 'google') {
+                } else if (llmProvider.providerId == 'google') {
                     const gemini = new GoogleGenerativeAI(llmProvider.apiKey)
                     const llmProviderModelId = chatRoom.llmProviderModelId;
                     if (!llmProviderModelId) throw new Error('No LLM model ID provided');

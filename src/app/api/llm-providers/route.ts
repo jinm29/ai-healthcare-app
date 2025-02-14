@@ -1,9 +1,11 @@
 import prisma, {Prisma} from "@/lib/prisma";
 import {NextResponse} from "next/server";
+import {auth} from "@/auth";
 
 export interface LLMProvider extends Prisma.LLMProviderGetPayload<{
     select: {
         id: true,
+        providerId: true,
         name: true,
         apiKey: true,
         apiURL: true,
@@ -17,10 +19,14 @@ export interface LLMProviderListResponse {
 }
 
 export async function GET() {
+    const session = await auth()
+    if (!session || !session.user) {
+        return NextResponse.json({error: 'Unauthorized'}, {status: 401})
+    }
+
     const llmProviders = await prisma.lLMProvider.findMany({
-        orderBy: {
-            order: 'asc'
-        }
+        where: {authorId: session.user.id},
+        orderBy: {order: 'asc'}
     })
     return NextResponse.json<LLMProviderListResponse>({
         llmProviders
