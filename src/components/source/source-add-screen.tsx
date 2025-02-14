@@ -1222,12 +1222,8 @@ export default function SourceAddScreen() {
                                                     isSearchable={false}
                                                     value={visionParser}
                                                     onChange={(selected: any) => {
-                                                        const model = visionDataList?.visions?.find(v => v.name === selected.value)?.models[0]
                                                         setVisionParser(selected)
-                                                        setVisionParserModel(model && {
-                                                            value: model.id,
-                                                            label: model.name
-                                                        })
+                                                        setVisionParserModel(undefined)
 
                                                         // Update API Url
                                                         const parser = visionDataList?.visions?.find(v => v.name === selected.value)

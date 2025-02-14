@@ -145,7 +145,8 @@ async function inference(inferenceOptions: InferenceOptions) {
             model: visionParserModel,
             messages: messages,
             input: input,
-            apiKey: visionParserOptions.apiKey
+            apiKey: visionParserOptions.apiKey,
+            apiUrl: visionParserOptions.apiUrl,
         }),
         4
     )
