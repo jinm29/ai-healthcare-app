@@ -3,6 +3,7 @@ import prisma, {Prisma} from "@/lib/prisma";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import {GoogleGenerativeAI} from "@google/generative-ai";
+import {auth} from "@/auth";
 
 export interface ChatMessage extends Prisma.ChatMessageGetPayload<{
     select: {
@@ -49,6 +50,10 @@ export async function POST(
         params: Promise<{ id: string }>,
     }
 ) {
+    const session = await auth()
+    const user = session?.user
+    if (!session || !user) return NextResponse.json({error: 'Unauthorized'}, {status: 401})
+
     const {id} = await params
     const body: ChatMessageCreateRequest = await req.json()
 
@@ -69,7 +74,7 @@ export async function POST(
             where: {chatRoomId: id},
             orderBy: {createdAt: 'asc'}
         })
-        const healthDataList = await prisma.healthData.findMany({})
+        const healthDataList = await prisma.healthData.findMany({where: {authorId: user.id}})
         const chatRoom = await prisma.chatRoom.findUniqueOrThrow({where: {id}})
         const llmProvider = await prisma.lLMProvider.findUniqueOrThrow({where: {id: chatRoom.llmProviderId}});
         return {

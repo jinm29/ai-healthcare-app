@@ -6,6 +6,7 @@ import {parseHealthData} from "@/lib/health-data/parser/pdf";
 import crypto from "node:crypto";
 import {fileTypeFromBuffer} from "file-type";
 import gm from "gm";
+import {auth} from "@/auth";
 
 export interface HealthData extends Prisma.HealthDataGetPayload<{
     select: {
@@ -42,6 +43,9 @@ export interface HealthDataCreateResponse extends HealthData {
 export async function POST(
     req: NextRequest
 ) {
+    const session = await auth()
+    if (!session || !session.user) return NextResponse.json({error: 'Unauthorized'}, {status: 401})
+
     const contentType = req.headers.get('content-type')
     if (!contentType) {
         return NextResponse.json({error: 'Missing content-type header'}, {status: 400})
@@ -50,7 +54,7 @@ export async function POST(
     if (contentType === 'application/json') {
         const data: HealthDataCreateRequest = await req.json()
         const healthData = await prisma.healthData.create({
-            data
+            data: {...data, authorId: session.user.id}
         })
         return NextResponse.json<HealthDataCreateResponse>(healthData)
     } else {
@@ -119,7 +123,8 @@ export async function POST(
                     status: 'PARSING',
                     filePath: filePath,
                     fileType: fileType,
-                    data: baseData ? {...baseData} : {}
+                    data: baseData ? {...baseData} : {},
+                    authorId: session.user.id,
                 },
             });
 
@@ -177,7 +182,19 @@ export async function POST(
 }
 
 export async function GET() {
+    const session = await auth()
+    if (!session || !session.user) return NextResponse.json({error: 'Unauthorized'}, {status: 401})
+
+    // Create personal info if it doesn't exist
+    const personalInfo = await prisma.healthData.findFirst({where: {authorId: session.user.id, type: 'PERSONAL_INFO'}})
+    if (personalInfo === null) {
+        await prisma.healthData.create({
+            data: {type: 'PERSONAL_INFO', authorId: session.user.id, data: {}}
+        })
+    }
+
     const healthDataList = await prisma.healthData.findMany({
+        where: {authorId: session.user.id},
         orderBy: {createdAt: 'asc'}
     })
     return NextResponse.json<HealthDataListResponse>({
