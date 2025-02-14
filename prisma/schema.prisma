@@ -8,13 +8,14 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(cuid())
-  name     String?
-  username String  @unique
-  password String
-
+  id        String   @id @default(cuid())
+  name      String?
+  username  String   @unique
+  password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  chatRooms ChatRoom[]
 }
 
 model HealthData {
@@ -35,12 +36,14 @@ model ChatRoom {
   assistantModeId    String
   llmProviderId      String
   llmProviderModelId String?
+  authorId           String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
   assistantMode AssistantMode @relation(fields: [assistantModeId], references: [id])
   llmProvider   LLMProvider   @relation(fields: [llmProviderId], references: [id])
   chatMessages  ChatMessage[]
+  author        User?         @relation(fields: [authorId], references: [id])
 }
 
 model ChatMessage {
