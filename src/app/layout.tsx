@@ -3,6 +3,7 @@ import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
 import 'katex/dist/katex.css';
 import React from "react";
+import NextAuthProvider from "@/context/next-auth";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -28,11 +29,11 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en">
-        <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-        {children}
-        {modal}
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <NextAuthProvider>
+            {children}
+            {modal}
+        </NextAuthProvider>
         </body>
         </html>
     );
