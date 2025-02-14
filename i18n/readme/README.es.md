@@ -145,4 +145,17 @@ Entrada de datos de salud --> Módulo de análisis --> Archivos de datos estruct
 
 > **Nota:** Si está usando Ollama con Docker, asegúrese de configurar el punto final de la API de Ollama como: `http://docker.for.mac.localhost:11434/`
 
+## 🌐 Comunidad y Soporte
+
+<div align="center">
+
+### 💫 Comparte tu Historia y Mantente Actualizado
+[![AIDoctor Subreddit](https://img.shields.io/badge/r/AIDoctor-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/AIDoctor/)
+[![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B9K654g4wf)
+
+### 📬 Contacto
+[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
+
+</div>
+
 ---

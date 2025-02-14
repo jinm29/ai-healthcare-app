@@ -128,6 +128,11 @@ Entrée de données de santé --> Module d'analyse --> Fichiers de données stru
 
 <div align="center">
 
+### 💫 Partagez Votre Histoire & Restez Informé
+[![AIDoctor Subreddit](https://img.shields.io/badge/r/AIDoctor-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/AIDoctor/)
+[![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B9K654g4wf)
+
+### 📬 Contact
 [![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
 
 </div> 

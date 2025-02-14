@@ -90,4 +90,13 @@ OpenHealth는 건강을 더 잘 이해하고 관리할 수 있도록 도와주�
 
 ## 🌐 커뮤니티 및 지원
 
-Reddit에서 연락하세요: [내 프로필](https://www.reddit.com/user/Dry_Steak30/) 
+<div align="center">
+
+### 💫 여러분의 이야기를 공유하고 업데이트 받기
+[![AIDoctor Subreddit](https://img.shields.io/badge/r/AIDoctor-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/AIDoctor/)
+[![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B9K654g4wf)
+
+### 📬 연락처
+[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
+
+</div> 

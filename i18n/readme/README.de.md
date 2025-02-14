@@ -119,4 +119,17 @@ Gesundheitsdaten-Eingabe --> Parsing-Modul --> Strukturierte Datendateien --> GP
 
 > **Hinweis:** Wenn Sie Ollama mit Docker verwenden, stellen Sie sicher, dass der Ollama-API-Endpunkt auf `http://docker.for.mac.localhost:11434/` eingestellt ist.
 
+## 🌐 Community und Support
+
+<div align="center">
+
+### 💫 Teilen Sie Ihre Geschichte & Bleiben Sie auf dem Laufenden
+[![AIDoctor Subreddit](https://img.shields.io/badge/r/AIDoctor-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/AIDoctor/)
+[![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B9K654g4wf)
+
+### 📬 Kontakt
+[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
+
+</div>
+
 ---
