@@ -132,7 +132,9 @@ async function inference(inferenceOptions: InferenceOptions) {
     if (!visionParser) throw new Error('Invalid vision parser')
 
     // Get models
-    const visionParserModels = await visionParser.models()
+    const visionParserModels = await visionParser.models({
+        apiUrl: visionParserOptions.apiUrl,
+    })
     const visionParserModel = visionParserModels.find(e => e.id === visionParserOptions.model)
     if (!visionParserModel) throw new Error('Invalid vision parser model')
 
