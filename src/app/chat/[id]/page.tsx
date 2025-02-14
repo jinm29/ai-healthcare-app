@@ -4,6 +4,7 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Menu, Send, Settings} from 'lucide-react';
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
+import LogoutButton from "@/components/auth/logout-button";
 
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import ChatSideBar from "@/components/chat/chat-side-bar";
@@ -101,9 +102,12 @@ export default function Page() {
                     <h1 className="text-lg font-semibold">OpenHealth</h1>
                 </div>
                 <div className="flex-1"/>
-                <Button variant="ghost" size="icon" onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}>
-                    <Settings className="w-4 h-4"/>
-                </Button>
+                <div className="flex items-center gap-2">
+                    <LogoutButton />
+                    <Button variant="ghost" size="icon" onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}>
+                        <Settings className="w-4 h-4"/>
+                    </Button>
+                </div>
             </div>
 
             <div className="flex-1 flex overflow-hidden">
