@@ -7,7 +7,7 @@
 <div align="center">
 
 ### 🌍 Wählen Sie Ihre Sprache
-[English](../../README.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Español](README.es.md) | [한국어](README.ko.md) | [中文](README.zh.md) | [日本語](README.ja.md)
+[English](../../README.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Español](README.es.md) | [한국어](README.ko.md) | [中文](README.zh.md) | [日本語](README.ja.md) | [Українська](README.uk.md)
 
 </div>
 
@@ -118,5 +118,18 @@ Gesundheitsdaten-Eingabe --> Parsing-Modul --> Strukturierte Datendateien --> GP
 > **Hinweis:** Das System besteht aus zwei Hauptkomponenten: Parsing und LLM. Derzeit verwendet das Parsing Upstage- und OpenAI-APIs (die in unseren Tests die beste Leistung zeigten), wobei ein lokaler Parser in Kürze hinzugefügt wird. Die LLM-Komponente kann mit Ollama vollständig lokal ausgeführt werden.
 
 > **Hinweis:** Wenn Sie Ollama mit Docker verwenden, stellen Sie sicher, dass der Ollama-API-Endpunkt auf `http://docker.for.mac.localhost:11434/` eingestellt ist.
+
+## 🌐 Community und Support
+
+<div align="center">
+
+### 💫 Teilen Sie Ihre Geschichte & Bleiben Sie auf dem Laufenden
+[![AIDoctor Subreddit](https://img.shields.io/badge/r/AIDoctor-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/AIDoctor/)
+[![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B9K654g4wf)
+
+### 📬 Kontakt
+[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
+
+</div>
 
 ---

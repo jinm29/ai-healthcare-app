@@ -11,7 +11,7 @@
 </p>
 
 ### 🌍 Choose Your Language
-[English](README.md) | [Français](i18n/readme/README.fr.md) | [Deutsch](i18n/readme/README.de.md) | [Español](i18n/readme/README.es.md) | [한국어](i18n/readme/README.ko.md) | [中文](i18n/readme/README.zh.md) | [日本語](i18n/readme/README.ja.md)
+[English](README.md) | [Français](i18n/readme/README.fr.md) | [Deutsch](i18n/readme/README.de.md) | [Español](i18n/readme/README.es.md) | [한국어](i18n/readme/README.ko.md) | [中文](i18n/readme/README.zh.md) | [日本語](i18n/readme/README.ja.md) | [Українська](i18n/readme/README.uk.md) | [Русский](i18n/readme/README.ru.md) | [اردو](i18n/readme/README.ur.md)
 
 </div>
 
@@ -140,13 +140,14 @@ graph LR
    ```bash
    docker/podman compose --env-file .env up --build
    ```
+   to rebuild the image. Run this also if you make any modifications to the .env file.
 
 3. **Access OpenHealth:**
    Open your browser and navigate to `http://localhost:3000` to begin using OpenHealth.
 
 > **Note:** The system consists of two main components: parsing and LLM. Currently, parsing utilizes Upstage and OpenAI APIs (which showed the best performance in our testing) with a local parser coming soon, while the LLM component can run fully locally using Ollama.
 
-> **Note:** If you're using Ollama with Docker/Podman, make sure to set the Ollama API endpoint to: `http://docker.for.mac.localhost:11434/`
+> **Note:** If you're using Ollama with Docker/Podman, make sure to set the Ollama API endpoint to: `http://docker.for.mac.localhost:11434/` on a Mac or `http://host.docker.internal:11434/` on Windows.
 
 </details>
 
@@ -164,6 +165,7 @@ graph LR
 
 ### 💫 Share Your Story & Get Updated & Give Feedback
 [![AIDoctor Subreddit](https://img.shields.io/badge/r/AIDoctor-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/AIDoctor/)
+[![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B9K654g4wf)
 
 ### 📬 Contact
 [![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)

@@ -11,6 +11,10 @@ services:
     ports:
       - "5432:5432"
 
+  docling-serve:
+    image: ghcr.io/ds4sd/docling-serve:latest
+    restart: always
+
   app:
     build:
       context: .
@@ -19,6 +23,7 @@ services:
         - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
     depends_on:
       - database
+      - docling-serve
     volumes:
       - app_data:/app/public/uploads
     ports:

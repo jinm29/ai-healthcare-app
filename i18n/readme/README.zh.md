@@ -90,4 +90,13 @@ OpenHealth提供私密且本地运行的助手，帮助您更好地理解和管�
 
 ## 🌐 社区与支持
 
-在Reddit上联系我：[我的主页](https://www.reddit.com/user/Dry_Steak30/) 
+<div align="center">
+
+### 💫 分享您的故事并获取更新
+[![AIDoctor Subreddit](https://img.shields.io/badge/r/AIDoctor-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/AIDoctor/)
+[![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B9K654g4wf)
+
+### 📬 联系方式
+[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
+
+</div> 
