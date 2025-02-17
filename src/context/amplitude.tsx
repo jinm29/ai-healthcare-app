@@ -7,6 +7,12 @@ const AMPLITUDE_API_KEY: string | undefined = process.env.NEXT_PUBLIC_AMPLITUDE_
 
 export const AmplitudeContext = createContext({});
 
+type TrackFunctionArgs = Parameters<typeof track>;
+
+const trackAmplitudeEvent = (args: TrackFunctionArgs) => {
+    track(...args);
+}
+
 const AmplitudeContextProvider = ({children}: React.PropsWithChildren) => {
     const {data: session} = useSession();
 
@@ -26,9 +32,7 @@ const AmplitudeContextProvider = ({children}: React.PropsWithChildren) => {
     }, [session]);
 
     return (
-        <AmplitudeContext.Provider value={({
-            trackAmplitudeEvent: track
-        })}>
+        <AmplitudeContext.Provider value={({trackAmplitudeEvent})}>
             {children}
         </AmplitudeContext.Provider>
     );
