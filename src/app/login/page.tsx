@@ -1,10 +1,11 @@
 import LoginScreen from '@/components/auth/login-screen';
-import {Suspense} from "react";
+import { Footer } from '@/components/ui/footer';
 
 export default function LoginPage() {
     return (
-        <Suspense>
+        <>
             <LoginScreen/>
-        </Suspense>
+            <Footer />
+        </>
     )
 }
