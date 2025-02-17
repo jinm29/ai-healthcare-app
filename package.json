@@ -12,6 +12,7 @@
     "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
   },
   "dependencies": {
+    "@amplitude/analytics-browser": "^2.11.12",
     "@anthropic-ai/sdk": "^0.36.3",
     "@google/generative-ai": "^0.21.0",
     "@langchain/core": "^0.3.39",
