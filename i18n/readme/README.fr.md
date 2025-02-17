@@ -2,9 +2,19 @@
 
 **Assistant de santé IA | Alimenté par vos données, exécuté localement**
 
----
-
 <div align="center">
+
+**Assistant Santé IA | Alimenté par Vos Données, Exécution Locale**
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
+  <img src="https://img.shields.io/badge/Language-TypeScript-blue?style=for-the-badge" alt="Language">
+  <img src="https://img.shields.io/badge/Framework-Next.js-black?style=for-the-badge" alt="Framework">
+</p>
+
+> **📢 Maintenant Disponible en Version Web !**  
+> Suite à vos demandes d'accès simplifié, nous avons lancé une version web.  
+> Essayez dès maintenant : **[open-health.me](https://open-health.me/)**
 
 ### 🌍 Choisissez votre langue
 [English](../../README.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Español](README.es.md) | [한국어](README.ko.md) | [中文](README.zh.md) | [日本語](README.ja.md) | [Українська](README.uk.md)

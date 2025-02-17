@@ -1,14 +1,20 @@
 # 🚀 **OpenHealth**
 
+<div align="center">
+
 **AI健康助手 | 由您的数据驱动，本地运行**
 
----
-
 <p align="center">
-  <img src="/intro/openhealth.avif" alt="OpenHealth 演示">
+  <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
+  <img src="https://img.shields.io/badge/Language-TypeScript-blue?style=for-the-badge" alt="Language">
+  <img src="https://img.shields.io/badge/Framework-Next.js-black?style=for-the-badge" alt="Framework">
 </p>
 
-## 🌟 概述
+> **📢 网页版现已上线！**  
+> 应用户要求提供更便捷的使用方式，我们推出了网页版。  
+> 立即体验：**[open-health.me](https://open-health.me/)**
+
+### 🌟 概述
 
 OpenHealth帮助您**掌控健康数据**。通过利用AI和您的个人健康信息，
 OpenHealth提供私密且本地运行的助手，帮助您更好地理解和管理健康。

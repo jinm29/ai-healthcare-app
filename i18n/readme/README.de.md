@@ -1,6 +1,16 @@
 # 🚀 **OpenHealth**
 
-**KI-Gesundheitsassistent | Betrieben mit Ihren Daten, Lokal ausgeführt**
+**KI-Gesundheitsassistent | Angetrieben von Ihren Daten, Lokal Ausgeführt**
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
+  <img src="https://img.shields.io/badge/Language-TypeScript-blue?style=for-the-badge" alt="Language">
+  <img src="https://img.shields.io/badge/Framework-Next.js-black?style=for-the-badge" alt="Framework">
+</p>
+
+> **📢 Jetzt als Webversion Verfügbar!**  
+> Aufgrund Ihrer Anfragen nach einfacherem Zugang haben wir eine Webversion gestartet.  
+> Jetzt ausprobieren: **[open-health.me](https://open-health.me/)**
 
 ---
 

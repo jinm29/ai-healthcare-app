@@ -1,29 +1,31 @@
 # 🚀 **OpenHealth**
 
-**AIヘルスアシスタント | あなたのデータで動作、ローカルで実行**
+<div align="center">
 
----
+**AIヘルスアシスタント | あなたのデータで動作するローカル実行型**
 
 <p align="center">
-  <img src="/intro/openhealth.avif" alt="OpenHealth デモ">
+  <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
+  <img src="https://img.shields.io/badge/Language-TypeScript-blue?style=for-the-badge" alt="Language">
+  <img src="https://img.shields.io/badge/Framework-Next.js-black?style=for-the-badge" alt="Framework">
 </p>
 
-## 🌟 概要
+> **📢 ウェブ版がリリースされました！**  
+> より簡単にアクセスできるようにとのご要望にお応えし、ウェブ版を公開しました。  
+> 今すぐお試しください: **[open-health.me](https://open-health.me/)**
+
+### 🌟 概要
 
 OpenHealthは、**あなたの健康データを管理**するお手伝いをします。AIとあなたの個人健康情報を活用し、
 OpenHealthはプライベートでローカルで実行されるアシスタントを提供し、健康をより良く理解し管理することを支援します。
 
----
-
-## ✨ プロジェクトの特徴
+### ✨ プロジェクトの特徴
 
 - 📊 **集中化された健康データ入力：** すべての健康データを一箇所で簡単に統合
 - 🛠️ **スマート解析：** 健康データを自動的に解析し、構造化されたデータファイルを生成
 - 🤝 **文脈に基づく会話：** GPT駆動のAIとのパーソナライズされた対話のために構造化データを活用
 
----
-
-## 📥 サポートされているデータソースと言語モデル
+### 📥 サポートされているデータソースと言語モデル
 
 | **追加可能なデータソース** | **サポートされている言語モデル** |
 |--------------------------|--------------------------------|
@@ -33,17 +35,13 @@ OpenHealthはプライベートでローカルで実行されるアシスタン�
 | 家族歴                    |                                |
 | 症状                      |                                |
 
----
-
-## 🤔 OpenHealthを作った理由
+### 🤔 OpenHealthを作った理由
 
 - 💡 **あなたの健康はあなたの責任です。**
 - ✅ 真の健康管理は**あなたのデータ** + **インテリジェンス**を組み合わせ、洞察を実行可能な計画に変換します。
 - 🧠 AIは長期的な健康管理を効果的に導き、支援する偏りのないツールとして機能します。
 
----
-
-## 🗺️ プロジェクト図
+### 🗺️ プロジェクト図
 
 ```plaintext
 健康データ入力 --> データ解析モジュール --> 構造化データファイル --> GPT統合
@@ -86,9 +84,7 @@ OpenHealthはプライベートでローカルで実行されるアシスタン�
 
 > **注意:** DockerでOllamaを使用する場合、Ollama APIエンドポイントを次のように設定してください: `http://docker.for.mac.localhost:11434/`
 
----
-
-## 🌐 コミュニティとサポート
+### 🌐 コミュニティとサポート
 
 <div align="center">
 

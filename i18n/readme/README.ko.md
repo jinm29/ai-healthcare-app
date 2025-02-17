@@ -1,14 +1,20 @@
 # 🚀 **OpenHealth**
 
-**AI 건강 도우미 | 당신의 데이터로 구동되는 로컬 실행 환경**
+<div align="center">
 
----
+**AI 건강 도우미 | 당신의 데이터로 구동되는 로컬 실행 방식**
 
 <p align="center">
-  <img src="/intro/openhealth.avif" alt="OpenHealth 데모">
+  <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
+  <img src="https://img.shields.io/badge/Language-TypeScript-blue?style=for-the-badge" alt="Language">
+  <img src="https://img.shields.io/badge/Framework-Next.js-black?style=for-the-badge" alt="Framework">
 </p>
 
-## 🌟 개요
+> **📢 웹 버전 출시!**  
+> 더 쉽게 사용하고 싶다는 의견을 반영하여 웹 버전을 출시했습니다.  
+> 지금 바로 사용해보세요: **[open-health.me](https://open-health.me/)**
+
+### 🌟 개요
 
 OpenHealth는 **당신의 건강 데이터를 관리**하도록 도와줍니다. AI와 개인 건강 정보를 활용하여,
 OpenHealth는 건강을 더 잘 이해하고 관리할 수 있도록 도와주는 프라이빗하고 로컬에서 실행되는 도우미를 제공합니다.
