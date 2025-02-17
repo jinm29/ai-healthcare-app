@@ -1,6 +1,7 @@
 import prisma, {Prisma} from "@/lib/prisma";
 import {NextResponse} from "next/server";
 import {auth} from "@/auth";
+import {decrypt} from "@/lib/encryption";
 
 export interface LLMProvider extends Prisma.LLMProviderGetPayload<{
     select: {
@@ -29,6 +30,16 @@ export async function GET() {
         orderBy: {order: 'asc'}
     })
     return NextResponse.json<LLMProviderListResponse>({
-        llmProviders
+        llmProviders: llmProviders.map((provider) => {
+            let decryptedApiKey: string
+            try {
+                decryptedApiKey = decrypt(provider.apiKey)
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (e) {
+                decryptedApiKey = ''
+            }
+
+            return {...provider, apiKey: decryptedApiKey}
+        })
     })
 }

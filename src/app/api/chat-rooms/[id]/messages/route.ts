@@ -4,6 +4,7 @@ import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import {GoogleGenerativeAI} from "@google/generative-ai";
 import {auth} from "@/auth";
+import {decrypt} from "@/lib/encryption";
 
 export interface ChatMessage extends Prisma.ChatMessageGetPayload<{
     select: {
@@ -86,6 +87,7 @@ export async function POST(
         }
     })
 
+    const apiKey = decrypt(llmProvider.apiKey)
     const messages = [
         {"role": "system" as const, "content": assistantMode.systemPrompt},
         {
@@ -140,7 +142,7 @@ export async function POST(
                     }
                 } else if (llmProvider.providerId === 'openai') {
                     // OpenAI API call
-                    const openai = new OpenAI({apiKey: llmProvider.apiKey, baseURL: llmProvider.apiURL});
+                    const openai = new OpenAI({apiKey, baseURL: llmProvider.apiURL});
                     const llmProviderModelId = chatRoom.llmProviderModelId;
                     if (!llmProviderModelId) throw new Error('No LLM model ID provided');
                     const chatStream = await openai.chat.completions.create({
@@ -155,7 +157,7 @@ export async function POST(
                         controller.enqueue(`${JSON.stringify({content: messageContent})}\n`);
                     }
                 } else if (llmProvider.providerId === 'anthropic') {
-                    const anthropic = new Anthropic({apiKey: llmProvider.apiKey, baseURL: llmProvider.apiURL});
+                    const anthropic = new Anthropic({apiKey, baseURL: llmProvider.apiURL});
                     const llmProviderModelId = chatRoom.llmProviderModelId;
                     if (!llmProviderModelId) throw new Error('No LLM model ID provided');
                     messageContent = await new Promise((resolve, reject) => {
@@ -183,7 +185,7 @@ export async function POST(
                             });
                     })
                 } else if (llmProvider.providerId == 'google') {
-                    const gemini = new GoogleGenerativeAI(llmProvider.apiKey)
+                    const gemini = new GoogleGenerativeAI(apiKey)
                     const llmProviderModelId = chatRoom.llmProviderModelId;
                     if (!llmProviderModelId) throw new Error('No LLM model ID provided');
                     const model = gemini.getGenerativeModel({model: llmProviderModelId})
