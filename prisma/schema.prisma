@@ -7,16 +7,33 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  username  String   @unique
+  password  String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  chatRooms      ChatRoom[]
+  healthDataList HealthData[]
+  AssistantMode  AssistantMode[]
+  LLMProvider    LLMProvider[]
+}
+
 model HealthData {
   id        String   @id @default(cuid())
   type      String // PERSONAL_INFO
   data      Json
+  authorId  String?
   metadata  Json?
   filePath  String?
   fileType  String? // image/jpeg, image/png, application/pdf
   status    String   @default("COMPLETED") // PARSING, COMPLETED
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  author User? @relation(fields: [authorId], references: [id])
 }
 
 model ChatRoom {
@@ -25,12 +42,14 @@ model ChatRoom {
   assistantModeId    String
   llmProviderId      String
   llmProviderModelId String?
+  authorId           String?
   createdAt          DateTime @default(now())
   updatedAt          DateTime @updatedAt
 
   assistantMode AssistantMode @relation(fields: [assistantModeId], references: [id])
   llmProvider   LLMProvider   @relation(fields: [llmProviderId], references: [id])
   chatMessages  ChatMessage[]
+  author        User?         @relation(fields: [authorId], references: [id])
 }
 
 model ChatMessage {
@@ -49,22 +68,27 @@ model AssistantMode {
   name         String
   description  String
   systemPrompt String
+  authorId     String?
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
   chatRoom ChatRoom[]
+  author   User?      @relation(fields: [authorId], references: [id])
 }
 
 model LLMProvider {
-  id        String   @id @default(cuid())
-  name      String
-  apiKey    String   @default("")
-  apiURL    String
-  order     Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String   @id @default(cuid())
+  providerId String
+  name       String
+  apiKey     String   @default("")
+  apiURL     String
+  order      Int
+  authorId   String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
 
   chatRooms ChatRoom[]
+  author    User?      @relation(fields: [authorId], references: [id])
 }
 
 enum ChatRole {

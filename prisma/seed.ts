@@ -1,25 +1,9 @@
 import {PrismaClient} from '@prisma/client'
-import assistantModeSeed from './data/assistant-mode.json'
-import llmProviderSeed from './data/llm-provider.json'
 
 
 const prisma = new PrismaClient()
 
 async function main() {
-    await prisma.assistantMode.createMany({
-        data: assistantModeSeed,
-        skipDuplicates: true
-    });
-
-    await prisma.lLMProvider.createMany({
-        data: llmProviderSeed,
-        skipDuplicates: true
-    });
-
-    const personalInfo = await prisma.healthData.findFirst({where: {type: 'PERSONAL_INFO'}})
-    if (!personalInfo) {
-        await prisma.healthData.create({data: {type: 'PERSONAL_INFO', data: {}}})
-    }
 }
 
 main()

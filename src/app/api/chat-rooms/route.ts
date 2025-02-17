@@ -1,5 +1,6 @@
 import prisma, {Prisma} from "@/lib/prisma";
 import {NextResponse} from "next/server";
+import {auth} from "@/auth";
 
 export interface ChatRoom extends Prisma.ChatRoomGetPayload<{
     select: {
@@ -24,6 +25,11 @@ export interface ChatRoomCreateResponse extends ChatRoom {
 }
 
 export async function GET() {
+    const session = await auth()
+    if (!session || !session.user) {
+        return NextResponse.json({error: 'Unauthorized'}, {status: 401})
+    }
+
     const chatRooms = await prisma.chatRoom.findMany({
         select: {
             id: true,
@@ -41,6 +47,7 @@ export async function GET() {
             createdAt: true,
             updatedAt: true
         },
+        where: {authorId: session.user.id},
         orderBy: {updatedAt: 'desc'},
     })
     return NextResponse.json<ChatRoomListResponse>({
@@ -49,21 +56,31 @@ export async function GET() {
 }
 
 export async function POST() {
+    const session = await auth()
+    const user = session?.user
+    if (!session || !user) {
+        return NextResponse.json({error: 'Unauthorized'}, {status: 401})
+    }
+
     const {id} = await prisma.$transaction(async (prisma) => {
         // Get the last used chat room to get its assistant mode
         const lastChatRoom = await prisma.chatRoom.findFirst({
+            where: {authorId: user.id},
             orderBy: {updatedAt: 'desc'},
             select: {assistantModeId: true}
         });
 
         // If we have a last chat room, use its assistant mode, otherwise find the first one
-        const assistantModeId = lastChatRoom?.assistantModeId || (await prisma.assistantMode.findFirstOrThrow()).id;
+        const assistantModeId = lastChatRoom?.assistantModeId || (await prisma.assistantMode.findFirstOrThrow({
+            where: {authorId: user.id}
+        })).id;
 
         return prisma.chatRoom.create({
             data: {
+                authorId: user.id,
                 name: 'New Chat',
                 assistantModeId: assistantModeId,
-                llmProviderId: (await prisma.lLMProvider.findFirstOrThrow()).id,
+                llmProviderId: (await prisma.lLMProvider.findFirstOrThrow({where: {authorId: user.id}})).id,
             },
         });
     });

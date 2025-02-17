@@ -3,6 +3,8 @@ import prisma, {Prisma} from "@/lib/prisma";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import {GoogleGenerativeAI} from "@google/generative-ai";
+import {auth} from "@/auth";
+import {decrypt} from "@/lib/encryption";
 
 export interface ChatMessage extends Prisma.ChatMessageGetPayload<{
     select: {
@@ -49,6 +51,10 @@ export async function POST(
         params: Promise<{ id: string }>,
     }
 ) {
+    const session = await auth()
+    const user = session?.user
+    if (!session || !user) return NextResponse.json({error: 'Unauthorized'}, {status: 401})
+
     const {id} = await params
     const body: ChatMessageCreateRequest = await req.json()
 
@@ -69,7 +75,7 @@ export async function POST(
             where: {chatRoomId: id},
             orderBy: {createdAt: 'asc'}
         })
-        const healthDataList = await prisma.healthData.findMany({})
+        const healthDataList = await prisma.healthData.findMany({where: {authorId: user.id}})
         const chatRoom = await prisma.chatRoom.findUniqueOrThrow({where: {id}})
         const llmProvider = await prisma.lLMProvider.findUniqueOrThrow({where: {id: chatRoom.llmProviderId}});
         return {
@@ -81,6 +87,7 @@ export async function POST(
         }
     })
 
+    const apiKey = decrypt(llmProvider.apiKey)
     const messages = [
         {"role": "system" as const, "content": assistantMode.systemPrompt},
         {
@@ -98,7 +105,7 @@ export async function POST(
             let messageContent = '';
 
             try {
-                if (chatRoom.llmProviderId === 'ollama') {
+                if (llmProvider.providerId === 'ollama') {
                     const response = await fetch(`${llmProvider.apiURL}/api/chat`, {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
@@ -133,9 +140,9 @@ export async function POST(
                             }
                         }
                     }
-                } else if (chatRoom.llmProviderId === 'openai') {
+                } else if (llmProvider.providerId === 'openai') {
                     // OpenAI API call
-                    const openai = new OpenAI({apiKey: llmProvider.apiKey, baseURL: llmProvider.apiURL});
+                    const openai = new OpenAI({apiKey, baseURL: llmProvider.apiURL});
                     const llmProviderModelId = chatRoom.llmProviderModelId;
                     if (!llmProviderModelId) throw new Error('No LLM model ID provided');
                     const chatStream = await openai.chat.completions.create({
@@ -149,8 +156,8 @@ export async function POST(
                         if (deltaContent !== undefined) messageContent += deltaContent;
                         controller.enqueue(`${JSON.stringify({content: messageContent})}\n`);
                     }
-                } else if (chatRoom.llmProviderId === 'anthropic') {
-                    const anthropic = new Anthropic({apiKey: llmProvider.apiKey, baseURL: llmProvider.apiURL});
+                } else if (llmProvider.providerId === 'anthropic') {
+                    const anthropic = new Anthropic({apiKey, baseURL: llmProvider.apiURL});
                     const llmProviderModelId = chatRoom.llmProviderModelId;
                     if (!llmProviderModelId) throw new Error('No LLM model ID provided');
                     messageContent = await new Promise((resolve, reject) => {
@@ -177,8 +184,8 @@ export async function POST(
                                 reject(error);
                             });
                     })
-                } else if (chatRoom.llmProviderId == 'google') {
-                    const gemini = new GoogleGenerativeAI(llmProvider.apiKey)
+                } else if (llmProvider.providerId == 'google') {
+                    const gemini = new GoogleGenerativeAI(apiKey)
                     const llmProviderModelId = chatRoom.llmProviderModelId;
                     if (!llmProviderModelId) throw new Error('No LLM model ID provided');
                     const model = gemini.getGenerativeModel({model: llmProviderModelId})
