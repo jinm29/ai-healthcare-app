@@ -140,6 +140,10 @@ Gesundheitsdaten-Eingabe --> Parsing-Modul --> Strukturierte Datendateien --> GP
 ### 📬 Kontakt
 [![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
 
+### 🤝 Mit dem Team sprechen
+[![Calendly](https://img.shields.io/badge/Meeting_Planen-00A2FF?style=for-the-badge&logo=calendar&logoColor=white)](https://calendly.com/open-health/30min)
+[![Email](https://img.shields.io/badge/E_Mail_Senden-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sj@open-health.me)
+
 </div>
 
 ---

@@ -102,7 +102,8 @@ OpenHealth는 건강을 더 잘 이해하고 관리할 수 있도록 도와주�
 [![AIDoctor Subreddit](https://img.shields.io/badge/r/AIDoctor-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/AIDoctor/)
 [![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B9K654g4wf)
 
-### 📬 연락처
-[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
+### 🤝 팀과 대화하기
+[![Calendly](https://img.shields.io/badge/미팅_예약-00A2FF?style=for-the-badge&logo=calendar&logoColor=white)](https://calendly.com/open-health/30min)
+[![Email](https://img.shields.io/badge/이메일_보내기-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sj@open-health.me)
 
 </div> 

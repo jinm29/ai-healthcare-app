@@ -161,8 +161,9 @@ Entrada de datos de salud --> Módulo de análisis --> Archivos de datos estruct
 [![AIDoctor Subreddit](https://img.shields.io/badge/r/AIDoctor-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/AIDoctor/)
 [![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B9K654g4wf)
 
-### 📬 Contacto
-[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
+### 🤝 Habla con el Equipo
+[![Calendly](https://img.shields.io/badge/Programar_Reunión-00A2FF?style=for-the-badge&logo=calendar&logoColor=white)](https://calendly.com/open-health/30min)
+[![Email](https://img.shields.io/badge/Enviar_Correo-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sj@open-health.me)
 
 </div>
 

@@ -145,4 +145,8 @@ Entrée de données de santé --> Module d'analyse --> Fichiers de données stru
 ### 📬 Contact
 [![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
 
+### 🤝 Parler avec l'Équipe
+[![Calendly](https://img.shields.io/badge/Planifier_Réunion-00A2FF?style=for-the-badge&logo=calendar&logoColor=white)](https://calendly.com/open-health/30min)
+[![Email](https://img.shields.io/badge/Envoyer_Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sj@open-health.me)
+
 </div> 
