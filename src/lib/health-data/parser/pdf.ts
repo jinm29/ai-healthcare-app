@@ -10,7 +10,6 @@ import documents from "@/lib/health-data/parser/document";
 import {put} from "@vercel/blob";
 import {currentDeploymentEnv} from "@/lib/current-deployment-env";
 import fs from "node:fs";
-import {pdf} from "pdf-to-img";
 
 interface VisionParserOptions {
     parser: string;
@@ -223,11 +222,7 @@ async function documentToImages({file: filePath}: Pick<SourceParseOptions, 'file
     // Convert pdf to images, or use the image as is
     const images: string[] = []
     if (mime === 'application/pdf') {
-        await import('pdfjs-dist/build/pdf.worker.min.mjs');
-        const document = await pdf(fileBuffer, {scale: 3});
-        for await (const image of document) {
-            images.push(`data:image/png;base64,${image.toString('base64')}`);
-        }
+        throw new Error('PDF parsing is not supported')
     } else {
         images.push(`data:${mime};base64,${fileBuffer.toString('base64')}`)
     }
