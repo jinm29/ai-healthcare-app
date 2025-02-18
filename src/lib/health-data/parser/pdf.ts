@@ -54,7 +54,10 @@ async function documentOCR({document, documentParser}: { document: string, docum
     return ocr
 }
 
-async function documentParse({document, documentParser}: { document: string, documentParser: DocumentParserOptions }) {
+async function documentParse({document, documentParser}: {
+    document: string,
+    documentParser: DocumentParserOptions
+}): Promise<any> {
 
     // Get the document parser
     const parser = documents.find(e => e.name === documentParser.parser)

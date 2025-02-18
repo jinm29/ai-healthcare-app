@@ -154,10 +154,7 @@ export async function POST(
                 where: {id: healthData.id},
                 data: {
                     status: 'COMPLETED',
-                    metadata: {
-                        ocr: ocrResults[0],
-                        dataPerPage: pages[0]
-                    },
+                    metadata: JSON.parse(JSON.stringify({ocr: ocrResults[0], dataPerPage: pages[0]})),
                     data: {...baseData, ...data[0]}
                 }
             });
