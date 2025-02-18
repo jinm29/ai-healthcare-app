@@ -11,6 +11,8 @@ import {put} from "@vercel/blob";
 import {currentDeploymentEnv} from "@/lib/current-deployment-env";
 import fs from "node:fs";
 import {fromBuffer as pdf2picFromBuffer} from 'pdf2pic'
+import {tasks} from "@trigger.dev/sdk/v3";
+import type {pdfToImages} from "@/trigger/pdf-to-image";
 
 interface VisionParserOptions {
     parser: string;
@@ -229,7 +231,16 @@ async function documentToImages({file: filePath}: Pick<SourceParseOptions, 'file
                 if (image.base64) images.push(`data:image/png;base64,${image.base64}`)
             }
         } else {
-            throw new Error('PDF parsing is not supported')
+            const result = await tasks.triggerAndPoll<typeof pdfToImages>(
+                'pdf-to-image',
+                {pdfUrl: filePath},
+                {pollIntervalMs: 5000},
+            )
+            if (result.status === 'COMPLETED' && result.output) {
+                images.push(...result.output.images.map((image) => `data:image/png;base64,${image}`))
+            } else {
+                throw new Error('Failed to convert the pdf to images')
+            }
         }
     } else {
         images.push(`data:${mime};base64,${fileBuffer.toString('base64')}`)
