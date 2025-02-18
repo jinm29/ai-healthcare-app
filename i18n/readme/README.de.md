@@ -127,7 +127,7 @@ Gesundheitsdaten-Eingabe --> Parsing-Modul --> Strukturierte Datendateien --> GP
 
 > **Hinweis:** Das System besteht aus zwei Hauptkomponenten: Parsing und LLM. Derzeit verwendet das Parsing Upstage- und OpenAI-APIs (die in unseren Tests die beste Leistung zeigten), wobei ein lokaler Parser in Kürze hinzugefügt wird. Die LLM-Komponente kann mit Ollama vollständig lokal ausgeführt werden.
 
-> **Hinweis:** Wenn Sie Ollama mit Docker verwenden, stellen Sie sicher, dass der Ollama-API-Endpunkt auf `http://docker.for.mac.localhost:11434/` eingestellt ist.
+> **Hinweis:** Wenn Sie Ollama mit Docker verwenden, stellen Sie sicher, dass der Ollama-API-Endpunkt auf @http://docker.for.mac.localhost:11434 für Mac oder http://host.docker.internal:11434 für Windows eingestellt ist.
 
 ## 🌐 Community und Support
 
