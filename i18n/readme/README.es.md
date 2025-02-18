@@ -151,7 +151,7 @@ Entrada de datos de salud --> Módulo de análisis --> Archivos de datos estruct
 
 > **Nota:** El sistema consta de dos componentes principales: análisis y LLM. Actualmente, el análisis utiliza las API de Upstage y OpenAI (que mostraron el mejor rendimiento en nuestras pruebas), con un analizador local próximamente, mientras que el componente LLM puede ejecutarse completamente de forma local usando Ollama.
 
-> **Nota:** Si está usando Ollama con Docker, asegúrese de configurar el punto final de la API de Ollama como: @http://docker.for.mac.localhost:11434 para Mac o http://host.docker.internal:11434 para Windows.
+> **Nota:** Si está usando Ollama con Docker, asegúrese de configurar el punto final de la API de Ollama como: `http://docker.for.mac.localhost:11434` para Mac o `http://host.docker.internal:11434` para Windows.
 
 ## 🌐 Comunidad y Soporte
 

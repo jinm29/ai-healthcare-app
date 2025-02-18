@@ -82,7 +82,7 @@ OpenHealthはプライベートでローカルで実行されるアシスタン�
 
 > **注意:** システムはパースとLLMの2つの主要コンポーネントで構成されています。現在、パースはUpstageとOpenAI APIを使用しており（テストで最高のパフォーマンスを示しました）、ローカルパーサーも近日追加予定です。LLMコンポーネントはOllamaを使用して完全にローカルで実行できます。
 
-> **注意:** DockerでOllamaを使用する場合、Ollama APIエンドポイントを次のように設定してください: @http://docker.for.mac.localhost:11434（Macの場合）または http://host.docker.internal:11434（Windowsの場合）
+> **注意:** DockerでOllamaを使用する場合、Ollama APIエンドポイントを次のように設定してください: `http://docker.for.mac.localhost:11434`（Macの場合）または `http://host.docker.internal:11434`（Windowsの場合）
 
 ### 🌐 コミュニティとサポート
 
