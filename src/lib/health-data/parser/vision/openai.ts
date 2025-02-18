@@ -2,6 +2,7 @@ import {BaseVisionParser, VisionParseOptions, VisionParserModel} from "@/lib/hea
 import {ChatOpenAI} from "@langchain/openai";
 import {HealthCheckupSchema} from "@/lib/health-data/parser/schema";
 import {ChatPromptTemplate} from "@langchain/core/prompts";
+import {currentDeploymentEnv} from "@/lib/current-deployment-env";
 
 export class OpenAIVisionParser extends BaseVisionParser {
 
@@ -10,7 +11,7 @@ export class OpenAIVisionParser extends BaseVisionParser {
     }
 
     get apiKeyRequired(): boolean {
-        return true
+        return currentDeploymentEnv === 'local'
     }
 
     async models(): Promise<VisionParserModel[]> {
@@ -23,7 +24,10 @@ export class OpenAIVisionParser extends BaseVisionParser {
     }
 
     async parse(options: VisionParseOptions) {
-        const llm = new ChatOpenAI({model: options.model.id, apiKey: options.apiKey})
+        const llm = new ChatOpenAI({
+            model: options.model.id,
+            apiKey: currentDeploymentEnv === 'cloud' ? process.env.OPENAI_API_KEY : options.apiKey
+        })
         const messages = options.messages || ChatPromptTemplate.fromMessages([]);
         const chain = messages.pipe(llm.withStructuredOutput(HealthCheckupSchema, {
             method: 'functionCalling',

@@ -4,6 +4,7 @@ import {HealthCheckupSchema} from "@/lib/health-data/parser/schema";
 import {ChatPromptTemplate} from "@langchain/core/prompts";
 import {z} from "zod";
 import {processBatchWithConcurrency} from "@/lib/health-data/parser/util";
+import {currentDeploymentEnv} from "@/lib/current-deployment-env";
 
 type ZodTypeAny = z.ZodTypeAny;
 type ZodRawShape = { [k: string]: ZodTypeAny };
@@ -15,7 +16,7 @@ export class GoogleVisionParser extends BaseVisionParser {
     }
 
     get apiKeyRequired(): boolean {
-        return true
+        return currentDeploymentEnv === 'local'
     }
 
     async models(): Promise<VisionParserModel[]> {
@@ -29,7 +30,10 @@ export class GoogleVisionParser extends BaseVisionParser {
     }
 
     async parse(options: VisionParseOptions) {
-        const llm = new ChatGoogleGenerativeAI({model: options.model.id, apiKey: options.apiKey})
+        const llm = new ChatGoogleGenerativeAI({
+            model: options.model.id,
+            apiKey: currentDeploymentEnv === 'cloud' ? process.env.GOOGLE_API_KEY : options.apiKey,
+        });
         const messages = options.messages || ChatPromptTemplate.fromMessages([]);
 
         // parse the date and name

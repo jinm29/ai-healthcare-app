@@ -1,5 +1,6 @@
 import {
-    BaseDocumentParser, DocumentModelOptions,
+    BaseDocumentParser,
+    DocumentModelOptions,
     DocumentOCROptions,
     DocumentParseOptions,
     DocumentParseResult,
@@ -9,6 +10,7 @@ import {
 import FormData from "form-data";
 import fs from "node:fs";
 import fetch from "node-fetch";
+import {currentDeploymentEnv} from "@/lib/current-deployment-env";
 
 export class UpstageDocumentParser extends BaseDocumentParser {
 
@@ -17,7 +19,7 @@ export class UpstageDocumentParser extends BaseDocumentParser {
     }
 
     get apiKeyRequired(): boolean {
-        return true
+        return currentDeploymentEnv === 'local'
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -33,10 +35,11 @@ export class UpstageDocumentParser extends BaseDocumentParser {
         formData.append("schema", "oac");
         formData.append("model", "ocr-2.2.1");
 
+        const apiKey = currentDeploymentEnv === 'cloud' ? process.env.UPSTAGE_API_KEY : options.apiKey
         const response = await fetch('https://api.upstage.ai/v1/document-ai/ocr', {
             method: 'POST',
             body: formData,
-            headers: {Authorization: `Bearer ${options.apiKey}`}
+            headers: {Authorization: `Bearer ${apiKey}`}
         });
 
         return {ocr: await response.json()}
@@ -50,10 +53,11 @@ export class UpstageDocumentParser extends BaseDocumentParser {
         formData.append("coordinates", "true");
         formData.append("model", "document-parse");
 
+        const apiKey = currentDeploymentEnv === 'cloud' ? process.env.UPSTAGE_API_KEY : options.apiKey
         const response = await fetch('https://api.upstage.ai/v1/document-ai/document-parse', {
             method: 'POST',
             body: formData,
-            headers: {Authorization: `Bearer ${options.apiKey}`}
+            headers: {Authorization: `Bearer ${apiKey}`}
         })
 
         return {document: await response.json()}
