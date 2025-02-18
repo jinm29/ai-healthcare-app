@@ -10,6 +10,7 @@ import documents from "@/lib/health-data/parser/document";
 import {put} from "@vercel/blob";
 import {currentDeploymentEnv} from "@/lib/current-deployment-env";
 import fs from "node:fs";
+import {fromBuffer as pdf2picFromBuffer} from 'pdf2pic'
 
 interface VisionParserOptions {
     parser: string;
@@ -222,7 +223,14 @@ async function documentToImages({file: filePath}: Pick<SourceParseOptions, 'file
     // Convert pdf to images, or use the image as is
     const images: string[] = []
     if (mime === 'application/pdf') {
-        throw new Error('PDF parsing is not supported')
+        if (currentDeploymentEnv === 'local') {
+            const pdf2picConverter = pdf2picFromBuffer(fileBuffer, {preserveAspectRatio: true})
+            for (const image of await pdf2picConverter.bulk(-1, {responseType: 'base64'})) {
+                if (image.base64) images.push(`data:image/png;base64,${image.base64}`)
+            }
+        } else {
+            throw new Error('PDF parsing is not supported')
+        }
     } else {
         images.push(`data:${mime};base64,${fileBuffer.toString('base64')}`)
     }
