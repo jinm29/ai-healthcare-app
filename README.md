@@ -136,13 +136,13 @@ graph LR
    # UPSTAGE_API_KEY - For parsing (You can get $10 credit without card registration by signing up at https://www.upstage.ai)
    # OPENAI_API_KEY - For enhanced parsing capabilities
 
-   # Start the application using Docker Compose
-   docker compose --env-file .env up
+   # Start the application using Docker/Podman Compose
+   docker/podman compose --env-file .env up
    ```
 
    For existing users, use:
    ```bash
-   docker compose --env-file .env up --build
+   docker/podman compose --env-file .env up --build
    ```
    to rebuild the image. Run this also if you make any modifications to the .env file.
 
@@ -151,7 +151,7 @@ graph LR
 
 > **Note:** The system consists of two main components: parsing and LLM. Currently, parsing utilizes Upstage and OpenAI APIs (which showed the best performance in our testing) with a local parser coming soon, while the LLM component can run fully locally using Ollama.
 
-> **Note:** If you're using Ollama with Docker, make sure to set the Ollama API endpoint to: @http://docker.for.mac.localhost:11434 on a Mac or http://host.docker.internal:11434 on Windows.
+> **Note:** If you're using Ollama with Docker, make sure to set the Ollama API endpoint to: `http://docker.for.mac.localhost:11434/` on a Mac or `http://host.docker.internal:11434/` on Windows.
 
 </details>
 
