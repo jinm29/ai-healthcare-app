@@ -23,6 +23,7 @@ import {HealthDataGetResponse} from "@/app/api/health-data/[id]/route";
 import {HealthDataParserDocumentListResponse} from "@/app/api/health-data-parser/documents/route";
 import {HealthDataParserVisionModelListResponse} from "@/app/api/health-data-parser/visions/[id]/models/route";
 import {HealthDataParserDocumentModelListResponse} from "@/app/api/health-data-parser/documents/[id]/models/route";
+import {ConditionalDeploymentEnv} from "@/components/common/deployment-env";
 
 const Select = dynamic(() => import('react-select'), {ssr: false});
 
@@ -221,7 +222,7 @@ const AddSourceDialog: React.FC<AddSourceDialogProps> = ({
                             type="file"
                             id="file-upload"
                             multiple
-                            accept="image/*,.pdf"
+                            accept="image/png,image/jpeg,.pdf"
                             className="hidden"
                             onChange={handleFileUpload}
                             disabled={uploadStatus === 'uploading'}
@@ -580,7 +581,7 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
                             healthData?.fileType?.includes('image') && healthData?.filePath ? (
                                 <div className="p-4">
                                     <Image
-                                        src={`/api/static${healthData.filePath}`}
+                                        src={healthData.filePath}
                                         alt="Preview"
                                         className="w-full h-auto"
                                         width={800}
@@ -592,7 +593,7 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
                             ) : (
                                 <div className="bg-gray-50 p-4 rounded-lg relative flex flex-row h-full">
                                     <div id="pdf" className="w-[60%] overflow-y-auto h-full">
-                                        <Document file={`/api/static${healthData.filePath}`}
+                                        <Document file={healthData.filePath}
                                                   className="w-full"
                                                   onLoadSuccess={onDocumentLoadSuccess}>
                                             {Array.from(new Array(numPages), (_, index) => {
@@ -1252,33 +1253,35 @@ export default function SourceAddScreen() {
                                                     }))}
                                                 />
 
-                                                {visionDataList?.visions?.find(v => v.name === visionParser?.value)?.apiKeyRequired && (
-                                                    <div className="space-y-2">
-                                                        <label className="text-sm font-medium">API Key</label>
-                                                        <input
-                                                            type="password"
-                                                            aria-autocomplete={'none'}
-                                                            autoComplete={'off'}
-                                                            placeholder="Enter your API key"
-                                                            className="w-full p-2 border rounded-md text-sm"
-                                                            value={visionParserApiKey}
-                                                            onChange={(e) => setVisionParserApiKey(e.target.value)}
-                                                        />
-                                                    </div>
-                                                )}
+                                                <ConditionalDeploymentEnv env={['local']}>
+                                                    {visionDataList?.visions?.find(v => v.name === visionParser?.value)?.apiKeyRequired && (
+                                                        <div className="space-y-2">
+                                                            <label className="text-sm font-medium">API Key</label>
+                                                            <input
+                                                                type="password"
+                                                                aria-autocomplete={'none'}
+                                                                autoComplete={'off'}
+                                                                placeholder="Enter your API key"
+                                                                className="w-full p-2 border rounded-md text-sm"
+                                                                value={visionParserApiKey}
+                                                                onChange={(e) => setVisionParserApiKey(e.target.value)}
+                                                            />
+                                                        </div>
+                                                    )}
 
-                                                {visionDataList?.visions?.find(v => v.name === visionParser?.value)?.apiUrlRequired && (
-                                                    <div className="space-y-2">
-                                                        <input
-                                                            aria-autocomplete={'none'}
-                                                            autoComplete={'off'}
-                                                            placeholder="Enter your API Url"
-                                                            className="w-full p-2 border rounded-md text-sm"
-                                                            value={visionParserApiUrl}
-                                                            onChange={(e) => setVisionParserApiUrl(e.target.value)}
-                                                        />
-                                                    </div>
-                                                )}
+                                                    {visionDataList?.visions?.find(v => v.name === visionParser?.value)?.apiUrlRequired && (
+                                                        <div className="space-y-2">
+                                                            <input
+                                                                aria-autocomplete={'none'}
+                                                                autoComplete={'off'}
+                                                                placeholder="Enter your API Url"
+                                                                className="w-full p-2 border rounded-md text-sm"
+                                                                value={visionParserApiUrl}
+                                                                onChange={(e) => setVisionParserApiUrl(e.target.value)}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </ConditionalDeploymentEnv>
                                             </div>
                                         </div>
 
@@ -1333,18 +1336,20 @@ export default function SourceAddScreen() {
                                                     }))}
                                                 />
 
-                                                {documentDataList?.documents?.find(v => v.name === documentParser?.value)?.apiKeyRequired && (
-                                                    <div className="space-y-2">
-                                                        <label className="text-sm font-medium">API Key</label>
-                                                        <input
-                                                            type="password"
-                                                            placeholder="Enter your API key"
-                                                            className="w-full p-2 border rounded-md text-sm"
-                                                            value={documentParserApiKey}
-                                                            onChange={(e) => setDocumentParserApiKey(e.target.value)}
-                                                        />
-                                                    </div>
-                                                )}
+                                                <ConditionalDeploymentEnv env={['local']}>
+                                                    {documentDataList?.documents?.find(v => v.name === documentParser?.value)?.apiKeyRequired && (
+                                                        <div className="space-y-2">
+                                                            <label className="text-sm font-medium">API Key</label>
+                                                            <input
+                                                                type="password"
+                                                                placeholder="Enter your API key"
+                                                                className="w-full p-2 border rounded-md text-sm"
+                                                                value={documentParserApiKey}
+                                                                onChange={(e) => setDocumentParserApiKey(e.target.value)}
+                                                            />
+                                                        </div>
+                                                    )}
+                                                </ConditionalDeploymentEnv>
                                             </div>
                                         </div>
                                     </div>

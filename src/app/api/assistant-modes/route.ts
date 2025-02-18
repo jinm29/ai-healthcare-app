@@ -1,5 +1,6 @@
 import {NextResponse} from "next/server";
 import prisma, {Prisma} from "@/lib/prisma";
+import {auth} from "@/auth";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface AssistantMode extends Prisma.AssistantModeGetPayload<{
@@ -12,9 +13,16 @@ export interface AssistantModeListResponse {
 }
 
 export async function GET() {
+    const session = await auth()
+    if (!session || !session.user) {
+        return NextResponse.json({message: "Unauthorized"}, {status: 401});
+    }
+
     const assistantModes = await prisma.assistantMode.findMany({
+        where: {authorId: session.user.id},
         orderBy: {id: 'asc'},
     })
+
     return NextResponse.json<AssistantModeListResponse>({
         assistantModes
     })

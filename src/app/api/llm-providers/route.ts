@@ -1,9 +1,13 @@
 import prisma, {Prisma} from "@/lib/prisma";
 import {NextResponse} from "next/server";
+import {auth} from "@/auth";
+import {decrypt} from "@/lib/encryption";
+import {currentDeploymentEnv} from "@/lib/current-deployment-env";
 
 export interface LLMProvider extends Prisma.LLMProviderGetPayload<{
     select: {
         id: true,
+        providerId: true,
         name: true,
         apiKey: true,
         apiURL: true,
@@ -17,12 +21,32 @@ export interface LLMProviderListResponse {
 }
 
 export async function GET() {
+    const session = await auth()
+    if (!session || !session.user) {
+        return NextResponse.json({error: 'Unauthorized'}, {status: 401})
+    }
+
     const llmProviders = await prisma.lLMProvider.findMany({
-        orderBy: {
-            order: 'asc'
-        }
+        where: {authorId: session.user.id},
+        orderBy: {order: 'asc'}
     })
     return NextResponse.json<LLMProviderListResponse>({
-        llmProviders
+        llmProviders: llmProviders
+            .filter(({providerId}) => {
+                // exclude Ollama from cloud deployment
+                if (currentDeploymentEnv === 'cloud') return !['ollama'].includes(providerId)
+                return true;
+            })
+            .map((provider) => {
+                let decryptedApiKey: string
+                try {
+                    decryptedApiKey = decrypt(provider.apiKey)
+                    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                } catch (e) {
+                    decryptedApiKey = ''
+                }
+
+                return {...provider, apiKey: decryptedApiKey}
+            })
     })
 }

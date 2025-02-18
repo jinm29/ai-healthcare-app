@@ -2,13 +2,17 @@
 
 <div align="center">
 
-**AI-ассистент для здоровья | Работает на ваших данных локально**
+**ИИ-ассистент здоровья | Работает на ваших данных, локально**
 
 <p align="center">
   <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
   <img src="https://img.shields.io/badge/Language-TypeScript-blue?style=for-the-badge" alt="Language">
   <img src="https://img.shields.io/badge/Framework-Next.js-black?style=for-the-badge" alt="Framework">
 </p>
+
+> **📢 Теперь доступно в веб-версии!**  
+> В ответ на запросы об упрощении доступа мы запустили веб-версию.  
+> Попробуйте сейчас: **[open-health.me](https://open-health.me/)**
 
 ### 🌍 Выберите язык
 [English](../../README.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Español](README.es.md) | [한국어](README.ko.md) | [中文](README.zh.md) | [日本語](README.ja.md) | [Українська](README.uk.md) | [Русский](README.ru.md) | [اردو](README.ur.md)

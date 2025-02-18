@@ -1,14 +1,20 @@
 # 🚀 **OpenHealth**
 
+<div align="center">
+
 **AI健康助手 | 由您的数据驱动，本地运行**
 
----
-
 <p align="center">
-  <img src="/intro/openhealth.avif" alt="OpenHealth 演示">
+  <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
+  <img src="https://img.shields.io/badge/Language-TypeScript-blue?style=for-the-badge" alt="Language">
+  <img src="https://img.shields.io/badge/Framework-Next.js-black?style=for-the-badge" alt="Framework">
 </p>
 
-## 🌟 概述
+> **📢 网页版现已上线！**  
+> 应用户要求提供更便捷的使用方式，我们推出了网页版。  
+> 立即体验：**[open-health.me](https://open-health.me/)**
+
+### 🌟 概述
 
 OpenHealth帮助您**掌控健康数据**。通过利用AI和您的个人健康信息，
 OpenHealth提供私密且本地运行的助手，帮助您更好地理解和管理健康。
@@ -84,7 +90,7 @@ OpenHealth提供私密且本地运行的助手，帮助您更好地理解和管�
 
 > **注意：** 系统由解析和LLM两个主要组件组成。目前，解析使用Upstage和OpenAI API（在我们的测试中表现最佳），本地解析器即将推出。LLM组件可以使用Ollama在本地完全运行。
 
-> **注意：** 如果您使用Docker运行Ollama，请确保将Ollama API端点设置为：`http://docker.for.mac.localhost:11434/`
+> **注意：** 如果您使用Docker运行Ollama，请确保将Ollama API端点设置为：@http://docker.for.mac.localhost:11434（Mac用户）或 http://host.docker.internal:11434（Windows用户）
 
 ---
 
@@ -96,7 +102,8 @@ OpenHealth提供私密且本地运行的助手，帮助您更好地理解和管�
 [![AIDoctor Subreddit](https://img.shields.io/badge/r/AIDoctor-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/AIDoctor/)
 [![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B9K654g4wf)
 
-### 📬 联系方式
-[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
+### 🤝 与团队交流
+[![Calendly](https://img.shields.io/badge/预约会议-00A2FF?style=for-the-badge&logo=calendar&logoColor=white)](https://calendly.com/open-health/30min)
+[![Email](https://img.shields.io/badge/发送邮件-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sj@open-health.me)
 
 </div> 

@@ -4,6 +4,7 @@ import React, {useEffect, useMemo, useRef, useState} from 'react';
 import {Menu, Send, Settings} from 'lucide-react';
 import {Button} from "@/components/ui/button";
 import {Input} from "@/components/ui/input";
+import LogoutButton from "@/components/auth/logout-button";
 
 import {Dialog, DialogContent, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import ChatSideBar from "@/components/chat/chat-side-bar";
@@ -93,7 +94,7 @@ export default function Page() {
 
     return (
         <div className="h-screen flex flex-col">
-            <div className="bg-white border-b h-14 flex items-center px-4 shrink-0">
+            <div className="bg-white dark:bg-zinc-900 border-b h-14 flex items-center px-4 shrink-0">
                 <div className="flex items-center gap-2">
                     <Button variant="ghost" size="icon" onClick={() => setIsLeftSidebarOpen(!isLeftSidebarOpen)}>
                         <Menu className="w-4 h-4"/>
@@ -101,9 +102,40 @@ export default function Page() {
                     <h1 className="text-lg font-semibold">OpenHealth</h1>
                 </div>
                 <div className="flex-1"/>
-                <Button variant="ghost" size="icon" onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}>
-                    <Settings className="w-4 h-4"/>
-                </Button>
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-4 mr-4">
+                        <a
+                            href="https://github.com/OpenHealthForAll/open-health"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors font-medium"
+                        >
+                            Github
+                        </a>
+                        <a
+                            href="https://www.reddit.com/r/AIDoctor/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors font-medium"
+                        >
+                            Reddit
+                        </a>
+                        <a
+                            href="https://discord.gg/B9K654g4wf"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors font-medium"
+                        >
+                            Discord
+                        </a>
+                    </div>
+                    <div className="flex items-center gap-1">
+                        <LogoutButton />
+                        <Button variant="ghost" size="icon" onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}>
+                            <Settings className="w-4 h-4"/>
+                        </Button>
+                    </div>
+                </div>
             </div>
 
             <div className="flex-1 flex overflow-hidden">

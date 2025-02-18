@@ -1,13 +1,16 @@
 /* eslint-disable */
-import * as fsPromise from "node:fs/promises";
+
 import {fromBuffer as pdf2picFromBuffer} from 'pdf2pic'
 import {ChatPromptTemplate} from "@langchain/core/prompts";
 import {HealthCheckupSchema, HealthCheckupType} from "@/lib/health-data/parser/schema";
 import {fileTypeFromBuffer} from 'file-type';
-import {getFileMd5, processBatchWithConcurrency, resolveUploadPath} from "@/lib/health-data/parser/util";
+import {getFileMd5, processBatchWithConcurrency} from "@/lib/health-data/parser/util";
 import {getParsePrompt, MessagePayload} from "@/lib/health-data/parser/prompt";
 import visions from "@/lib/health-data/parser/vision";
 import documents from "@/lib/health-data/parser/document";
+import {put} from "@vercel/blob";
+import {currentDeploymentEnv} from "@/lib/current-deployment-env";
+import fs from "node:fs";
 
 interface VisionParserOptions {
     parser: string;
@@ -37,13 +40,6 @@ interface InferenceOptions {
 }
 
 async function documentOCR({document, documentParser}: { document: string, documentParser: DocumentParserOptions }) {
-    const documentFile = await fsPromise.readFile(document)
-    const filename = await getFileMd5(documentFile)
-    const path = `./public/uploads/${filename}_ocr.json`
-
-    // if file exists, return the result
-    const fileExists = await fsPromise.access(path).then(() => true).catch(() => false)
-    if (fileExists) return JSON.parse(await fsPromise.readFile(path, 'utf-8'))
 
     // Get the document parser
     const parser = documents.find(e => e.name === documentParser.parser)
@@ -57,20 +53,13 @@ async function documentOCR({document, documentParser}: { document: string, docum
     // Get the ocr result
     const {ocr} = await parser.ocr({input: document, model: model, apiKey: documentParser.apiKey})
 
-    // Save the result
-    await fsPromise.writeFile(path, JSON.stringify(ocr))
-
     return ocr
 }
 
-async function documentParse({document, documentParser}: { document: string, documentParser: DocumentParserOptions }) {
-    const documentFile = await fsPromise.readFile(document)
-    const filename = await getFileMd5(documentFile)
-    const path = `./public/uploads/${filename}.json`
-
-    // if file exists, return the result
-    const fileExists = await fsPromise.access(path).then(() => true).catch(() => false)
-    if (fileExists) return JSON.parse(await fsPromise.readFile(path, 'utf-8'))
+async function documentParse({document, documentParser}: {
+    document: string,
+    documentParser: DocumentParserOptions
+}): Promise<any> {
 
     // Get the document parser
     const parser = documents.find(e => e.name === documentParser.parser)
@@ -83,9 +72,6 @@ async function documentParse({document, documentParser}: { document: string, doc
 
     // Get the parse result
     const {document: result} = await parser.parse({input: document, model: model, apiKey: documentParser.apiKey})
-
-    // Save the result
-    await fsPromise.writeFile(path, JSON.stringify(result))
 
     return result
 }
@@ -113,7 +99,11 @@ async function inference(inferenceOptions: InferenceOptions) {
     // Extract image data if not excluding images
     const imageDataList: string[] = !excludeImage ? await processBatchWithConcurrency(
         imagePaths,
-        async (path) => `data:image/png;base64,${(await fsPromise.readFile(path)).toString('base64')}`,
+        async (path) => {
+            const fileResponse = await fetch(path)
+            const buffer = Buffer.from(await fileResponse.arrayBuffer())
+            return `data:image/png;base64,${buffer.toString('base64')}`
+        },
         4
     ) : []
 
@@ -223,8 +213,8 @@ async function inference(inferenceOptions: InferenceOptions) {
  * @returns {Promise<string[]>} - List of image paths
  */
 async function documentToImages({file: filePath}: Pick<SourceParseOptions, 'file'>): Promise<string[]> {
-    const file = await fsPromise.readFile(filePath)
-    const fileBuffer = Buffer.from(file)
+    const fileResponse = await fetch(filePath);
+    const fileBuffer = Buffer.from(await fileResponse.arrayBuffer())
     const result = await fileTypeFromBuffer(fileBuffer)
     const fileHash = await getFileMd5(fileBuffer)
     if (!result) throw new Error('Invalid file type')
@@ -244,9 +234,17 @@ async function documentToImages({file: filePath}: Pick<SourceParseOptions, 'file
     // Write the image data to a file
     const imagePaths = []
     for (let i = 0; i < images.length; i++) {
-        const path = await resolveUploadPath(`${fileHash}_${i}.png`)
-        await fsPromise.writeFile(path, Buffer.from(images[i].split(',')[1], 'base64'))
-        imagePaths.push(path)
+        if (currentDeploymentEnv === 'local') {
+            fs.writeFileSync(`./public/uploads/${fileHash}_${i}.png`, Buffer.from(images[i].split(',')[1], 'base64'))
+            imagePaths.push(`${process.env.NEXT_PUBLIC_URL}/api/static/uploads/${fileHash}_${i}.png`)
+        } else {
+            const blob = await put(
+                `/uploads/${fileHash}_${i}.png`,
+                Buffer.from(images[i].split(',')[1], 'base64'),
+                {access: 'public', contentType: 'image/png'}
+            )
+            imagePaths.push(blob.downloadUrl)
+        }
     }
 
     return imagePaths

@@ -2,13 +2,17 @@
 
 <div align="center">
 
-**AI ہیلتھ اسسٹنٹ | آپ کے ڈیٹا سے چلنے والا، مقامی طور پر**
+**AI صحت کا معاون | آپ کے ڈیٹا سے چلنے والا، مقامی طور پر**
 
 <p align="center">
   <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
   <img src="https://img.shields.io/badge/Language-TypeScript-blue?style=for-the-badge" alt="Language">
   <img src="https://img.shields.io/badge/Framework-Next.js-black?style=for-the-badge" alt="Framework">
 </p>
+
+> **📢 اب ویب ورژن دستیاب ہے!**  
+> آسان رسائی کی درخواستوں کے جواب میں، ہم نے ویب ورژن لانچ کیا ہے۔  
+> ابھی آزمائیں: **[open-health.me](https://open-health.me/)**
 
 ### 🌍 اپنی زبان منتخب کریں
 [English](../../README.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Español](README.es.md) | [한국어](README.ko.md) | [中文](README.zh.md) | [日本語](README.ja.md) | [Українська](README.uk.md) | [Русский](README.ru.md) | [اردو](README.ur.md)

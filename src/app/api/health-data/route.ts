@@ -1,11 +1,13 @@
 import prisma, {Prisma} from "@/lib/prisma";
 import {NextRequest, NextResponse} from "next/server";
-
-import fs from 'fs'
 import {parseHealthData} from "@/lib/health-data/parser/pdf";
 import crypto from "node:crypto";
 import {fileTypeFromBuffer} from "file-type";
-import gm from "gm";
+import sharp from 'sharp'
+import {auth} from "@/auth";
+import {put} from "@vercel/blob";
+import {currentDeploymentEnv} from "@/lib/current-deployment-env";
+import fs from 'fs'
 
 export interface HealthData extends Prisma.HealthDataGetPayload<{
     select: {
@@ -42,6 +44,9 @@ export interface HealthDataCreateResponse extends HealthData {
 export async function POST(
     req: NextRequest
 ) {
+    const session = await auth()
+    if (!session || !session.user) return NextResponse.json({error: 'Unauthorized'}, {status: 401})
+
     const contentType = req.headers.get('content-type')
     if (!contentType) {
         return NextResponse.json({error: 'Missing content-type header'}, {status: 400})
@@ -50,7 +55,7 @@ export async function POST(
     if (contentType === 'application/json') {
         const data: HealthDataCreateRequest = await req.json()
         const healthData = await prisma.healthData.create({
-            data
+            data: {...data, authorId: session.user.id}
         })
         return NextResponse.json<HealthDataCreateResponse>(healthData)
     } else {
@@ -86,25 +91,36 @@ export async function POST(
 
             const {mime} = result
             if (mime.startsWith('image/')) {
-                const imageMagick = gm.subClass({imageMagick: true});
-                const outputBuffer = await new Promise<Buffer>((resolve, reject) => {
-                    imageMagick(fileBuffer)
-                        .toBuffer('PNG', (err, buffer) => {
-                            if (err) reject(err);
-                            else resolve(buffer);
-                        });
-                });
+                const outputBuffer = await sharp(fileBuffer).png().toBuffer()
                 const filename = `${fileHash}.png`;
-                fs.writeFileSync(`./public/uploads/${filename}`, outputBuffer)
-                fileType = file.type
-                filePath = `/uploads/${filename}`
+                if (currentDeploymentEnv === 'local') {
+                    fs.writeFileSync(`./public/uploads/${filename}`, outputBuffer)
+                    filePath = `${process.env.NEXT_PUBLIC_URL}/api/static/uploads/${filename}`
+                } else {
+                    const blob = await put(`/uploads/${filename}`, outputBuffer, {
+                        access: 'public',
+                        contentType: 'image/png'
+                    })
+                    filePath = blob.downloadUrl
+                }
+                fileType = 'image/png'
                 baseData = {fileName: file.name}
             } else {
-                const extension = file.name.split('.').pop()
-                const filename = `${fileHash}.${extension}`;
-                fs.writeFileSync(`./public/uploads/${filename}`, fileBuffer)
-                fileType = file.type
-                filePath = `/uploads/${filename}`
+                if (currentDeploymentEnv === 'local') {
+                    const extension = file.name.split('.').pop()
+                    const filename = `${fileHash}.${extension}`;
+                    fs.writeFileSync(`./public/uploads/${filename}`, fileBuffer)
+                    filePath = `${process.env.NEXT_PUBLIC_URL}/api/static/uploads/${filename}`
+                } else {
+                    const extension = file.name.split('.').pop()
+                    const filename = `${fileHash}.${extension}`;
+                    const blob = await put(`/uploads/${filename}`, fileBuffer, {
+                        access: 'public',
+                        contentType: mime
+                    })
+                    filePath = blob.downloadUrl
+                }
+                fileType = mime
                 baseData = {fileName: file.name}
             }
         }
@@ -119,17 +135,14 @@ export async function POST(
                     status: 'PARSING',
                     filePath: filePath,
                     fileType: fileType,
-                    data: baseData ? {...baseData} : {}
+                    data: baseData ? {...baseData} : {},
+                    authorId: session.user.id,
                 },
             });
 
-            // Return initial response
-            if (!file) return NextResponse.json(healthData);
-            if (!(file instanceof File)) return NextResponse.json(healthData);
-
             // Process file
             const {data, pages, ocrResults} = await parseHealthData({
-                file: `./public${filePath}`,
+                file: filePath as string,
                 visionParser: visionParser ? {
                     parser: visionParser as string,
                     model: visionParserModel as string,
@@ -148,10 +161,7 @@ export async function POST(
                 where: {id: healthData.id},
                 data: {
                     status: 'COMPLETED',
-                    metadata: {
-                        ocr: ocrResults[0],
-                        dataPerPage: pages[0]
-                    },
+                    metadata: JSON.parse(JSON.stringify({ocr: ocrResults[0], dataPerPage: pages[0]})),
                     data: {...baseData, ...data[0]}
                 }
             });
@@ -177,7 +187,19 @@ export async function POST(
 }
 
 export async function GET() {
+    const session = await auth()
+    if (!session || !session.user) return NextResponse.json({error: 'Unauthorized'}, {status: 401})
+
+    // Create personal info if it doesn't exist
+    const personalInfo = await prisma.healthData.findFirst({where: {authorId: session.user.id, type: 'PERSONAL_INFO'}})
+    if (personalInfo === null) {
+        await prisma.healthData.create({
+            data: {type: 'PERSONAL_INFO', authorId: session.user.id, data: {}}
+        })
+    }
+
     const healthDataList = await prisma.healthData.findMany({
+        where: {authorId: session.user.id},
         orderBy: {createdAt: 'asc'}
     })
     return NextResponse.json<HealthDataListResponse>({

@@ -3,6 +3,8 @@ import {Geist, Geist_Mono} from "next/font/google";
 import "./globals.css";
 import 'katex/dist/katex.css';
 import React from "react";
+import NextAuthProvider from "@/context/next-auth";
+import AmplitudeContextProvider from "@/context/amplitude";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -19,20 +21,19 @@ export const metadata: Metadata = {
     description: "OpenHealth",
 };
 
-export default function RootLayout({
-                                       children,
-                                       modal,
-                                   }: Readonly<{
+export default function RootLayout({children, modal}: Readonly<{
     children: React.ReactNode;
     modal: React.ReactNode;
 }>) {
     return (
         <html lang="en">
-        <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-        {children}
-        {modal}
+        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <NextAuthProvider>
+            <AmplitudeContextProvider>
+                {children}
+                {modal}
+            </AmplitudeContextProvider>
+        </NextAuthProvider>
         </body>
         </html>
     );

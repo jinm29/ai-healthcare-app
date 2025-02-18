@@ -10,6 +10,8 @@ import {ChatRoomGetResponse} from "@/app/api/chat-rooms/[id]/route";
 import {AssistantModePatchRequest} from "@/app/api/assistant-modes/[id]/route";
 import {LLMProvider, LLMProviderListResponse} from "@/app/api/llm-providers/route";
 import {LLMProviderModel, LLMProviderModelListResponse} from "@/app/api/llm-providers/[id]/models/route";
+import {cn} from "@/lib/utils";
+import {ConditionalDeploymentEnv} from "@/components/common/deployment-env";
 
 interface ChatSettingSideBarProps {
     isRightSidebarOpen: boolean;
@@ -189,7 +191,7 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
                             <SelectTrigger>
                                 <SelectValue placeholder="Select company"/>
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className={cn('bg-white')}>
                                 {llmProvidersData?.llmProviders.map((provider) => <SelectItem
                                     key={provider.id}
                                     value={provider.id}>{provider.name}</SelectItem>)}
@@ -200,7 +202,7 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
                             <SelectTrigger>
                                 <SelectValue placeholder="Select model"/>
                             </SelectTrigger>
-                            <SelectContent>
+                            <SelectContent className={cn('bg-white')}>
                                 {llmProviderModels.map((model) => (
                                     <SelectItem key={model.id} value={model.id}>
                                         {model.name}
@@ -212,31 +214,34 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
                                 )}
                             </SelectContent>
                         </Select>
-                        {selectedLLMProvider && (['ollama', 'openai'].includes(selectedLLMProvider.id)) && (
-                            <Input
-                                type="text"
-                                placeholder={`API endpoint (default: ${selectedLLMProvider?.id === 'ollama' ? 'http://localhost:11434' : 'https://api.openai.com/v1'})`}
-                                value={selectedLLMProvider?.apiURL}
-                                onChange={(e) => onLLMProviderChange({apiURL: e.target.value})}
-                            />
-                        )}
-                        {selectedLLMProvider?.id !== 'ollama' && (
-                            <div className="relative">
+
+                        <ConditionalDeploymentEnv env={['local']}>
+                            {selectedLLMProvider && (['ollama', 'openai'].includes(selectedLLMProvider.providerId)) && (
                                 <Input
-                                    type={showApiKey ? "text" : "password"}
-                                    placeholder="Enter API key"
-                                    value={selectedLLMProvider?.apiKey || ''}
-                                    onChange={(e) => onLLMProviderChange({apiKey: e.target.value})}
-                                    className="pr-16"
+                                    type="text"
+                                    placeholder={`API endpoint (default: ${selectedLLMProvider?.providerId === 'ollama' ? 'http://localhost:11434' : 'https://api.openai.com/v1'})`}
+                                    value={selectedLLMProvider?.apiURL}
+                                    onChange={(e) => onLLMProviderChange({apiURL: e.target.value})}
                                 />
-                                <button
-                                    className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-sm text-gray-500 hover:text-gray-700"
-                                    onClick={() => setShowApiKey(!showApiKey)}
-                                >
-                                    {showApiKey ? "Hide" : "Show"}
-                                </button>
-                            </div>
-                        )}
+                            )}
+                            {selectedLLMProvider?.providerId !== 'ollama' && (
+                                <div className="relative">
+                                    <Input
+                                        type={showApiKey ? "text" : "password"}
+                                        placeholder="Enter API key"
+                                        value={selectedLLMProvider?.apiKey || ''}
+                                        onChange={(e) => onLLMProviderChange({apiKey: e.target.value})}
+                                        className="pr-16"
+                                    />
+                                    <button
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-sm text-gray-500 hover:text-gray-700"
+                                        onClick={() => setShowApiKey(!showApiKey)}
+                                    >
+                                        {showApiKey ? "Hide" : "Show"}
+                                    </button>
+                                </div>
+                            )}
+                        </ConditionalDeploymentEnv>
                     </div>
                 </div>
 

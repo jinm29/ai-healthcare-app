@@ -6,6 +6,6 @@ const visions = [
     new OpenAIVisionParser(),
     new GoogleVisionParser(),
     new OllamaVisionParser(),
-]
+].filter(v => v.enabled)
 
 export default visions

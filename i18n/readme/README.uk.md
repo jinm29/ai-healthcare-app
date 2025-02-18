@@ -2,13 +2,17 @@
 
 <div align="center">
 
-**ШІ Помічник з питань здоров'я | На основі ваших даних, працює локально**
+**AI-асистент здоров'я | Працює на ваших даних, локально**
 
 <p align="center">
   <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
   <img src="https://img.shields.io/badge/Language-TypeScript-blue?style=for-the-badge" alt="Language">
   <img src="https://img.shields.io/badge/Framework-Next.js-black?style=for-the-badge" alt="Framework">
 </p>
+
+> **📢 Тепер доступно у веб-версії!**  
+> У відповідь на запити щодо простішого доступу ми запустили веб-версію.  
+> Спробуйте зараз: **[open-health.me](https://open-health.me/)**
 
 ### 🌍 Виберіть свою мову
 [English](../../README.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Español](README.es.md) | [한국어](README.ko.md) | [中文](README.zh.md) | [日本語](README.ja.md) | [Українська](README.uk.md)
@@ -146,7 +150,7 @@ graph LR
 
 > **Примітка.** Система складається з двох основних компонентів: аналізу та LLM. Наразі для синтаксичного аналізу використовуються API Upstage та OpenAI (які показали найкращу продуктивність під час нашого тестування), незабаром з'явиться локальний синтаксичний аналізатор, а компонент LLM може працювати повністю локально за допомогою Ollama.
 
-> **Примітка.** Якщо ви використовуєте Ollama з Docker, обов'язково встановіть кінцеву точку Ollama API на: `http://docker.for.mac.localhost:11434/`
+> **Примітка.** Якщо ви використовуєте Ollama з Docker, обов'язково встановіть кінцеву точку Ollama API на: @http://docker.for.mac.localhost:11434 для Mac або http://host.docker.internal:11434 для Windows.
 
 </details>
 
@@ -162,6 +166,10 @@ graph LR
 
 ### 📬 Контакти
 [![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
+
+### 🤝 Поговорити з Командою
+[![Calendly](https://img.shields.io/badge/Запланувати_Зустріч-00A2FF?style=for-the-badge&logo=calendar&logoColor=white)](https://calendly.com/open-health/30min)
+[![Email](https://img.shields.io/badge/Надіслати_Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sj@open-health.me)
 
 </div>
 

@@ -2,9 +2,17 @@
 
 **Asistente de Salud con IA | Impulsado por tus datos, Ejecutado localmente**
 
----
-
 <div align="center">
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
+  <img src="https://img.shields.io/badge/Language-TypeScript-blue?style=for-the-badge" alt="Language">
+  <img src="https://img.shields.io/badge/Framework-Next.js-black?style=for-the-badge" alt="Framework">
+</p>
+
+> **📢 ¡Ahora Disponible en Versión Web!**  
+> En respuesta a las solicitudes de acceso más fácil, hemos lanzado una versión web.  
+> Pruébalo ahora: **[open-health.me](https://open-health.me/)**
 
 ### 🌍 Elija su Idioma
 [English](../../README.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Español](README.es.md) | [한국어](README.ko.md) | [中文](README.zh.md) | [日本語](README.ja.md) | [Українська](README.uk.md)
@@ -143,7 +151,7 @@ Entrada de datos de salud --> Módulo de análisis --> Archivos de datos estruct
 
 > **Nota:** El sistema consta de dos componentes principales: análisis y LLM. Actualmente, el análisis utiliza las API de Upstage y OpenAI (que mostraron el mejor rendimiento en nuestras pruebas), con un analizador local próximamente, mientras que el componente LLM puede ejecutarse completamente de forma local usando Ollama.
 
-> **Nota:** Si está usando Ollama con Docker, asegúrese de configurar el punto final de la API de Ollama como: `http://docker.for.mac.localhost:11434/`
+> **Nota:** Si está usando Ollama con Docker, asegúrese de configurar el punto final de la API de Ollama como: @http://docker.for.mac.localhost:11434 para Mac o http://host.docker.internal:11434 para Windows.
 
 ## 🌐 Comunidad y Soporte
 
@@ -153,8 +161,9 @@ Entrada de datos de salud --> Módulo de análisis --> Archivos de datos estruct
 [![AIDoctor Subreddit](https://img.shields.io/badge/r/AIDoctor-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/AIDoctor/)
 [![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B9K654g4wf)
 
-### 📬 Contacto
-[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
+### 🤝 Habla con el Equipo
+[![Calendly](https://img.shields.io/badge/Programar_Reunión-00A2FF?style=for-the-badge&logo=calendar&logoColor=white)](https://calendly.com/open-health/30min)
+[![Email](https://img.shields.io/badge/Enviar_Correo-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sj@open-health.me)
 
 </div>
 

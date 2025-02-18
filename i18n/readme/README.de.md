@@ -1,6 +1,16 @@
 # 🚀 **OpenHealth**
 
-**KI-Gesundheitsassistent | Betrieben mit Ihren Daten, Lokal ausgeführt**
+**KI-Gesundheitsassistent | Angetrieben von Ihren Daten, Lokal Ausgeführt**
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
+  <img src="https://img.shields.io/badge/Language-TypeScript-blue?style=for-the-badge" alt="Language">
+  <img src="https://img.shields.io/badge/Framework-Next.js-black?style=for-the-badge" alt="Framework">
+</p>
+
+> **📢 Jetzt als Webversion Verfügbar!**  
+> Aufgrund Ihrer Anfragen nach einfacherem Zugang haben wir eine Webversion gestartet.  
+> Jetzt ausprobieren: **[open-health.me](https://open-health.me/)**
 
 ---
 
@@ -117,7 +127,7 @@ Gesundheitsdaten-Eingabe --> Parsing-Modul --> Strukturierte Datendateien --> GP
 
 > **Hinweis:** Das System besteht aus zwei Hauptkomponenten: Parsing und LLM. Derzeit verwendet das Parsing Upstage- und OpenAI-APIs (die in unseren Tests die beste Leistung zeigten), wobei ein lokaler Parser in Kürze hinzugefügt wird. Die LLM-Komponente kann mit Ollama vollständig lokal ausgeführt werden.
 
-> **Hinweis:** Wenn Sie Ollama mit Docker verwenden, stellen Sie sicher, dass der Ollama-API-Endpunkt auf `http://docker.for.mac.localhost:11434/` eingestellt ist.
+> **Hinweis:** Wenn Sie Ollama mit Docker verwenden, stellen Sie sicher, dass der Ollama-API-Endpunkt auf @http://docker.for.mac.localhost:11434 für Mac oder http://host.docker.internal:11434 für Windows eingestellt ist.
 
 ## 🌐 Community und Support
 
@@ -129,6 +139,10 @@ Gesundheitsdaten-Eingabe --> Parsing-Modul --> Strukturierte Datendateien --> GP
 
 ### 📬 Kontakt
 [![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
+
+### 🤝 Mit dem Team sprechen
+[![Calendly](https://img.shields.io/badge/Meeting_Planen-00A2FF?style=for-the-badge&logo=calendar&logoColor=white)](https://calendly.com/open-health/30min)
+[![Email](https://img.shields.io/badge/E_Mail_Senden-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sj@open-health.me)
 
 </div>
 

@@ -1,14 +1,20 @@
 # 🚀 **OpenHealth**
 
-**AI 건강 도우미 | 당신의 데이터로 구동되는 로컬 실행 환경**
+<div align="center">
 
----
+**AI 건강 도우미 | 당신의 데이터로 구동되는 로컬 실행 방식**
 
 <p align="center">
-  <img src="/intro/openhealth.avif" alt="OpenHealth 데모">
+  <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
+  <img src="https://img.shields.io/badge/Language-TypeScript-blue?style=for-the-badge" alt="Language">
+  <img src="https://img.shields.io/badge/Framework-Next.js-black?style=for-the-badge" alt="Framework">
 </p>
 
-## 🌟 개요
+> **📢 웹 버전 출시!**  
+> 더 쉽게 사용하고 싶다는 의견을 반영하여 웹 버전을 출시했습니다.  
+> 지금 바로 사용해보세요: **[open-health.me](https://open-health.me/)**
+
+### 🌟 개요
 
 OpenHealth는 **당신의 건강 데이터를 관리**하도록 도와줍니다. AI와 개인 건강 정보를 활용하여,
 OpenHealth는 건강을 더 잘 이해하고 관리할 수 있도록 도와주는 프라이빗하고 로컬에서 실행되는 도우미를 제공합니다.
@@ -84,7 +90,7 @@ OpenHealth는 건강을 더 잘 이해하고 관리할 수 있도록 도와주�
 
 > **참고:** 시스템은 파싱과 LLM 두 가지 주요 구성 요소로 이루어져 있습니다. 현재 파싱은 Upstage와 OpenAI API를 사용하고 있으며(테스트 결과 가장 좋은 성능을 보였습니다), 곧 로컬 파서가 추가될 예정입니다. LLM 구성 요소는 Ollama를 사용하여 완전히 로컬에서 실행할 수 있습니다.
 
-> **참고:** Docker에서 Ollama를 사용하는 경우, Ollama API 엔드포인트를 다음과 같이 설정하세요: `http://docker.for.mac.localhost:11434/`
+> **참고:** Docker에서 Ollama를 사용하는 경우, Ollama API 엔드포인트를 다음과 같이 설정하세요: @http://docker.for.mac.localhost:11434 (Mac의 경우) 또는 http://host.docker.internal:11434 (Windows의 경우)
 
 ---
 
@@ -96,7 +102,8 @@ OpenHealth는 건강을 더 잘 이해하고 관리할 수 있도록 도와주�
 [![AIDoctor Subreddit](https://img.shields.io/badge/r/AIDoctor-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/AIDoctor/)
 [![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B9K654g4wf)
 
-### 📬 연락처
-[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
+### 🤝 팀과 대화하기
+[![Calendly](https://img.shields.io/badge/미팅_예약-00A2FF?style=for-the-badge&logo=calendar&logoColor=white)](https://calendly.com/open-health/30min)
+[![Email](https://img.shields.io/badge/이메일_보내기-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sj@open-health.me)
 
 </div> 

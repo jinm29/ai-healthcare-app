@@ -2,9 +2,19 @@
 
 **Assistant de santé IA | Alimenté par vos données, exécuté localement**
 
----
-
 <div align="center">
+
+**Assistant Santé IA | Alimenté par Vos Données, Exécution Locale**
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
+  <img src="https://img.shields.io/badge/Language-TypeScript-blue?style=for-the-badge" alt="Language">
+  <img src="https://img.shields.io/badge/Framework-Next.js-black?style=for-the-badge" alt="Framework">
+</p>
+
+> **📢 Maintenant Disponible en Version Web !**  
+> Suite à vos demandes d'accès simplifié, nous avons lancé une version web.  
+> Essayez dès maintenant : **[open-health.me](https://open-health.me/)**
 
 ### 🌍 Choisissez votre langue
 [English](../../README.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Español](README.es.md) | [한국어](README.ko.md) | [中文](README.zh.md) | [日本語](README.ja.md) | [Українська](README.uk.md)
@@ -120,7 +130,7 @@ Entrée de données de santé --> Module d'analyse --> Fichiers de données stru
 
 > **Note:** Le système est composé de deux composants principaux: l'analyse et le LLM. Actuellement, l'analyse utilise les API Upstage et OpenAI (qui ont montré les meilleures performances lors de nos tests), avec un analyseur local à venir prochainement, tandis que le composant LLM peut fonctionner entièrement en local avec Ollama.
 
-> **Note:** Si vous utilisez Ollama avec Docker, assurez-vous de définir le point de terminaison de l'API Ollama sur: `http://docker.for.mac.localhost:11434/`
+> **Note:** Si vous utilisez Ollama avec Docker, assurez-vous de définir le point de terminaison de l'API Ollama sur: @http://docker.for.mac.localhost:11434 pour Mac ou http://host.docker.internal:11434 pour Windows.
 
 ---
 
@@ -134,5 +144,9 @@ Entrée de données de santé --> Module d'analyse --> Fichiers de données stru
 
 ### 📬 Contact
 [![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
+
+### 🤝 Parler avec l'Équipe
+[![Calendly](https://img.shields.io/badge/Planifier_Réunion-00A2FF?style=for-the-badge&logo=calendar&logoColor=white)](https://calendly.com/open-health/30min)
+[![Email](https://img.shields.io/badge/Envoyer_Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sj@open-health.me)
 
 </div> 
