@@ -5,6 +5,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import {GoogleGenerativeAI} from "@google/generative-ai";
 import {auth} from "@/auth";
 import {decrypt} from "@/lib/encryption";
+import {currentDeploymentEnv} from "@/lib/current-deployment-env";
 
 export interface ChatMessage extends Prisma.ChatMessageGetPayload<{
     select: {
@@ -87,7 +88,25 @@ export async function POST(
         }
     })
 
-    const apiKey = decrypt(llmProvider.apiKey)
+    let apiKey: string
+    if (currentDeploymentEnv === 'local') {
+        apiKey = decrypt(llmProvider.apiKey)
+    } else if (currentDeploymentEnv === 'cloud') {
+        switch (llmProvider.providerId) {
+            case 'openai':
+                apiKey = process.env.OPENAI_API_KEY as string
+                break;
+            case 'anthropic':
+                apiKey = process.env.ANTHROPIC_API_KEY as string
+                break;
+            case 'google':
+                apiKey = process.env.GOOGLE_API_KEY as string
+                break;
+            default:
+                throw new Error('Unsupported LLM provider');
+        }
+    }
+
     const messages = [
         {"role": "system" as const, "content": assistantMode.systemPrompt},
         {

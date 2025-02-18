@@ -3,6 +3,7 @@ import prisma from "@/lib/prisma";
 import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import {decrypt} from "@/lib/encryption";
+import {currentDeploymentEnv} from "@/lib/current-deployment-env";
 
 export interface LLMProviderModel {
     id: string
@@ -30,19 +31,22 @@ export async function GET(
     }
 
     if (llmProvider.providerId === 'openai') {
+        if (currentDeploymentEnv === 'cloud') apiKey = process.env.OPENAI_API_KEY as string
         const results: LLMProviderModel[] = []
         const openAI = new OpenAI({apiKey, baseURL: llmProvider.apiURL})
         const modelsPage = await openAI.models.list()
         for await (const models of modelsPage.iterPages()) {
             const modelList = models.data;
-            results.push(...modelList.map(
-                model => ({id: model.id, name: model.id})
-            ))
+            results.push(...modelList.filter((model) => {
+                return !(currentDeploymentEnv === 'cloud' && model.id.startsWith('ft:'));
+
+            }).map(model => ({id: model.id, name: model.id})))
         }
         return NextResponse.json<LLMProviderModelListResponse>({
             llmProviderModels: results,
         })
     } else if (llmProvider.providerId === 'anthropic') {
+        if (currentDeploymentEnv === 'cloud') apiKey = process.env.ANTHROPIC_API_KEY as string
         const results: LLMProviderModel[] = []
         const anthropic = new Anthropic({apiKey, baseURL: llmProvider.apiURL});
         const modelsPage = await anthropic.models.list();
@@ -56,6 +60,7 @@ export async function GET(
             llmProviderModels: results,
         })
     } else if (llmProvider.providerId === 'google') {
+        if (currentDeploymentEnv === 'cloud') apiKey = process.env.GOOGLE_API_KEY as string
         const url = new URL('https://generativelanguage.googleapis.com/v1beta/models');
         url.searchParams.append('key', apiKey);
         url.searchParams.append('pageSize', '1000');
