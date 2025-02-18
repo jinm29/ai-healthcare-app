@@ -222,7 +222,7 @@ const AddSourceDialog: React.FC<AddSourceDialogProps> = ({
                             type="file"
                             id="file-upload"
                             multiple
-                            accept="image/*,.pdf"
+                            accept="image/png,image/jpeg,.pdf"
                             className="hidden"
                             onChange={handleFileUpload}
                             disabled={uploadStatus === 'uploading'}

@@ -3,7 +3,7 @@ import {NextRequest, NextResponse} from "next/server";
 import {parseHealthData} from "@/lib/health-data/parser/pdf";
 import crypto from "node:crypto";
 import {fileTypeFromBuffer} from "file-type";
-import gm from "gm";
+import sharp from 'sharp'
 import {auth} from "@/auth";
 import {put} from "@vercel/blob";
 import {currentDeploymentEnv} from "@/lib/current-deployment-env";
@@ -91,14 +91,7 @@ export async function POST(
 
             const {mime} = result
             if (mime.startsWith('image/')) {
-                const imageMagick = gm.subClass({imageMagick: true});
-                const outputBuffer = await new Promise<Buffer>((resolve, reject) => {
-                    imageMagick(fileBuffer)
-                        .toBuffer('PNG', (err, buffer) => {
-                            if (err) reject(err);
-                            else resolve(buffer);
-                        });
-                });
+                const outputBuffer = await sharp(fileBuffer).png().toBuffer()
                 const filename = `${fileHash}.png`;
                 if (currentDeploymentEnv === 'local') {
                     fs.writeFileSync(`./public/uploads/${filename}`, outputBuffer)
