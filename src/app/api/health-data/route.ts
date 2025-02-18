@@ -1,12 +1,11 @@
 import prisma, {Prisma} from "@/lib/prisma";
 import {NextRequest, NextResponse} from "next/server";
-
-import fs from 'fs'
 import {parseHealthData} from "@/lib/health-data/parser/pdf";
 import crypto from "node:crypto";
 import {fileTypeFromBuffer} from "file-type";
 import gm from "gm";
 import {auth} from "@/auth";
+import {put} from "@vercel/blob";
 
 export interface HealthData extends Prisma.HealthDataGetPayload<{
     select: {
@@ -99,16 +98,22 @@ export async function POST(
                         });
                 });
                 const filename = `${fileHash}.png`;
-                fs.writeFileSync(`./public/uploads/${filename}`, outputBuffer)
-                fileType = file.type
-                filePath = `/uploads/${filename}`
+                const blob = await put(`/uploads/${filename}`, outputBuffer, {
+                    access: 'public',
+                    contentType: 'image/png'
+                })
+                fileType = 'image/png'
+                filePath = blob.downloadUrl
                 baseData = {fileName: file.name}
             } else {
                 const extension = file.name.split('.').pop()
                 const filename = `${fileHash}.${extension}`;
-                fs.writeFileSync(`./public/uploads/${filename}`, fileBuffer)
-                fileType = file.type
-                filePath = `/uploads/${filename}`
+                const blob = await put(`/uploads/${filename}`, fileBuffer, {
+                    access: 'public',
+                    contentType: mime
+                })
+                fileType = mime
+                filePath = blob.downloadUrl
                 baseData = {fileName: file.name}
             }
         }
@@ -128,13 +133,9 @@ export async function POST(
                 },
             });
 
-            // Return initial response
-            if (!file) return NextResponse.json(healthData);
-            if (!(file instanceof File)) return NextResponse.json(healthData);
-
             // Process file
             const {data, pages, ocrResults} = await parseHealthData({
-                file: `./public${filePath}`,
+                file: filePath as string,
                 visionParser: visionParser ? {
                     parser: visionParser as string,
                     model: visionParserModel as string,

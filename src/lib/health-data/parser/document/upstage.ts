@@ -8,7 +8,6 @@ import {
     OCRParseResult
 } from "@/lib/health-data/parser/document/base-document";
 import FormData from "form-data";
-import fs from "node:fs";
 import fetch from "node-fetch";
 import {currentDeploymentEnv} from "@/lib/current-deployment-env";
 
@@ -34,8 +33,11 @@ export class UpstageDocumentParser extends BaseDocumentParser {
     }
 
     async ocr(options: DocumentOCROptions): Promise<OCRParseResult> {
+        const fileResponse = await fetch(options.input);
+        const fileBuffer = await fileResponse.buffer();
+
         const formData = new FormData();
-        formData.append('document', fs.createReadStream(options.input));
+        formData.append('document', fileBuffer, {filename: 'document'});
         formData.append("schema", "oac");
         formData.append("model", "ocr-2.2.1");
 
@@ -50,8 +52,11 @@ export class UpstageDocumentParser extends BaseDocumentParser {
     }
 
     async parse(options: DocumentParseOptions): Promise<DocumentParseResult> {
+        const fileResponse = await fetch(options.input);
+        const fileBuffer = await fileResponse.buffer();
+
         const formData = new FormData();
-        formData.append('document', fs.createReadStream(options.input));
+        formData.append('document', fileBuffer, {filename: 'document'});
         formData.append('ocr', 'force')
         formData.append('output_formats', JSON.stringify(["markdown"]))
         formData.append("coordinates", "true");

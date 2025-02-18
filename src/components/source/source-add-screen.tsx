@@ -581,7 +581,7 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
                             healthData?.fileType?.includes('image') && healthData?.filePath ? (
                                 <div className="p-4">
                                     <Image
-                                        src={`/api/static${healthData.filePath}`}
+                                        src={healthData.filePath}
                                         alt="Preview"
                                         className="w-full h-auto"
                                         width={800}
@@ -593,7 +593,7 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
                             ) : (
                                 <div className="bg-gray-50 p-4 rounded-lg relative flex flex-row h-full">
                                     <div id="pdf" className="w-[60%] overflow-y-auto h-full">
-                                        <Document file={`/api/static${healthData.filePath}`}
+                                        <Document file={healthData.filePath}
                                                   className="w-full"
                                                   onLoadSuccess={onDocumentLoadSuccess}>
                                             {Array.from(new Array(numPages), (_, index) => {
