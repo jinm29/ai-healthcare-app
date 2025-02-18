@@ -24,6 +24,8 @@ export abstract class BaseVisionParser {
 
     abstract get apiKeyRequired(): boolean;
 
+    abstract get enabled(): boolean;
+
     get apiUrl(): string | undefined {
         return undefined;
     }

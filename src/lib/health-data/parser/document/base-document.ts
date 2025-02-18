@@ -34,6 +34,8 @@ export abstract class BaseDocumentParser {
 
     abstract get apiKeyRequired(): boolean;
 
+    abstract get enabled(): boolean;
+
     abstract models(options?: DocumentModelOptions): Promise<DocumentParserModel[]>
 
     abstract ocr(options: DocumentOCROptions): Promise<OCRParseResult>

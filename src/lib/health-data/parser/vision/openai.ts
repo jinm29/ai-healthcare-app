@@ -14,6 +14,10 @@ export class OpenAIVisionParser extends BaseVisionParser {
         return currentDeploymentEnv === 'local'
     }
 
+    get enabled(): boolean {
+        return true
+    }
+
     async models(): Promise<VisionParserModel[]> {
         return [
             {id: 'gpt-4o-mini', name: 'gpt-4o-mini'},

@@ -10,10 +10,15 @@ import {
 import fetch from 'node-fetch'
 import FormData from 'form-data'
 import fs from 'node:fs'
+import {currentDeploymentEnv} from "@/lib/current-deployment-env";
 
 export class DoclingDocumentParser extends BaseDocumentParser {
     get apiKeyRequired(): boolean {
         return false;
+    }
+
+    get enabled(): boolean {
+        return currentDeploymentEnv === 'local';
     }
 
     get name(): string {

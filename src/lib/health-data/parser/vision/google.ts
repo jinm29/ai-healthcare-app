@@ -19,6 +19,10 @@ export class GoogleVisionParser extends BaseVisionParser {
         return currentDeploymentEnv === 'local'
     }
 
+    get enabled(): boolean {
+        return true
+    }
+
     async models(): Promise<VisionParserModel[]> {
         return [
             {id: 'gemini-2.0-flash', name: 'Gemini 2.0 Flash'},

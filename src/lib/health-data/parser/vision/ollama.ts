@@ -8,6 +8,7 @@ import fetch from 'node-fetch'
 import {HealthCheckupSchema, HealthCheckupType} from "@/lib/health-data/parser/schema";
 import {ChatOllama} from "@langchain/ollama";
 import {ChatPromptTemplate} from "@langchain/core/prompts";
+import {currentDeploymentEnv} from "@/lib/current-deployment-env";
 
 export class OllamaVisionParser extends BaseVisionParser {
 
@@ -15,6 +16,10 @@ export class OllamaVisionParser extends BaseVisionParser {
 
     get apiKeyRequired(): boolean {
         return false
+    }
+
+    get enabled(): boolean {
+        return currentDeploymentEnv === 'local';
     }
 
     get apiUrlRequired(): boolean {

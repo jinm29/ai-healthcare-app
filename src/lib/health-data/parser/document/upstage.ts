@@ -22,6 +22,10 @@ export class UpstageDocumentParser extends BaseDocumentParser {
         return currentDeploymentEnv === 'local'
     }
 
+    get enabled(): boolean {
+        return true
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async models(options?: DocumentModelOptions): Promise<DocumentParserModel[]> {
         return [
