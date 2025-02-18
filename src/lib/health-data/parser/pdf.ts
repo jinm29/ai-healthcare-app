@@ -9,6 +9,8 @@ import {getParsePrompt, MessagePayload} from "@/lib/health-data/parser/prompt";
 import visions from "@/lib/health-data/parser/vision";
 import documents from "@/lib/health-data/parser/document";
 import {put} from "@vercel/blob";
+import {currentDeploymentEnv} from "@/lib/current-deployment-env";
+import fs from "node:fs";
 
 interface VisionParserOptions {
     parser: string;
@@ -232,12 +234,17 @@ async function documentToImages({file: filePath}: Pick<SourceParseOptions, 'file
     // Write the image data to a file
     const imagePaths = []
     for (let i = 0; i < images.length; i++) {
-        const blob = await put(
-            `/uploads/${fileHash}_${i}.png`,
-            Buffer.from(images[i].split(',')[1], 'base64'),
-            {access: 'public', contentType: 'image/png'}
-        )
-        imagePaths.push(blob.downloadUrl)
+        if (currentDeploymentEnv === 'local') {
+            fs.writeFileSync(`./public/uploads/${fileHash}_${i}.png`, Buffer.from(images[i].split(',')[1], 'base64'))
+            imagePaths.push(`${process.env.NEXT_PUBLIC_URL}/api/static/uploads/${fileHash}_${i}.png`)
+        } else {
+            const blob = await put(
+                `/uploads/${fileHash}_${i}.png`,
+                Buffer.from(images[i].split(',')[1], 'base64'),
+                {access: 'public', contentType: 'image/png'}
+            )
+            imagePaths.push(blob.downloadUrl)
+        }
     }
 
     return imagePaths

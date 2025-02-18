@@ -6,6 +6,8 @@ import {fileTypeFromBuffer} from "file-type";
 import gm from "gm";
 import {auth} from "@/auth";
 import {put} from "@vercel/blob";
+import {currentDeploymentEnv} from "@/lib/current-deployment-env";
+import fs from 'fs'
 
 export interface HealthData extends Prisma.HealthDataGetPayload<{
     select: {
@@ -98,22 +100,34 @@ export async function POST(
                         });
                 });
                 const filename = `${fileHash}.png`;
-                const blob = await put(`/uploads/${filename}`, outputBuffer, {
-                    access: 'public',
-                    contentType: 'image/png'
-                })
+                if (currentDeploymentEnv === 'local') {
+                    fs.writeFileSync(`./public/uploads/${filename}`, outputBuffer)
+                    filePath = `${process.env.NEXT_PUBLIC_URL}/api/static/uploads/${filename}`
+                } else {
+                    const blob = await put(`/uploads/${filename}`, outputBuffer, {
+                        access: 'public',
+                        contentType: 'image/png'
+                    })
+                    filePath = blob.downloadUrl
+                }
                 fileType = 'image/png'
-                filePath = blob.downloadUrl
                 baseData = {fileName: file.name}
             } else {
-                const extension = file.name.split('.').pop()
-                const filename = `${fileHash}.${extension}`;
-                const blob = await put(`/uploads/${filename}`, fileBuffer, {
-                    access: 'public',
-                    contentType: mime
-                })
+                if (currentDeploymentEnv === 'local') {
+                    const extension = file.name.split('.').pop()
+                    const filename = `${fileHash}.${extension}`;
+                    fs.writeFileSync(`./public/uploads/${filename}`, fileBuffer)
+                    filePath = `${process.env.NEXT_PUBLIC_URL}/api/static/uploads/${filename}`
+                } else {
+                    const extension = file.name.split('.').pop()
+                    const filename = `${fileHash}.${extension}`;
+                    const blob = await put(`/uploads/${filename}`, fileBuffer, {
+                        access: 'public',
+                        contentType: mime
+                    })
+                    filePath = blob.downloadUrl
+                }
                 fileType = mime
-                filePath = blob.downloadUrl
                 baseData = {fileName: file.name}
             }
         }
