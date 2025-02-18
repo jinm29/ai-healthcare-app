@@ -92,7 +92,8 @@ OpenHealthはプライベートでローカルで実行されるアシスタン�
 [![AIDoctor Subreddit](https://img.shields.io/badge/r/AIDoctor-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/AIDoctor/)
 [![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B9K654g4wf)
 
-### 📬 お問い合わせ
-[![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
+### 🤝 チームと話す
+[![Calendly](https://img.shields.io/badge/ミーティングを予約-00A2FF?style=for-the-badge&logo=calendar&logoColor=white)](https://calendly.com/open-health/30min)
+[![Email](https://img.shields.io/badge/メールを送信-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sj@open-health.me)
 
 </div> 

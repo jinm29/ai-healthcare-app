@@ -167,5 +167,9 @@ graph LR
 ### 📬 Контакти
 [![Reddit](https://img.shields.io/badge/Reddit-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/user/Dry_Steak30/)
 
+### 🤝 Поговорити з Командою
+[![Calendly](https://img.shields.io/badge/Запланувати_Зустріч-00A2FF?style=for-the-badge&logo=calendar&logoColor=white)](https://calendly.com/open-health/30min)
+[![Email](https://img.shields.io/badge/Надіслати_Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sj@open-health.me)
+
 </div>
 
