@@ -5,19 +5,14 @@ import React, {useMemo, useState} from "react";
 import useSWR from "swr";
 import {ChatRoom, ChatRoomListResponse} from "@/app/api/chat-rooms/route";
 import {Button} from "@/components/ui/button";
-import {Files, FileText, MessageCircle, Download, Copy, Trash2} from "lucide-react";
+import {Copy, Download, Files, FileText, MessageCircle, Trash2} from "lucide-react";
 import Link from "next/link";
 import {useRouter} from "next/navigation";
 import {HealthDataListResponse} from "@/app/api/health-data/route";
 import dayjs from "@/lib/dayjs";
-import {Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter} from "@/components/ui/dialog";
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import JSONEditor from "@/components/form/json-editor";
-import {
-    Tooltip,
-    TooltipContent,
-    TooltipProvider,
-    TooltipTrigger,
-} from "@/components/ui/tooltip"
+import {Tooltip, TooltipContent, TooltipProvider, TooltipTrigger,} from "@/components/ui/tooltip"
 
 interface ChatSideBarProps {
     isLeftSidebarOpen: boolean;
@@ -141,8 +136,8 @@ export default function ChatSideBar({
     }
 
     return <>
-        <div className={`border-r bg-gray-50 flex flex-col transition-all duration-300 ease-in-out
-          ${isLeftSidebarOpen ? 'w-72' : 'w-16'} relative`}>
+        <div className={`border-r bg-gray-50 flex flex-col transition-all duration-300 ease-in-out overflow-clip
+          ${isLeftSidebarOpen ? 'w-72' : 'w-0'} relative`}>
             <div className={`absolute inset-0 ${isLeftSidebarOpen ? 'opacity-100' : 'opacity-0'} 
                 transition-opacity duration-300 overflow-hidden flex flex-col`}>
                 <div className="border-b bg-white">
