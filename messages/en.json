@@ -1,0 +1,28 @@
+{
+  "HomePage": {
+  },
+  "Chat": {
+    "inputPlaceholder": "Type your message..."
+  },
+  "ChatSideBar": {
+    "sources": "Sources",
+    "numberOfFiles": "{value, number} files",
+    "countOfTokens": "{value, number} tokens",
+    "viewAggregatedSources": "View aggregated sources",
+    "aggregatedSources": "Aggregated Sources",
+    "manageSources": "Manage Sources",
+    "newChat": "New Chat",
+    "copy": "Copy",
+    "download": "Download",
+    "chatDeleteTitle": "Delete Chat",
+    "chatDeleteMessage": "Are you sure you want to delete this chat?",
+    "chatDeleteMessageDetail": "This action cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete"
+  },
+  "ChatSettingSideBar": {
+    "modelSettings": "Model Settings",
+    "systemPrompt": "System Prompt",
+    "assistantMode": "Assistant Mode"
+  }
+}

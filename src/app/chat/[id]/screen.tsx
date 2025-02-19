@@ -14,6 +14,7 @@ import {useParams} from "next/navigation";
 import {ChatMessageListResponse} from "@/app/api/chat-rooms/[id]/messages/route";
 import {ChatRole} from "@prisma/client";
 import ChatSettingSideBar from "@/components/chat/chat-setting-side-bar";
+import {useTranslations} from "next-intl";
 
 interface ScreenProps {
     isMobile: boolean;
@@ -23,6 +24,7 @@ export default function Screen(
     {isMobile}: ScreenProps
 ) {
     const {id} = useParams<{ id: string }>();
+    const t = useTranslations('Chat')
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -156,7 +158,7 @@ export default function Screen(
                     <div className="p-4 border-t">
                         <div className="flex gap-2">
                             <Input
-                                placeholder="Type your message..."
+                                placeholder={t('inputPlaceholder')}
                                 value={inputText}
                                 onChange={(e) => setInputText(e.target.value)}
                                 onKeyPress={(e) => {

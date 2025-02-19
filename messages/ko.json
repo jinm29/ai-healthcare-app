@@ -1,0 +1,28 @@
+{
+  "HomePage": {
+  },
+  "Chat": {
+    "inputPlaceholder": "메시지 입력..."
+  },
+  "ChatSideBar": {
+    "sources": "소스",
+    "numberOfFiles": "{value, number} 파일",
+    "countOfTokens": "{value, number} 토큰",
+    "viewAggregatedSources": "집계된 소스 보기",
+    "aggregatedSources": "집계된 소스",
+    "manageSources": "소스 관리",
+    "newChat": "새 채팅",
+    "copy": "복사",
+    "download": "다운로드",
+    "chatDeleteTitle": "채팅 삭제",
+    "chatDeleteMessage": "이 채팅을 삭제하시겠습니까?",
+    "chatDeleteMessageDetail": "이 작업은 취소할 수 없습니다.",
+    "cancel": "취소",
+    "delete": "삭제"
+  },
+  "ChatSettingSideBar": {
+    "modelSettings": "모델 설정",
+    "systemPrompt": "시스템 프롬프트",
+    "assistantMode": "어시스턴트 모드"
+  }
+}
