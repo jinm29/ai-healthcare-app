@@ -19,12 +19,17 @@ export class OpenAIVisionParser extends BaseVisionParser {
     }
 
     async models(): Promise<VisionParserModel[]> {
+        if (currentDeploymentEnv === 'cloud') {
+            return [
+                {id: 'gpt-4o', name: 'gpt-4o'},
+            ];
+        }
         return [
             {id: 'gpt-4o-mini', name: 'gpt-4o-mini'},
             {id: 'gpt-4o', name: 'gpt-4o'},
             {id: 'o1', name: 'o1'},
             {id: 'o1-mini', name: 'o1-mini'},
-        ]
+        ];
     }
 
     async parse(options: VisionParseOptions) {
