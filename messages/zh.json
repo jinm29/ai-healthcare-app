@@ -1,0 +1,83 @@
+{
+  "HomePage": {
+  },
+  "Chat": {
+    "inputPlaceholder": "请输入您的消息..."
+  },
+  "ChatSideBar": {
+    "sources": "来源",
+    "numberOfFiles": "{value, number} 个文件",
+    "countOfTokens": "{value, number} 个令牌",
+    "viewAggregatedSources": "查看汇总来源",
+    "aggregatedSources": "汇总来源",
+    "manageSources": "管理来源",
+    "newChat": "新对话",
+    "copy": "复制",
+    "download": "下载",
+    "chatDeleteTitle": "删除对话",
+    "chatDeleteMessage": "确定要删除此对话吗？",
+    "chatDeleteMessageDetail": "此操作无法撤销。",
+    "cancel": "取消",
+    "delete": "删除"
+  },
+  "ChatSettingSideBar": {
+    "modelSettings": "模型设置",
+    "systemPrompt": "系统提示",
+    "assistantMode": "助手模式",
+    "selectModel": "选择模型",
+    "selectCompany": "选择公司",
+    "noModelsFound": "未找到模型。",
+    "enterApiKey": "输入API密钥",
+    "show": "显示",
+    "hide": "隐藏"
+  },
+  "SourceManagement": {
+    "title": "来源管理",
+    "addSource": "添加来源",
+    "addNewSource": "添加新来源",
+    "personalInfo": "个人信息",
+    "parsingSettings": "解析设置",
+    "parsingSettingsDescription": "Vision和OCR模型一起使用以提高解析性能。",
+    "visionModel": "Vision模型",
+    "visionModelDescription": "只能使用具有视觉功能的模型。",
+    "documentModel": "文档模型",
+    "documentModelDescription": "Docling是一个本地运行的开源解析模型。",
+    "documentModelDoclingGithub": "Github",
+    "documentModelUpstage": "Upstage",
+    "documentModelUpstageDescription": "Upstage在我们的测试中表现最好。",
+    "documentModelUpstageDescription2": "为新注册用户提供$10免费额度，无需信用卡。",
+    "name": "姓名",
+    "birthdate": "出生日期",
+    "height": "身高",
+    "weight": "体重",
+    "bloodType": "血型",
+    "familyHistory": "家族病史",
+    "select": "选择",
+    "extractedData": "提取的数据",
+    "update": "更新",
+    "uploadFiles": "上传文件",
+    "uploadFilesDescription": "添加图片或PDF文件。",
+    "uploadSymptoms": "新症状",
+    "uploadSymptomsDescription": "记录今天的症状。",
+    "date": "日期",
+    "description": "描述",
+    "symptoms": "症状",
+    "selectModel": "选择模型",
+    "apiKey": "API密钥",
+    "enterYourAPIKey": "输入您的API密钥",
+    "enterYourAPIUrl": "输入您的API URL"
+  },
+  "DynamicForm": {
+    "selectPlaceholder": "请选择..."
+  },
+  "LoginPage": {
+    "username": "用户名",
+    "usernamePlaceholder": "输入您的用户名",
+    "password": "密码",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "登录",
+    "needSignUp": "需要账号？注册",
+    "alreadyHaveAccount": "已有账号？登录",
+    "signUp": "创建账号"
+  }
+} 

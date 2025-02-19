@@ -1,0 +1,83 @@
+{
+  "HomePage": {
+  },
+  "Chat": {
+    "inputPlaceholder": "Tapez votre message..."
+  },
+  "ChatSideBar": {
+    "sources": "Sources",
+    "numberOfFiles": "{value, number} fichiers",
+    "countOfTokens": "{value, number} tokens",
+    "viewAggregatedSources": "Voir les sources agrégées",
+    "aggregatedSources": "Sources agrégées",
+    "manageSources": "Gérer les sources",
+    "newChat": "Nouvelle conversation",
+    "copy": "Copier",
+    "download": "Télécharger",
+    "chatDeleteTitle": "Supprimer la conversation",
+    "chatDeleteMessage": "Êtes-vous sûr de vouloir supprimer cette conversation ?",
+    "chatDeleteMessageDetail": "Cette action ne peut pas être annulée.",
+    "cancel": "Annuler",
+    "delete": "Supprimer"
+  },
+  "ChatSettingSideBar": {
+    "modelSettings": "Paramètres du modèle",
+    "systemPrompt": "Prompt système",
+    "assistantMode": "Mode assistant",
+    "selectModel": "Sélectionner le modèle",
+    "selectCompany": "Sélectionner l'entreprise",
+    "noModelsFound": "Aucun modèle trouvé.",
+    "enterApiKey": "Entrer la clé API",
+    "show": "Afficher",
+    "hide": "Masquer"
+  },
+  "SourceManagement": {
+    "title": "Gestion des sources",
+    "addSource": "Ajouter une source",
+    "addNewSource": "Ajouter une nouvelle source",
+    "personalInfo": "Informations personnelles",
+    "parsingSettings": "Paramètres d'analyse",
+    "parsingSettingsDescription": "Les modèles Vision et OCR sont utilisés ensemble pour améliorer les performances d'analyse.",
+    "visionModel": "Modèle Vision",
+    "visionModelDescription": "Seuls les modèles avec des capacités de vision peuvent être utilisés.",
+    "documentModel": "Modèle de document",
+    "documentModelDescription": "Docling est un modèle d'analyse open-source qui fonctionne localement.",
+    "documentModelDoclingGithub": "Github",
+    "documentModelUpstage": "Upstage",
+    "documentModelUpstageDescription": "Upstage a montré les meilleures performances dans nos tests.",
+    "documentModelUpstageDescription2": "offre $10 de crédit gratuit pour les nouvelles inscriptions, sans carte requise.",
+    "name": "Nom",
+    "birthdate": "Date de naissance",
+    "height": "Taille",
+    "weight": "Poids",
+    "bloodType": "Groupe sanguin",
+    "familyHistory": "Historique familial",
+    "select": "Sélectionner",
+    "extractedData": "Données extraites",
+    "update": "Mettre à jour",
+    "uploadFiles": "Télécharger des fichiers",
+    "uploadFilesDescription": "Ajouter des images ou des fichiers PDF.",
+    "uploadSymptoms": "Nouveaux symptômes",
+    "uploadSymptomsDescription": "Enregistrer les symptômes d'aujourd'hui.",
+    "date": "Date",
+    "description": "Description",
+    "symptoms": "Symptômes",
+    "selectModel": "Sélectionner le modèle",
+    "apiKey": "Clé API",
+    "enterYourAPIKey": "Entrez votre clé API",
+    "enterYourAPIUrl": "Entrez votre URL API"
+  },
+  "DynamicForm": {
+    "selectPlaceholder": "Sélectionner..."
+  },
+  "LoginPage": {
+    "username": "Nom d'utilisateur",
+    "usernamePlaceholder": "Entrez votre nom d'utilisateur",
+    "password": "Mot de passe",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "Se connecter",
+    "needSignUp": "Besoin d'un compte ? S'inscrire",
+    "alreadyHaveAccount": "Vous avez déjà un compte ? Se connecter",
+    "signUp": "Créer un compte"
+  }
+} 

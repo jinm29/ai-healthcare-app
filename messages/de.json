@@ -1,0 +1,83 @@
+{
+  "HomePage": {
+  },
+  "Chat": {
+    "inputPlaceholder": "Geben Sie Ihre Nachricht ein..."
+  },
+  "ChatSideBar": {
+    "sources": "Quellen",
+    "numberOfFiles": "{value, number} Dateien",
+    "countOfTokens": "{value, number} Token",
+    "viewAggregatedSources": "Aggregierte Quellen anzeigen",
+    "aggregatedSources": "Aggregierte Quellen",
+    "manageSources": "Quellen verwalten",
+    "newChat": "Neuer Chat",
+    "copy": "Kopieren",
+    "download": "Herunterladen",
+    "chatDeleteTitle": "Chat löschen",
+    "chatDeleteMessage": "Sind Sie sicher, dass Sie diesen Chat löschen möchten?",
+    "chatDeleteMessageDetail": "Diese Aktion kann nicht rückgängig gemacht werden.",
+    "cancel": "Abbrechen",
+    "delete": "Löschen"
+  },
+  "ChatSettingSideBar": {
+    "modelSettings": "Modelleinstellungen",
+    "systemPrompt": "System-Prompt",
+    "assistantMode": "Assistenten-Modus",
+    "selectModel": "Modell auswählen",
+    "selectCompany": "Unternehmen auswählen",
+    "noModelsFound": "Keine Modelle gefunden.",
+    "enterApiKey": "API-Schlüssel eingeben",
+    "show": "Anzeigen",
+    "hide": "Ausblenden"
+  },
+  "SourceManagement": {
+    "title": "Quellenverwaltung",
+    "addSource": "Quelle hinzufügen",
+    "addNewSource": "Neue Quelle hinzufügen",
+    "personalInfo": "Persönliche Informationen",
+    "parsingSettings": "Parsing-Einstellungen",
+    "parsingSettingsDescription": "Vision- und OCR-Modelle werden gemeinsam verwendet, um die Parsing-Leistung zu verbessern.",
+    "visionModel": "Vision-Modell",
+    "visionModelDescription": "Es können nur Modelle mit Vision-Fähigkeiten verwendet werden.",
+    "documentModel": "Dokumenten-Modell",
+    "documentModelDescription": "Docling ist ein Open-Source-Parsing-Modell, das lokal läuft.",
+    "documentModelDoclingGithub": "Github",
+    "documentModelUpstage": "Upstage",
+    "documentModelUpstageDescription": "Upstage zeigte die beste Leistung in unseren Tests.",
+    "documentModelUpstageDescription2": "bietet $10 Guthaben für Neuanmeldungen, keine Karte erforderlich.",
+    "name": "Name",
+    "birthdate": "Geburtsdatum",
+    "height": "Größe",
+    "weight": "Gewicht",
+    "bloodType": "Blutgruppe",
+    "familyHistory": "Familiengeschichte",
+    "select": "Auswählen",
+    "extractedData": "Extrahierte Daten",
+    "update": "Aktualisieren",
+    "uploadFiles": "Dateien hochladen",
+    "uploadFilesDescription": "Bilder oder PDF-Dateien hinzufügen.",
+    "uploadSymptoms": "Neue Symptome",
+    "uploadSymptomsDescription": "Heutige Symptome aufzeichnen.",
+    "date": "Datum",
+    "description": "Beschreibung",
+    "symptoms": "Symptome",
+    "selectModel": "Modell auswählen",
+    "apiKey": "API-Schlüssel",
+    "enterYourAPIKey": "Geben Sie Ihren API-Schlüssel ein",
+    "enterYourAPIUrl": "Geben Sie Ihre API-URL ein"
+  },
+  "DynamicForm": {
+    "selectPlaceholder": "Auswählen..."
+  },
+  "LoginPage": {
+    "username": "Benutzername",
+    "usernamePlaceholder": "Geben Sie Ihren Benutzernamen ein",
+    "password": "Passwort",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "Anmelden",
+    "needSignUp": "Benötigen Sie ein Konto? Registrieren",
+    "alreadyHaveAccount": "Haben Sie bereits ein Konto? Anmelden",
+    "signUp": "Konto erstellen"
+  }
+} 

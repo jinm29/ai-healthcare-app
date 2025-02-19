@@ -1,0 +1,83 @@
+{
+  "HomePage": {
+  },
+  "Chat": {
+    "inputPlaceholder": "メッセージを入力してください..."
+  },
+  "ChatSideBar": {
+    "sources": "ソース",
+    "numberOfFiles": "ファイル数: {value, number}",
+    "countOfTokens": "トークン数: {value, number}",
+    "viewAggregatedSources": "集計されたソースを表示",
+    "aggregatedSources": "集計されたソース",
+    "manageSources": "ソース管理",
+    "newChat": "新規チャット",
+    "copy": "コピー",
+    "download": "ダウンロード",
+    "chatDeleteTitle": "チャットを削除",
+    "chatDeleteMessage": "このチャットを削除してもよろしいですか？",
+    "chatDeleteMessageDetail": "この操作は取り消すことができません。",
+    "cancel": "キャンセル",
+    "delete": "削除"
+  },
+  "ChatSettingSideBar": {
+    "modelSettings": "モデル設定",
+    "systemPrompt": "システムプロンプト",
+    "assistantMode": "アシスタントモード",
+    "selectModel": "モデルを選択",
+    "selectCompany": "企業を選択",
+    "noModelsFound": "モデルが見つかりません。",
+    "enterApiKey": "APIキーを入力",
+    "show": "表示",
+    "hide": "非表示"
+  },
+  "SourceManagement": {
+    "title": "ソース管理",
+    "addSource": "ソースを追加",
+    "addNewSource": "新規ソースを追加",
+    "personalInfo": "個人情報",
+    "parsingSettings": "解析設定",
+    "parsingSettingsDescription": "VisionモデルとOCRモデルを組み合わせて解析性能を向上させています。",
+    "visionModel": "Visionモデル",
+    "visionModelDescription": "ビジョン機能を持つモデルのみ使用可能です。",
+    "documentModel": "ドキュメントモデル",
+    "documentModelDescription": "Doclingはローカルで動作するオープンソースの解析モデルです。",
+    "documentModelDoclingGithub": "Github",
+    "documentModelUpstage": "Upstage",
+    "documentModelUpstageDescription": "Upstageは当社のテストで最高のパフォーマンスを示しました。",
+    "documentModelUpstageDescription2": "新規登録で$10の無料クレジットを提供、カード不要。",
+    "name": "名前",
+    "birthdate": "生年月日",
+    "height": "身長",
+    "weight": "体重",
+    "bloodType": "血液型",
+    "familyHistory": "家族歴",
+    "select": "選択",
+    "extractedData": "抽出データ",
+    "update": "更新",
+    "uploadFiles": "ファイルをアップロード",
+    "uploadFilesDescription": "画像またはPDFファイルを追加。",
+    "uploadSymptoms": "新規症状",
+    "uploadSymptomsDescription": "今日の症状を記録。",
+    "date": "日付",
+    "description": "説明",
+    "symptoms": "症状",
+    "selectModel": "モデルを選択",
+    "apiKey": "APIキー",
+    "enterYourAPIKey": "APIキーを入力してください",
+    "enterYourAPIUrl": "API URLを入力してください"
+  },
+  "DynamicForm": {
+    "selectPlaceholder": "選択してください..."
+  },
+  "LoginPage": {
+    "username": "ユーザー名",
+    "usernamePlaceholder": "ユーザー名を入力",
+    "password": "パスワード",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "ログイン",
+    "needSignUp": "アカウントが必要ですか？新規登録",
+    "alreadyHaveAccount": "すでにアカウントをお持ちですか？ログイン",
+    "signUp": "アカウント作成"
+  }
+} 

@@ -52,6 +52,7 @@
     "weight": "몸무게",
     "bloodType": "혈액형",
     "familyHistory": "가족력",
+    "select": "선택",
     "extractedData": "추출된 데이터",
     "update": "업데이트",
     "uploadFiles": "파일 업로드",

@@ -1,0 +1,83 @@
+{
+  "HomePage": {
+  },
+  "Chat": {
+    "inputPlaceholder": "Escribe tu mensaje..."
+  },
+  "ChatSideBar": {
+    "sources": "Fuentes",
+    "numberOfFiles": "{value, number} archivos",
+    "countOfTokens": "{value, number} tokens",
+    "viewAggregatedSources": "Ver fuentes agregadas",
+    "aggregatedSources": "Fuentes agregadas",
+    "manageSources": "Gestionar fuentes",
+    "newChat": "Nueva conversación",
+    "copy": "Copiar",
+    "download": "Descargar",
+    "chatDeleteTitle": "Eliminar conversación",
+    "chatDeleteMessage": "¿Estás seguro de que quieres eliminar esta conversación?",
+    "chatDeleteMessageDetail": "Esta acción no se puede deshacer.",
+    "cancel": "Cancelar",
+    "delete": "Eliminar"
+  },
+  "ChatSettingSideBar": {
+    "modelSettings": "Configuración del modelo",
+    "systemPrompt": "Prompt del sistema",
+    "assistantMode": "Modo asistente",
+    "selectModel": "Seleccionar modelo",
+    "selectCompany": "Seleccionar empresa",
+    "noModelsFound": "No se encontraron modelos.",
+    "enterApiKey": "Ingresar clave API",
+    "show": "Mostrar",
+    "hide": "Ocultar"
+  },
+  "SourceManagement": {
+    "title": "Gestión de fuentes",
+    "addSource": "Agregar fuente",
+    "addNewSource": "Agregar nueva fuente",
+    "personalInfo": "Información personal",
+    "parsingSettings": "Configuración de análisis",
+    "parsingSettingsDescription": "Los modelos Vision y OCR se utilizan juntos para mejorar el rendimiento del análisis.",
+    "visionModel": "Modelo Vision",
+    "visionModelDescription": "Solo se pueden usar modelos con capacidades de visión.",
+    "documentModel": "Modelo de documento",
+    "documentModelDescription": "Docling es un modelo de análisis de código abierto que se ejecuta localmente.",
+    "documentModelDoclingGithub": "Github",
+    "documentModelUpstage": "Upstage",
+    "documentModelUpstageDescription": "Upstage mostró el mejor rendimiento en nuestras pruebas.",
+    "documentModelUpstageDescription2": "ofrece $10 de crédito gratis para nuevos registros, sin tarjeta requerida.",
+    "name": "Nombre",
+    "birthdate": "Fecha de nacimiento",
+    "height": "Altura",
+    "weight": "Peso",
+    "bloodType": "Tipo de sangre",
+    "familyHistory": "Historia familiar",
+    "select": "Seleccionar",
+    "extractedData": "Datos extraídos",
+    "update": "Actualizar",
+    "uploadFiles": "Subir archivos",
+    "uploadFilesDescription": "Agregar imágenes o archivos PDF.",
+    "uploadSymptoms": "Nuevos síntomas",
+    "uploadSymptomsDescription": "Registrar los síntomas de hoy.",
+    "date": "Fecha",
+    "description": "Descripción",
+    "symptoms": "Síntomas",
+    "selectModel": "Seleccionar modelo",
+    "apiKey": "Clave API",
+    "enterYourAPIKey": "Ingresa tu clave API",
+    "enterYourAPIUrl": "Ingresa tu URL API"
+  },
+  "DynamicForm": {
+    "selectPlaceholder": "Seleccionar..."
+  },
+  "LoginPage": {
+    "username": "Nombre de usuario",
+    "usernamePlaceholder": "Ingresa tu nombre de usuario",
+    "password": "Contraseña",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "Iniciar sesión",
+    "needSignUp": "¿Necesitas una cuenta? Regístrate",
+    "alreadyHaveAccount": "¿Ya tienes una cuenta? Inicia sesión",
+    "signUp": "Crear cuenta"
+  }
+} 

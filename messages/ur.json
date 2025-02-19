@@ -1,0 +1,83 @@
+{
+  "HomePage": {
+  },
+  "Chat": {
+    "inputPlaceholder": "اپنا پیغام ٹائپ کریں..."
+  },
+  "ChatSideBar": {
+    "sources": "ذرائع",
+    "numberOfFiles": "{value, number} فائلیں",
+    "countOfTokens": "{value, number} ٹوکنز",
+    "viewAggregatedSources": "مجموعی ذرائع دیکھیں",
+    "aggregatedSources": "مجموعی ذرائع",
+    "manageSources": "ذرائع کا انتظام",
+    "newChat": "نئی چیٹ",
+    "copy": "کاپی",
+    "download": "ڈاؤن لوڈ",
+    "chatDeleteTitle": "چیٹ حذف کریں",
+    "chatDeleteMessage": "کیا آپ واقعی اس چیٹ کو حذف کرنا چاہتے ہیں؟",
+    "chatDeleteMessageDetail": "یہ عمل واپس نہیں کیا جا سکتا۔",
+    "cancel": "منسوخ",
+    "delete": "حذف کریں"
+  },
+  "ChatSettingSideBar": {
+    "modelSettings": "ماڈل کی ترتیبات",
+    "systemPrompt": "سسٹم پرامپٹ",
+    "assistantMode": "اسسٹنٹ موڈ",
+    "selectModel": "ماڈل منتخب کریں",
+    "selectCompany": "کمپنی منتخب کریں",
+    "noModelsFound": "کوئی ماڈل نہیں ملا۔",
+    "enterApiKey": "API کلید درج کریں",
+    "show": "دکھائیں",
+    "hide": "چھپائیں"
+  },
+  "SourceManagement": {
+    "title": "ذرائع کا انتظام",
+    "addSource": "ذریعہ شامل کریں",
+    "addNewSource": "نیا ذریعہ شامل کریں",
+    "personalInfo": "ذاتی معلومات",
+    "parsingSettings": "پارسنگ کی ترتیبات",
+    "parsingSettingsDescription": "پارسنگ کی کارکردگی کو بہتر بنانے کے لیے Vision اور OCR ماڈلز ایک ساتھ استعمال کیے جاتے ہیں۔",
+    "visionModel": "Vision ماڈل",
+    "visionModelDescription": "صرف ویژن صلاحیتوں والے ماڈلز استعمال کیے جا سکتے ہیں۔",
+    "documentModel": "دستاویز ماڈل",
+    "documentModelDescription": "Docling ایک اوپن سورس پارسنگ ماڈل ہے جو مقامی طور پر چلتا ہے۔",
+    "documentModelDoclingGithub": "Github",
+    "documentModelUpstage": "Upstage",
+    "documentModelUpstageDescription": "Upstage نے ہمارے ٹیسٹوں میں بہترین کارکردگی دکھائی۔",
+    "documentModelUpstageDescription2": "نئی سائن اپ کے لیے $10 مفت کریڈٹ، کارڈ کی ضرورت نہیں۔",
+    "name": "نام",
+    "birthdate": "تاریخ پیدائش",
+    "height": "قد",
+    "weight": "وزن",
+    "bloodType": "خون کی قسم",
+    "familyHistory": "خاندانی تاریخ",
+    "select": "منتخب کریں",
+    "extractedData": "نکالا گیا ڈیٹا",
+    "update": "اپ ڈیٹ",
+    "uploadFiles": "فائلیں اپ لوڈ کریں",
+    "uploadFilesDescription": "تصاویر یا PDF فائلیں شامل کریں۔",
+    "uploadSymptoms": "نئی علامات",
+    "uploadSymptomsDescription": "آج کی علامات ریکارڈ کریں۔",
+    "date": "تاریخ",
+    "description": "تفصیل",
+    "symptoms": "علامات",
+    "selectModel": "ماڈل منتخب کریں",
+    "apiKey": "API کلید",
+    "enterYourAPIKey": "اپنی API کلید درج کریں",
+    "enterYourAPIUrl": "اپنی API URL درج کریں"
+  },
+  "DynamicForm": {
+    "selectPlaceholder": "منتخب کریں..."
+  },
+  "LoginPage": {
+    "username": "صارف نام",
+    "usernamePlaceholder": "اپنا صارف نام درج کریں",
+    "password": "پاس ورڈ",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "سائن ان",
+    "needSignUp": "اکاؤنٹ کی ضرورت ہے؟ سائن اپ کریں",
+    "alreadyHaveAccount": "پہلے سے اکاؤنٹ ہے؟ سائن ان کریں",
+    "signUp": "اکاؤنٹ بنائیں"
+  }
+} 

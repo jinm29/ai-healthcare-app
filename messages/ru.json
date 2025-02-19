@@ -1,0 +1,83 @@
+{
+  "HomePage": {
+  },
+  "Chat": {
+    "inputPlaceholder": "Введите ваше сообщение..."
+  },
+  "ChatSideBar": {
+    "sources": "Источники",
+    "numberOfFiles": "{value, number} файлов",
+    "countOfTokens": "{value, number} токенов",
+    "viewAggregatedSources": "Просмотр агрегированных источников",
+    "aggregatedSources": "Агрегированные источники",
+    "manageSources": "Управление источниками",
+    "newChat": "Новый чат",
+    "copy": "Копировать",
+    "download": "Скачать",
+    "chatDeleteTitle": "Удалить чат",
+    "chatDeleteMessage": "Вы уверены, что хотите удалить этот чат?",
+    "chatDeleteMessageDetail": "Это действие нельзя отменить.",
+    "cancel": "Отмена",
+    "delete": "Удалить"
+  },
+  "ChatSettingSideBar": {
+    "modelSettings": "Настройки модели",
+    "systemPrompt": "Системный промпт",
+    "assistantMode": "Режим ассистента",
+    "selectModel": "Выбрать модель",
+    "selectCompany": "Выбрать компанию",
+    "noModelsFound": "Модели не найдены.",
+    "enterApiKey": "Введите API ключ",
+    "show": "Показать",
+    "hide": "Скрыть"
+  },
+  "SourceManagement": {
+    "title": "Управление источниками",
+    "addSource": "Добавить источник",
+    "addNewSource": "Добавить новый источник",
+    "personalInfo": "Личная информация",
+    "parsingSettings": "Настройки парсинга",
+    "parsingSettingsDescription": "Модели Vision и OCR используются совместно для улучшения производительности парсинга.",
+    "visionModel": "Модель Vision",
+    "visionModelDescription": "Можно использовать только модели с возможностями компьютерного зрения.",
+    "documentModel": "Модель документов",
+    "documentModelDescription": "Docling - это модель парсинга с открытым исходным кодом, работающая локально.",
+    "documentModelDoclingGithub": "Github",
+    "documentModelUpstage": "Upstage",
+    "documentModelUpstageDescription": "Upstage показал лучшую производительность в наших тестах.",
+    "documentModelUpstageDescription2": "предлагает $10 бесплатных кредитов для новых регистраций, карта не требуется.",
+    "name": "Имя",
+    "birthdate": "Дата рождения",
+    "height": "Рост",
+    "weight": "Вес",
+    "bloodType": "Группа крови",
+    "familyHistory": "Семейная история",
+    "select": "Выбрать",
+    "extractedData": "Извлеченные данные",
+    "update": "Обновить",
+    "uploadFiles": "Загрузить файлы",
+    "uploadFilesDescription": "Добавить изображения или PDF файлы.",
+    "uploadSymptoms": "Новые симптомы",
+    "uploadSymptomsDescription": "Записать сегодняшние симптомы.",
+    "date": "Дата",
+    "description": "Описание",
+    "symptoms": "Симптомы",
+    "selectModel": "Выбрать модель",
+    "apiKey": "API ключ",
+    "enterYourAPIKey": "Введите ваш API ключ",
+    "enterYourAPIUrl": "Введите ваш API URL"
+  },
+  "DynamicForm": {
+    "selectPlaceholder": "Выберите..."
+  },
+  "LoginPage": {
+    "username": "Имя пользователя",
+    "usernamePlaceholder": "Введите имя пользователя",
+    "password": "Пароль",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "Войти",
+    "needSignUp": "Нужен аккаунт? Зарегистрируйтесь",
+    "alreadyHaveAccount": "Уже есть аккаунт? Войдите",
+    "signUp": "Создать аккаунт"
+  }
+} 

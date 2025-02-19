@@ -1,0 +1,83 @@
+{
+  "HomePage": {
+  },
+  "Chat": {
+    "inputPlaceholder": "Введіть ваше повідомлення..."
+  },
+  "ChatSideBar": {
+    "sources": "Джерела",
+    "numberOfFiles": "{value, number} файлів",
+    "countOfTokens": "{value, number} токенів",
+    "viewAggregatedSources": "Переглянути агреговані джерела",
+    "aggregatedSources": "Агреговані джерела",
+    "manageSources": "Керування джерелами",
+    "newChat": "Новий чат",
+    "copy": "Копіювати",
+    "download": "Завантажити",
+    "chatDeleteTitle": "Видалити чат",
+    "chatDeleteMessage": "Ви впевнені, що хочете видалити цей чат?",
+    "chatDeleteMessageDetail": "Цю дію неможливо скасувати.",
+    "cancel": "Скасувати",
+    "delete": "Видалити"
+  },
+  "ChatSettingSideBar": {
+    "modelSettings": "Налаштування моделі",
+    "systemPrompt": "Системний промпт",
+    "assistantMode": "Режим асистента",
+    "selectModel": "Вибрати модель",
+    "selectCompany": "Вибрати компанію",
+    "noModelsFound": "Моделі не знайдено.",
+    "enterApiKey": "Введіть API ключ",
+    "show": "Показати",
+    "hide": "Приховати"
+  },
+  "SourceManagement": {
+    "title": "Керування джерелами",
+    "addSource": "Додати джерело",
+    "addNewSource": "Додати нове джерело",
+    "personalInfo": "Особиста інформація",
+    "parsingSettings": "Налаштування парсингу",
+    "parsingSettingsDescription": "Моделі Vision та OCR використовуються разом для покращення ефективності парсингу.",
+    "visionModel": "Модель Vision",
+    "visionModelDescription": "Можна використовувати лише моделі з можливостями комп'ютерного зору.",
+    "documentModel": "Модель документів",
+    "documentModelDescription": "Docling - це модель парсингу з відкритим кодом, що працює локально.",
+    "documentModelDoclingGithub": "Github",
+    "documentModelUpstage": "Upstage",
+    "documentModelUpstageDescription": "Upstage показав найкращу продуктивність у наших тестах.",
+    "documentModelUpstageDescription2": "пропонує $10 безкоштовних кредитів для нових реєстрацій, карта не потрібна.",
+    "name": "Ім'я",
+    "birthdate": "Дата народження",
+    "height": "Зріст",
+    "weight": "Вага",
+    "bloodType": "Група крові",
+    "familyHistory": "Сімейна історія",
+    "select": "Вибрати",
+    "extractedData": "Витягнуті дані",
+    "update": "Оновити",
+    "uploadFiles": "Завантажити файли",
+    "uploadFilesDescription": "Додати зображення або PDF файли.",
+    "uploadSymptoms": "Нові симптоми",
+    "uploadSymptomsDescription": "Записати сьогоднішні симптоми.",
+    "date": "Дата",
+    "description": "Опис",
+    "symptoms": "Симптоми",
+    "selectModel": "Вибрати модель",
+    "apiKey": "API ключ",
+    "enterYourAPIKey": "Введіть ваш API ключ",
+    "enterYourAPIUrl": "Введіть вашу API URL"
+  },
+  "DynamicForm": {
+    "selectPlaceholder": "Виберіть..."
+  },
+  "LoginPage": {
+    "username": "Ім'я користувача",
+    "usernamePlaceholder": "Введіть ім'я користувача",
+    "password": "Пароль",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "Увійти",
+    "needSignUp": "Потрібен обліковий запис? Зареєструйтеся",
+    "alreadyHaveAccount": "Вже є обліковий запис? Увійдіть",
+    "signUp": "Створити обліковий запис"
+  }
+} 
