@@ -1,11 +1,11 @@
 import {NextRequest, NextResponse} from "next/server";
 import prisma, {Prisma} from "@/lib/prisma";
-import OpenAI from "openai";
 import Anthropic from "@anthropic-ai/sdk";
 import {GoogleGenerativeAI} from "@google/generative-ai";
 import {auth} from "@/auth";
 import {decrypt} from "@/lib/encryption";
 import {currentDeploymentEnv} from "@/lib/current-deployment-env";
+import {ChatOpenAI} from "@langchain/openai";
 
 export interface ChatMessage extends Prisma.ChatMessageGetPayload<{
     select: {
@@ -161,17 +161,18 @@ export async function POST(
                     }
                 } else if (llmProvider.providerId === 'openai') {
                     // OpenAI API call
-                    const openai = new OpenAI({apiKey, baseURL: llmProvider.apiURL});
                     const llmProviderModelId = chatRoom.llmProviderModelId;
                     if (!llmProviderModelId) throw new Error('No LLM model ID provided');
-                    const chatStream = await openai.chat.completions.create({
+                    const openai = new ChatOpenAI({
+                        apiKey,
                         model: llmProviderModelId,
-                        messages: messages,
-                        stream: true
-                    });
+                        configuration: {baseURL: llmProvider.apiURL},
+                        streaming: true,
+                    })
 
+                    const chatStream = await openai.stream(messages)
                     for await (const part of chatStream) {
-                        const deltaContent = part.choices[0]?.delta.content
+                        const deltaContent = part.content.toString()
                         if (deltaContent !== undefined) messageContent += deltaContent;
                         controller.enqueue(`${JSON.stringify({content: messageContent})}\n`);
                     }
