@@ -24,5 +24,40 @@
     "modelSettings": "Model Settings",
     "systemPrompt": "System Prompt",
     "assistantMode": "Assistant Mode"
+  },
+  "SourceManagement": {
+    "title": "Source Management",
+    "addSource": "Add Source",
+    "addNewSource": "Add New Source",
+    "personalInfo": "Personal Info",
+    "parsingSettings": "Parsing Settings",
+    "parsingSettingsDescription": "Vision and OCR models are used together to enhance parsing performance.",
+    "visionModel": "Vision Model",
+    "visionModelDescription": "Only models with vision capabilities can be used.",
+    "documentModel": "Document Model",
+    "documentModelDescription": "Docling is an open-source parsing model that runs locally.",
+    "documentModelDoclingGithub": "Github",
+    "documentModelUpstage": "Upstage",
+    "documentModelUpstageDescription": "Upstage showed the best performance in our tests.",
+    "documentModelUpstageDescription2": "offers $10 free credit for new sign-ups, no card required.",
+    "name": "Name",
+    "birthdate": "Birthdate",
+    "height": "Height",
+    "weight": "Weight",
+    "bloodType": "Blood Type",
+    "familyHistory": "Family History",
+    "select": "Select",
+    "extractedData": "Extracted Data",
+    "update": "Update",
+    "uploadFiles": "Upload Files",
+    "uploadFilesDescription": "Add images or PDF files.",
+    "uploadSymptoms": "New Symptoms",
+    "uploadSymptomsDescription": "Record today's symptoms.",
+    "date": "Date",
+    "description": "Description",
+    "symptoms": "Symptoms"
+  },
+  "DynamicForm": {
+    "selectPlaceholder": "Select..."
   }
 }
