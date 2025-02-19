@@ -1,10 +1,10 @@
 # 🚀 **OpenHealth**
 
-**Assistant de santé IA | Alimenté par vos données, exécuté localement**
+**Assistant de santé IA | Alimenté par vos données**
 
 <div align="center">
 
-**Assistant Santé IA | Alimenté par Vos Données, Exécution Locale**
+**Assistant Santé IA | Alimenté par Vos Données**
 
 <p align="center">
   <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
@@ -112,16 +112,17 @@ Entrée de données de santé --> Module d'analyse --> Fichiers de données stru
    # Copier le fichier d'environnement
    cp .env.example .env
 
-   # Ajouter les clés API dans le fichier .env:
-   # UPSTAGE_API_KEY - Pour l'analyse (Obtenez un crédit de 10$ sans inscription de carte sur https://www.upstage.ai)
-   # OPENAI_API_KEY - Pour des capacités d'analyse améliorées
-
    # Démarrer l'application avec Docker Compose
    docker compose --env-file .env up
    ```
 
    Pour les utilisateurs existants:
    ```bash
+   # Générer la clé ENCRYPTION_KEY pour le fichier .env:
+   # Exécutez la commande ci-dessous et ajoutez la sortie à ENCRYPTION_KEY dans .env
+   echo $(head -c 32 /dev/urandom | base64)
+
+   # Reconstruire et démarrer l'application
    docker compose --env-file .env up --build
    ```
 
