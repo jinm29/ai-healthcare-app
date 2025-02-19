@@ -5,6 +5,14 @@ export function NavLinks() {
     <nav className="w-full py-4 bg-zinc-900/40 backdrop-blur-sm">
       <div className="container mx-auto flex justify-center space-x-6">
         <a
+          href="https://tally.so/r/3xl2GE"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-4 py-2 text-zinc-400 hover:text-white transition-colors font-medium"
+        >
+          Feedback
+        </a>
+        <a
           href="https://github.com/OpenHealthForAll/open-health"
           target="_blank"
           rel="noopener noreferrer"

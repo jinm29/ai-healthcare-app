@@ -112,6 +112,14 @@ export default function Screen(
                 <div className="flex items-center gap-4">
                     <div className="flex items-center gap-4 mr-4">
                         <a
+                            href="https://tally.so/r/3xl2GE"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors font-medium"
+                        >
+                            Feedback
+                        </a>
+                        <a
                             href="https://github.com/OpenHealthForAll/open-health"
                             target="_blank"
                             rel="noopener noreferrer"
