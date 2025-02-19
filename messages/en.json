@@ -62,7 +62,10 @@
     "date": "Date",
     "description": "Description",
     "symptoms": "Symptoms",
-    "selectModel": "Select Model"
+    "selectModel": "Select Model",
+    "apiKey": "API Key",
+    "enterYourAPIKey": "Enter your API key",
+    "enterYourAPIUrl": "Enter your API URL"
   },
   "DynamicForm": {
     "selectPlaceholder": "Select..."

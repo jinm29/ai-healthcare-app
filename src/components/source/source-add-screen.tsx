@@ -1268,12 +1268,12 @@ export default function SourceAddScreen() {
                                                 <ConditionalDeploymentEnv env={['local']}>
                                                     {visionDataList?.visions?.find(v => v.name === visionParser?.value)?.apiKeyRequired && (
                                                         <div className="space-y-2">
-                                                            <label className="text-sm font-medium">API Key</label>
+                                                            <label className="text-sm font-medium">{t('apiKey')}</label>
                                                             <input
                                                                 type="password"
                                                                 aria-autocomplete={'none'}
                                                                 autoComplete={'off'}
-                                                                placeholder="Enter your API key"
+                                                                placeholder={t('enterYourAPIKey')}
                                                                 className="w-full p-2 border rounded-md text-sm"
                                                                 value={visionParserApiKey}
                                                                 onChange={(e) => setVisionParserApiKey(e.target.value)}
@@ -1286,7 +1286,7 @@ export default function SourceAddScreen() {
                                                             <input
                                                                 aria-autocomplete={'none'}
                                                                 autoComplete={'off'}
-                                                                placeholder="Enter your API Url"
+                                                                placeholder={t('enterYourAPIUrl')}
                                                                 className="w-full p-2 border rounded-md text-sm"
                                                                 value={visionParserApiUrl}
                                                                 onChange={(e) => setVisionParserApiUrl(e.target.value)}
@@ -1351,10 +1351,10 @@ export default function SourceAddScreen() {
                                                 <ConditionalDeploymentEnv env={['local']}>
                                                     {documentDataList?.documents?.find(v => v.name === documentParser?.value)?.apiKeyRequired && (
                                                         <div className="space-y-2">
-                                                            <label className="text-sm font-medium">API Key</label>
+                                                            <label className="text-sm font-medium">{t('apiKey')}</label>
                                                             <input
                                                                 type="password"
-                                                                placeholder="Enter your API key"
+                                                                placeholder={t('enterYourAPIKey')}
                                                                 className="w-full p-2 border rounded-md text-sm"
                                                                 value={documentParserApiKey}
                                                                 onChange={(e) => setDocumentParserApiKey(e.target.value)}
