@@ -58,5 +58,15 @@
   },
   "DynamicForm": {
     "selectPlaceholder": "선택..."
+  },
+  "LoginPage": {
+    "username": "사용자 이름",
+    "usernamePlaceholder": "사용자 이름을 입력하세요",
+    "password": "비밀번호",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "로그인",
+    "needSignUp": "계정이 없으신가요? 가입하기",
+    "alreadyHaveAccount": "계정이 있으신가요? 로그인",
+    "signUp": "계정 만들기"
   }
 }

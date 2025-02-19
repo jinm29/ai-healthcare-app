@@ -59,5 +59,15 @@
   },
   "DynamicForm": {
     "selectPlaceholder": "Select..."
+  },
+  "LoginPage": {
+    "username": "Username",
+    "usernamePlaceholder": "Enter your username",
+    "password": "Password",
+    "passwordPlaceholder": "••••••••",
+    "signIn": "Sign In",
+    "needSignUp": "Need an account? Sign up",
+    "alreadyHaveAccount": "Already have an account? Sign in",
+    "signUp": "Create account"
   }
 }
