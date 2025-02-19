@@ -28,7 +28,7 @@
 ## 🌟 Descripción General
 
 > OpenHealth le ayuda a **tomar el control de sus datos de salud**. Aprovechando la IA y su información personal de salud,
-> OpenHealth proporciona un asistente privado y de ejecución local que le ayuda a comprender y gestionar mejor su salud.
+> OpenHealth proporciona un asistente privado que le ayuda a comprender y gestionar mejor su salud. Puede ejecutarlo completamente de forma local para máxima privacidad.
 
 ## ✨ Características del Proyecto
 

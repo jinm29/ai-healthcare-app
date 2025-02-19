@@ -30,7 +30,7 @@
 ## 🌟 Überblick
 
 > OpenHealth hilft Ihnen, **die Kontrolle über Ihre Gesundheitsdaten zu übernehmen**. Durch den Einsatz von KI und Ihren persönlichen Gesundheitsinformationen
-> bietet OpenHealth einen privaten und lokal ausgeführten Assistenten, der Ihnen hilft, Ihre Gesundheit besser zu verstehen und zu verwalten.
+> bietet OpenHealth einen privaten Assistenten, der Ihnen hilft, Ihre Gesundheit besser zu verstehen und zu verwalten. Für maximale Privatsphäre können Sie es vollständig lokal ausführen.
 
 ## ✨ Projektfunktionen
 

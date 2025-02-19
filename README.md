@@ -28,7 +28,7 @@
 ## 🌟 Overview
 
 > OpenHealth helps you **take charge of your health data**. By leveraging AI and your personal health information,
-> OpenHealth provides a private and locally-run assistant that helps you better understand and manage your health.
+> OpenHealth provides a private assistant that helps you better understand and manage your health. You can run it completely locally for maximum privacy.
 
 ## ✨ Project Features
 
