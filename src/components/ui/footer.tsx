@@ -5,6 +5,14 @@ export function Footer() {
     <footer className="fixed bottom-0 w-full py-4 bg-zinc-900/40 dark:bg-zinc-800/40 backdrop-blur-sm">
       <div className="container mx-auto flex justify-center space-x-6">
         <a
+          href="https://tally.so/r/3xl2GE"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-4 py-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors font-medium"
+        >
+          Feedback
+        </a>
+        <a
           href="https://github.com/OpenHealthForAll/open-health"
           target="_blank"
           rel="noopener noreferrer"
