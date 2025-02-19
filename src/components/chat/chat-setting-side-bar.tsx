@@ -192,7 +192,7 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
                                     onChangeChatRoom({llmProviderId: value, llmProviderModelId: null});
                                 }}>
                             <SelectTrigger>
-                                <SelectValue placeholder="Select company"/>
+                                <SelectValue placeholder={t('selectCompany')}/>
                             </SelectTrigger>
                             <SelectContent className={cn('bg-white')}>
                                 {llmProvidersData?.llmProviders.map((provider) => <SelectItem
@@ -203,7 +203,7 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
                         <Select value={selectedLLMProviderModel?.id}
                                 onValueChange={(value) => setSelectedLLMProviderModel(llmProviderModels.find((model) => model.id === value))}>
                             <SelectTrigger>
-                                <SelectValue placeholder="Select model"/>
+                                <SelectValue placeholder={t('selectModel')}/>
                             </SelectTrigger>
                             <SelectContent className={cn('bg-white')}>
                                 {llmProviderModels.map((model) => (
@@ -213,7 +213,7 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
                                 ))}
 
                                 {llmProviderModels.length === 0 && (
-                                    <div className="p-2 text-sm text-gray-500">No models found</div>
+                                    <div className="p-2 text-sm text-gray-500">{t('noModelsFound')}</div>
                                 )}
                             </SelectContent>
                         </Select>
@@ -231,7 +231,7 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
                                 <div className="relative">
                                     <Input
                                         type={showApiKey ? "text" : "password"}
-                                        placeholder="Enter API key"
+                                        placeholder={t('enterApiKey')}
                                         value={selectedLLMProvider?.apiKey || ''}
                                         onChange={(e) => onLLMProviderChange({apiKey: e.target.value})}
                                         className="pr-16"
@@ -240,7 +240,7 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
                                         className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-sm text-gray-500 hover:text-gray-700"
                                         onClick={() => setShowApiKey(!showApiKey)}
                                     >
-                                        {showApiKey ? "Hide" : "Show"}
+                                        {showApiKey ? t('hide') : t('show')}
                                     </button>
                                 </div>
                             )}

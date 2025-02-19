@@ -23,7 +23,13 @@
   "ChatSettingSideBar": {
     "modelSettings": "Model Settings",
     "systemPrompt": "System Prompt",
-    "assistantMode": "Assistant Mode"
+    "assistantMode": "Assistant Mode",
+    "selectModel": "Select Model",
+    "selectCompany": "Select Company",
+    "noModelsFound": "No models found.",
+    "enterApiKey": "Enter API Key",
+    "show": "Show",
+    "hide": "Hide"
   },
   "SourceManagement": {
     "title": "Source Management",
@@ -55,7 +61,8 @@
     "uploadSymptomsDescription": "Record today's symptoms.",
     "date": "Date",
     "description": "Description",
-    "symptoms": "Symptoms"
+    "symptoms": "Symptoms",
+    "selectModel": "Select Model"
   },
   "DynamicForm": {
     "selectPlaceholder": "Select..."

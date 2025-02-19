@@ -1256,7 +1256,7 @@ export default function SourceAddScreen() {
                                                     className="basic-single text-sm"
                                                     classNamePrefix="select"
                                                     isSearchable={false}
-                                                    placeholder="Select model"
+                                                    placeholder={t('selectModel')}
                                                     value={visionParserModel}
                                                     onChange={(selected: any) => setVisionParserModel(selected)}
                                                     options={visionModelDataList?.models?.map((model) => ({
@@ -1337,7 +1337,7 @@ export default function SourceAddScreen() {
                                                     className="basic-single text-sm"
                                                     classNamePrefix="select"
                                                     isSearchable={false}
-                                                    placeholder="Select model"
+                                                    placeholder={t('selectModel')}
                                                     value={documentParserModel}
                                                     onChange={(selected: any) => {
                                                         setDocumentParserModel(selected)
