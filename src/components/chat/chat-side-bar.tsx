@@ -297,14 +297,14 @@ export default function ChatSideBar({
                         onClick={() => setDeleteDialogOpen(false)}
                         className="text-sm"
                     >
-                        ${t('cancel')}
+                        {t('cancel')}
                     </Button>
                     <Button
                         variant="outline"
                         onClick={confirmDelete}
                         className="text-sm bg-gray-200 hover:bg-gray-300 text-gray-900"
                     >
-                        ${t('delete')}
+                        {t('delete')}
                     </Button>
                 </DialogFooter>
             </DialogContent>
