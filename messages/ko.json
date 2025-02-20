@@ -5,7 +5,7 @@
     "inputPlaceholder": "메시지 입력..."
   },
   "Feedback": {
-    "helpMessage": "오픈헬스를 도와 당신의 건강문제와 더 많은 사람들의 건강문제를 해결할 수 있도록해주세요",
+    "helpMessage": "오픈헬스를 도와 당신의 건강문제와 더 많은 사람들의 건강문제를 해결할 수 있도록 해주세요",
     "shareFeedback": "피드백 남기기"
   },
   "ChatSideBar": {
@@ -83,5 +83,93 @@
     "needSignUp": "계정이 없으신가요? 가입하기",
     "alreadyHaveAccount": "계정이 있으신가요? 로그인",
     "signUp": "계정 만들기"
+  },
+  "Onboarding": {
+    "introduction": {
+      "title": "Health Solver",
+      "subtitle": "by OpenHealth",
+      "description": "해결되지 않은 건강 문제가 있으신가요?\nAI가 당신의 데이터를 심층 분석합니다",
+      "privacyNotice": "수집된 데이터는 오직 귀하의 건강 문제 해결을 위해서만 사용됩니다.",
+      "runLocally": "로컬에서 실행할 수 있습니다",
+      "here": "여기"
+    },
+    "healthConcerns": {
+      "title": "건강 문제",
+      "description": "현재 겪고 계신 건강 문제를 자세히 설명해 주세요",
+      "placeholder": "예시: \n- 어떤 증상이 있나요?\n- 언제부터 시작되었나요?\n- 어떤 상황에서 증상이 악화되나요?\n- 이전에도 비슷한 증상을 경험한 적이 있나요?",
+      "error": "건강 문제를 설명해 주세요"
+    },
+    "personalInfo": {
+      "title": "개인 정보",
+      "description": "귀하의 프로필을 더 잘 이해할 수 있도록 도와주세요",
+      "gender": {
+        "label": "성별",
+        "male": "남성",
+        "female": "여성",
+        "error": "성별을 선택해 주세요"
+      },
+      "birthDate": {
+        "label": "생년월일",
+        "error": "생년월일을 입력해 주세요"
+      },
+      "height": {
+        "label": "키",
+        "placeholder": {
+          "cm": "170",
+          "ft": "5.6"
+        },
+        "error": "키를 입력해 주세요"
+      },
+      "weight": {
+        "label": "체중",
+        "placeholder": {
+          "kg": "65",
+          "lb": "143"
+        },
+        "error": "체중을 입력해 주세요"
+      },
+      "ethnicity": {
+        "label": "인종",
+        "placeholder": "인종을 선택하세요",
+        "options": {
+          "east_asian": "동아시아인",
+          "southeast_asian": "동남아시아인",
+          "south_asian": "남아시아인",
+          "european": "유럽인",
+          "middle_eastern": "중동/북아프리카인",
+          "african": "아프리카인",
+          "african_american": "아프리카계 미국인",
+          "pacific_islander": "태평양 섬 주민",
+          "native_american": "아메리카 원주민",
+          "hispanic": "히스패닉/라틴계",
+          "mixed": "혼혈",
+          "other": "기타"
+        },
+        "error": "인종을 선택해 주세요"
+      },
+      "country": {
+        "label": "국가",
+        "placeholder": "국가명을 입력하세요",
+        "error": "국가를 선택해 주세요"
+      }
+    },
+    "medicalRecords": {
+      "title": "의료 기록",
+      "description": "더 나은 분석을 위해 의료 기록을 업로드하세요 (선택사항)",
+      "dragDrop": {
+        "title": "파일을 여기에 끌어다 놓으세요",
+        "or": "또는",
+        "browse": "파일 찾기",
+        "supportedFormats": "지원 형식: PDF, JPEG, PNG, DOC"
+      }
+    },
+    "analysis": {
+      "description": "AI가 귀하의 건강 데이터를 분석하여 상태를 파악하고\n맞춤형 건강 인사이트를 제공합니다"
+    },
+    "navigation": {
+      "back": "이전",
+      "next": "다음",
+      "skip": "건너뛰기"
+    }
   }
 }
