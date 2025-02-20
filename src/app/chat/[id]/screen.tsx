@@ -35,16 +35,19 @@ export default function Screen(
     const [isJsonViewerOpen, setIsJsonViewerOpen] = useState(false);
     const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(!isMobile);
     const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(!isMobile);
-    const [showFeedbackBanner, setShowFeedbackBanner] = useState(() => {
-        if (typeof window === 'undefined') return true;
-        return localStorage.getItem('feedbackBannerClosed') !== 'true';
-    });
+    const [showFeedbackBanner, setShowFeedbackBanner] = useState<boolean>();
 
     const {data, mutate} = useSWR<ChatMessageListResponse>(`/api/chat-rooms/${id}/messages`, async (url: string) => {
         const response = await fetch(url);
         return response.json();
     });
     const messages = useMemo(() => data?.chatMessages || [], [data]);
+
+    useEffect(() => {
+        if (showFeedbackBanner === undefined) {
+            setShowFeedbackBanner(!localStorage.getItem('feedbackBannerClosed'));
+        }
+    }, [showFeedbackBanner]);
 
     useEffect(() => {
         if (messagesEndRef.current) {
