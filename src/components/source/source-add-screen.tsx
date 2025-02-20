@@ -325,7 +325,6 @@ ${isSelected
                 )}
                 <Button
                     variant="ghost"
-                    size="icon"
                     onClick={(e) => {
                         e.stopPropagation();
                         onDelete(healthData.id);
@@ -1212,7 +1211,7 @@ export default function SourceAddScreen() {
                         <>
                             <div className="h-12 px-4 flex items-center justify-between border-t">
                                 <h2 className="text-sm font-medium">{t('parsingSettings')}</h2>
-                                <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+                                <Button variant="ghost" onClick={() => setIsOpen(false)}>
                                     <ChevronRight className="h-4 w-4"/>
                                 </Button>
                             </div>
@@ -1370,7 +1369,7 @@ export default function SourceAddScreen() {
                         </>
                     ) : (
                         <div className="h-12 flex items-center justify-center border-t">
-                            <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
+                            <Button variant="ghost" onClick={() => setIsOpen(true)}>
                                 <ChevronLeft className="h-4 w-4"/>
                             </Button>
                         </div>

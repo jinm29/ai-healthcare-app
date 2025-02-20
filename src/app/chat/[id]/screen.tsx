@@ -114,7 +114,7 @@ export default function Screen(
         <div className="h-screen flex flex-col">
             <div className="bg-white dark:bg-zinc-900 border-b h-14 flex items-center px-4 shrink-0">
                 <div className="flex items-center gap-2">
-                    <Button variant="ghost" size="icon" onClick={() => setIsLeftSidebarOpen(!isLeftSidebarOpen)}>
+                    <Button variant="ghost" size="default" onClick={() => setIsLeftSidebarOpen(!isLeftSidebarOpen)}>
                         <Menu className="w-4 h-4"/>
                     </Button>
                     <h1 className="text-lg font-semibold">OpenHealth</h1>
@@ -124,7 +124,7 @@ export default function Screen(
                     <NavLinks/>
                     <div className="flex items-center gap-1">
                         <LogoutButton/>
-                        <Button variant="ghost" size="icon" onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}>
+                        <Button variant="ghost" size="default" onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}>
                             <Settings className="w-4 h-4"/>
                         </Button>
                     </div>
@@ -158,7 +158,7 @@ export default function Screen(
                                     </Button>
                                     <Button
                                         variant="ghost"
-                                        size="icon"
+                                        size="default"
                                         className="h-8 w-8 text-gray-500 hover:text-gray-700"
                                         onClick={handleCloseFeedbackBanner}
                                     >
