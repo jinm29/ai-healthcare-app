@@ -1,6 +1,6 @@
 'use client';
 
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
 import {AnimatePresence, motion} from 'framer-motion';
 import {Card, CardContent} from '@/components/ui/card';
 import {toast} from 'sonner';
@@ -14,14 +14,10 @@ import MedicalRecords from '@/components/onboarding/MedicalRecords';
 import Analysis from '@/components/onboarding/Analysis';
 import ProgressBar from '@/components/onboarding/ProgressBar';
 import NavigationButtons from '@/components/onboarding/NavigationButtons';
+import {onboardingSubmit} from "@/actions/onboarding";
+import {redirect} from "next/navigation";
 
-const steps = [
-    {id: 1, component: Introduction},
-    {id: 2, component: HealthConcerns},
-    {id: 3, component: PersonalInfo},
-    {id: 4, component: MedicalRecords},
-    {id: 5, component: Analysis},
-];
+const steps = [{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}];
 
 export default function OnboardingPage() {
     const [currentStep, setCurrentStep] = useState(1);
@@ -36,7 +32,12 @@ export default function OnboardingPage() {
         ethnicity: '',
         country: '',
     });
+    const [medicalRecords, setMedicalRecords] = useState<File[]>([]);
     const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>({});
+
+    useEffect(() => {
+        if (currentStep === 5) submit();
+    }, [currentStep]);
 
     const validateCurrentStep = () => {
         switch (currentStep) {
@@ -48,7 +49,7 @@ export default function OnboardingPage() {
                 }
                 break;
             case 3: // PersonalInfo
-                const requiredFields = ['gender', 'birthDate', 'height', 'weight', 'country', 'ethnicity'];
+                const requiredFields: (keyof PersonalInfoData)[] = ['gender', 'birthDate', 'height', 'weight', 'country', 'ethnicity'];
                 let isValid = true;
 
                 const newTouchedFields = {...touchedFields};
@@ -88,7 +89,30 @@ export default function OnboardingPage() {
         }
     };
 
-    const CurrentStepComponent = steps[currentStep - 1].component;
+    const submit = async () => {
+        // Upload All Files
+        await Promise.all(
+            medicalRecords.map(async (file) => {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('visionParser', 'OpenAI');
+                formData.append('visionParserModel', 'gpt-4o');
+                formData.append('documentParser', 'Upstage');
+                formData.append('documentParserModel', 'document-parse');
+
+                try {
+                    await fetch('/api/health-data', {method: 'POST', body: formData});
+                } catch (error) {
+                    console.error(error);
+                }
+            })
+        )
+
+        await onboardingSubmit({symptoms: healthConcerns, personalInfo});
+
+        // redirect to /
+        redirect('/')
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white flex items-center justify-center p-4">
@@ -108,21 +132,26 @@ export default function OnboardingPage() {
                             exit={{opacity: 0, x: -20}}
                             transition={{duration: 0.3}}
                         >
-                            {currentStep === 2 ? (
-                                <HealthConcerns
-                                    value={healthConcerns}
-                                    onChange={setHealthConcerns}
-                                    isInvalid={touchedFields.healthConcerns && !healthConcerns.trim()}
-                                />
-                            ) : currentStep === 3 ? (
-                                <PersonalInfo
-                                    value={personalInfo}
-                                    onChange={setPersonalInfo}
-                                    touchedFields={touchedFields}
-                                />
-                            ) : (
-                                <CurrentStepComponent/>
-                            )}
+                            {
+                                currentStep === 1 ? (
+                                    <Introduction/>
+                                ) : currentStep === 2 ? (
+                                    <HealthConcerns
+                                        value={healthConcerns}
+                                        onChange={setHealthConcerns}
+                                        isInvalid={touchedFields.healthConcerns && !healthConcerns.trim()}
+                                    />
+                                ) : currentStep === 3 ? (
+                                    <PersonalInfo
+                                        value={personalInfo}
+                                        onChange={setPersonalInfo}
+                                        touchedFields={touchedFields}
+                                    />
+                                ) : currentStep === 4 ? (
+                                    <MedicalRecords value={medicalRecords} onValueChange={setMedicalRecords}/>
+                                ) : (
+                                    <Analysis/>
+                                )}
                         </motion.div>
                     </AnimatePresence>
 

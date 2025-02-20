@@ -1,6 +1,7 @@
 import {redirect} from "next/navigation";
 import prisma from "@/lib/prisma";
 import {auth} from "@/auth";
+import {currentDeploymentEnv} from "@/lib/current-deployment-env";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +21,13 @@ export default async function Page() {
     ])
 
     // If user has not onboarded, redirect to onboarding
-    if (!user.hasOnboarded) redirect('/onboarding');
+    if (!user.hasOnboarded) {
+        if (currentDeploymentEnv === 'cloud') {
+            redirect('/onboarding');
+        } else {
+            await prisma.user.update({where: {id: session.user.id}, data: {hasOnboarded: true}})
+        }
+    }
 
     let chatRoom = lastChatRoom
     if (!lastChatRoom) {
