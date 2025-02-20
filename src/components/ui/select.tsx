@@ -1,12 +1,10 @@
 "use client"
 
 import * as React from "react"
+import {SelectHTMLAttributes} from "react"
 import * as SelectPrimitive from "@radix-ui/react-select"
-import { Check, ChevronDown, ChevronUp } from "lucide-react"
-import { forwardRef, SelectHTMLAttributes } from 'react';
-import { cn } from '@/lib/utils';
-
-import { cn as oldCn } from "@/lib/utils"
+import {Check, ChevronDown} from "lucide-react"
+import {cn} from '@/lib/utils';
 
 const Select = SelectPrimitive.Root
 
