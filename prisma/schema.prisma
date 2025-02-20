@@ -12,7 +12,7 @@ model User {
   name         String?
   username     String   @unique
   password     String
-  hasOnboarded Boolean  @default(false)
+  hasOnboarded Boolean  @default(true)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
