@@ -141,9 +141,9 @@ export default function Screen(
                         ))}
                         <div ref={messagesEndRef}/>
                     </div>
-                    <div className="border-t">
+                    <div className="border-t mb-16 md:mb-0">
                         {showFeedbackBanner && (
-                            <div className="p-4 bg-blue-50 flex items-center justify-between mb-16 md:mb-0">
+                            <div className="p-4 bg-blue-50 flex items-center justify-between">
                                 <div className="text-sm text-blue-800 flex-1 pr-4">
                                     <p>{tf('helpMessage')}</p>
                                 </div>
