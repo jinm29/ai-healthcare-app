@@ -143,7 +143,7 @@ export default function Screen(
                     </div>
                     <div className="border-t">
                         {showFeedbackBanner && (
-                            <div className="p-4 bg-blue-50 flex items-center justify-between">
+                            <div className="p-4 bg-blue-50 flex items-center justify-between mb-16 md:mb-0">
                                 <div className="text-sm text-blue-800 flex-1 pr-4">
                                     <p>{tf('helpMessage')}</p>
                                 </div>
@@ -167,7 +167,7 @@ export default function Screen(
                                 </div>
                             </div>
                         )}
-                        <div className="p-4">
+                        <div className="border-t p-4 z-10 md:static fixed bottom-0 left-0 w-full bg-white">
                             <div className="flex gap-2">
                                 <Input
                                     placeholder={t('inputPlaceholder')}
