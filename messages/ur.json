@@ -2,7 +2,11 @@
   "HomePage": {
   },
   "Chat": {
-    "inputPlaceholder": "اپنا پیغام ٹائپ کریں..."
+    "inputPlaceholder": "اپنا پیغام لکھیں..."
+  },
+  "Feedback": {
+    "helpMessage": "اوپن ہیلتھ کی مدد کریں آپ اور دوسرے لوگوں کے صحت کے مسائل حل کرنے میں",
+    "shareFeedback": "رائے دیں"
   },
   "ChatSideBar": {
     "sources": "ذرائع",

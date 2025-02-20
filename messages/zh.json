@@ -2,7 +2,11 @@
   "HomePage": {
   },
   "Chat": {
-    "inputPlaceholder": "请输入您的消息..."
+    "inputPlaceholder": "输入消息..."
+  },
+  "Feedback": {
+    "helpMessage": "帮助 OpenHealth 解决您和更多人的健康问题",
+    "shareFeedback": "分享反馈"
   },
   "ChatSideBar": {
     "sources": "来源",

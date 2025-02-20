@@ -25,6 +25,7 @@ export default function Screen(
 ) {
     const {id} = useParams<{ id: string }>();
     const t = useTranslations('Chat')
+    const tf = useTranslations('Feedback')
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -33,6 +34,10 @@ export default function Screen(
     const [isJsonViewerOpen, setIsJsonViewerOpen] = useState(false);
     const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(!isMobile);
     const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(!isMobile);
+    const [showFeedbackBanner, setShowFeedbackBanner] = useState(() => {
+        if (typeof window === 'undefined') return true;
+        return localStorage.getItem('feedbackBannerClosed') !== 'true';
+    });
 
     const {data, mutate} = useSWR<ChatMessageListResponse>(`/api/chat-rooms/${id}/messages`, async (url: string) => {
         const response = await fetch(url);
@@ -99,6 +104,11 @@ export default function Screen(
         }
     };
 
+    const handleCloseFeedbackBanner = () => {
+        setShowFeedbackBanner(false);
+        localStorage.setItem('feedbackBannerClosed', 'true');
+    };
+
     return (
         <div className="h-screen flex flex-col">
             <div className="bg-white dark:bg-zinc-900 border-b h-14 flex items-center px-4 shrink-0">
@@ -115,7 +125,7 @@ export default function Screen(
                             href="https://tally.so/r/3xl2GE"
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors font-medium"
+                            className="text-blue-600 hover:text-blue-800 transition-colors font-medium"
                         >
                             Feedback
                         </a>
@@ -163,22 +173,49 @@ export default function Screen(
                         ))}
                         <div ref={messagesEndRef}/>
                     </div>
-                    <div className="p-4 border-t">
-                        <div className="flex gap-2">
-                            <Input
-                                placeholder={t('inputPlaceholder')}
-                                value={inputText}
-                                onChange={(e) => setInputText(e.target.value)}
-                                onKeyPress={(e) => {
-                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                        e.preventDefault();
-                                        handleSendMessage();
-                                    }
-                                }}
-                            />
-                            <Button onClick={handleSendMessage}>
-                                <Send className="w-4 h-4"/>
-                            </Button>
+                    <div className="border-t">
+                        {showFeedbackBanner && (
+                            <div className="p-4 bg-blue-50 flex items-center justify-between">
+                                <div className="text-sm text-blue-800 flex-1 pr-4">
+                                    <p>{tf('helpMessage')}</p>
+                                </div>
+                                <div className="flex gap-2 items-center shrink-0">
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-blue-600 border-blue-200 hover:bg-blue-100"
+                                        onClick={() => window.open('https://tally.so/r/3xl2GE', '_blank')}
+                                    >
+                                        {tf('shareFeedback')}
+                                    </Button>
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        className="h-8 w-8 text-gray-500 hover:text-gray-700"
+                                        onClick={handleCloseFeedbackBanner}
+                                    >
+                                        ✕
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+                        <div className="p-4">
+                            <div className="flex gap-2">
+                                <Input
+                                    placeholder={t('inputPlaceholder')}
+                                    value={inputText}
+                                    onChange={(e) => setInputText(e.target.value)}
+                                    onKeyPress={(e) => {
+                                        if (e.key === 'Enter' && !e.shiftKey) {
+                                            e.preventDefault();
+                                            handleSendMessage();
+                                        }
+                                    }}
+                                />
+                                <Button onClick={handleSendMessage}>
+                                    <Send className="w-4 h-4"/>
+                                </Button>
+                            </div>
                         </div>
                     </div>
                 </div>

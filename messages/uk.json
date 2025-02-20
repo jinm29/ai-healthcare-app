@@ -2,7 +2,11 @@
   "HomePage": {
   },
   "Chat": {
-    "inputPlaceholder": "Введіть ваше повідомлення..."
+    "inputPlaceholder": "Введіть повідомлення..."
+  },
+  "Feedback": {
+    "helpMessage": "Допоможіть OpenHealth вирішувати проблеми зі здоров'ям для вас та багатьох інших",
+    "shareFeedback": "Залишити відгук"
   },
   "ChatSideBar": {
     "sources": "Джерела",

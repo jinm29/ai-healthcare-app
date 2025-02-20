@@ -2,7 +2,11 @@
   "HomePage": {
   },
   "Chat": {
-    "inputPlaceholder": "Geben Sie Ihre Nachricht ein..."
+    "inputPlaceholder": "Nachricht eingeben..."
+  },
+  "Feedback": {
+    "helpMessage": "Helfen Sie OpenHealth, Gesundheitsprobleme für Sie und viele andere zu lösen",
+    "shareFeedback": "Feedback geben"
   },
   "ChatSideBar": {
     "sources": "Quellen",

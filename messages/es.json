@@ -4,6 +4,10 @@
   "Chat": {
     "inputPlaceholder": "Escribe tu mensaje..."
   },
+  "Feedback": {
+    "helpMessage": "Ayuda a OpenHealth a resolver problemas de salud para ti y muchas otras personas",
+    "shareFeedback": "Compartir opinión"
+  },
   "ChatSideBar": {
     "sources": "Fuentes",
     "numberOfFiles": "{value, number} archivos",
