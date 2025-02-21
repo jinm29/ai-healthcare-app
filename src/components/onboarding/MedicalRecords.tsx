@@ -1,4 +1,4 @@
-import {useState} from 'react';
+import {useRef, useState} from 'react';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Button} from '@/components/ui/button';
@@ -10,7 +10,10 @@ interface MedicalRecordsProps {
 }
 
 export default function MedicalRecords({value, onValueChange}: MedicalRecordsProps) {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+
     const [dragActive, setDragActive] = useState(false);
+
     const t = useTranslations('Onboarding.medicalRecords');
 
     const handleDrag = (e: React.DragEvent) => {
@@ -35,6 +38,10 @@ export default function MedicalRecords({value, onValueChange}: MedicalRecordsPro
         if (e.target.files) {
             onValueChange([...value, ...Array.from(e.target.files)]);
         }
+    };
+
+    const handleButtonClick = () => {
+        fileInputRef.current?.click();
     };
 
     const removeFile = (index: number) => {
@@ -86,8 +93,9 @@ export default function MedicalRecords({value, onValueChange}: MedicalRecordsPro
                                 onChange={handleFileInput}
                                 multiple
                                 accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                ref={fileInputRef}
                             />
-                            <Button type="button" variant="outline">
+                            <Button type="button" variant="outline" onClick={handleButtonClick}>
                                 {t('dragDrop.browse')}
                             </Button>
                         </Label>
