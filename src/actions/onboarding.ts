@@ -14,7 +14,7 @@ export async function onboardingSubmit(data: OnboardingSubmitRequest) {
     const userId = session?.user?.id
     if (userId === undefined) throw new Error('User not found')
 
-    await prisma.$transaction(async (prisma) => {
+    return prisma.$transaction(async (prisma) => {
         const personalInfo = await prisma.healthData.findFirst({
             where: {authorId: userId, type: 'PERSONAL_INFO'}
         })
@@ -48,7 +48,7 @@ export async function onboardingSubmit(data: OnboardingSubmitRequest) {
         // ChatRoom assistant modes 채팅 전부 생성
         const llmProvider = await prisma.lLMProvider.findFirstOrThrow({where: {providerId: 'openai'}})
         const assistantModes = await prisma.assistantMode.findMany({where: {authorId: userId}})
-        await prisma.chatRoom.createMany({
+        return prisma.chatRoom.createManyAndReturn({
             data: assistantModes.map((mode) => {
                 return {
                     name: 'New Chat',

@@ -16,10 +16,13 @@ import ProgressBar from '@/components/onboarding/ProgressBar';
 import NavigationButtons from '@/components/onboarding/NavigationButtons';
 import {onboardingSubmit} from "@/actions/onboarding";
 import {redirect} from "next/navigation";
+import {useTranslations} from "next-intl";
 
 const steps = [{id: 1}, {id: 2}, {id: 3}, {id: 4}, {id: 5}];
 
 export default function OnboardingPage() {
+    const t = useTranslations('Onboarding.healthSolver');
+
     const [currentStep, setCurrentStep] = useState(1);
     const [healthConcerns, setHealthConcerns] = useState('');
     const [personalInfo, setPersonalInfo] = useState<PersonalInfoData>({
@@ -108,7 +111,19 @@ export default function OnboardingPage() {
             })
         )
 
-        await onboardingSubmit({symptoms: healthConcerns, personalInfo});
+        const chatRooms = await onboardingSubmit({symptoms: healthConcerns, personalInfo});
+        const chatRoomIds = chatRooms.map((chatRoom) => chatRoom.id)
+
+        // Initial Chat Messages
+        await Promise.all(
+            chatRoomIds.map(async chatRoomId =>
+                fetch(`/api/chat-rooms/${chatRoomId}/messages`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({content: t('message'), role: 'USER'})
+                })
+            )
+        )
 
         // redirect to /
         redirect('/')
@@ -162,6 +177,7 @@ export default function OnboardingPage() {
                         isFirstStep={currentStep === 1}
                         isLastStep={currentStep === steps.length}
                         showSkip={currentStep === 4}
+                        showBack={currentStep !== steps.length}
                     />
                 </CardContent>
             </Card>

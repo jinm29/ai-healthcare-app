@@ -170,6 +170,9 @@
       "back": "Back",
       "next": "Next",
       "skip": "Skip"
+    },
+    "healthSolver": {
+      "message": "Tell me about my health issues"
     }
   }
 }
