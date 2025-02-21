@@ -69,7 +69,7 @@ export async function POST(
         await prisma.chatMessage.create({data: {content: body.content, role: body.role, chatRoomId: id}});
         const {assistantMode} = await prisma.chatRoom.update({
             where: {id},
-            data: {updatedAt: new Date()},
+            data: {lastActivityAt: new Date()},
             select: {assistantMode: {select: {systemPrompt: true}}}
         })
         const chatMessages = await prisma.chatMessage.findMany({
@@ -220,7 +220,7 @@ export async function POST(
                         }
                     });
                     await prisma.chatRoom.update({
-                        where: {id}, data: {updatedAt: new Date(), name: messageContent}
+                        where: {id}, data: {lastActivityAt: new Date(), name: messageContent}
                     })
                 });
             } catch (error) {

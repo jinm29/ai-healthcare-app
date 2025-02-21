@@ -211,7 +211,7 @@ export default function ChatSideBar({
                             >
                                 <div className="pr-8 font-medium truncate">{chatRoom.name}</div>
                                 <div
-                                    className="pr-8 text-xs text-gray-500 mt-0.5">{dayjs(chatRoom.updatedAt).format('L LT')}</div>
+                                    className="pr-8 text-xs text-gray-500 mt-0.5">{dayjs(chatRoom.lastActivityAt).format('L LT')}</div>
                                 <Button
                                     variant="ghost"
                                     className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 h-7 w-7"
