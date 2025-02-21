@@ -83,5 +83,96 @@
     "needSignUp": "需要账号？注册",
     "alreadyHaveAccount": "已有账号？登录",
     "signUp": "创建账号"
+  },
+  "Onboarding": {
+    "introduction": {
+      "title": "Health Solver",
+      "subtitle": "by OpenHealth",
+      "description": "有未解决的健康问题吗？\n让AI深入分析您的数据",
+      "privacyNotice": "您的收集数据仅用于解决您的健康问题。",
+      "runLocally": "您可以在本地运行",
+      "here": "这里"
+    },
+    "healthConcerns": {
+      "title": "健康问题",
+      "description": "请详细描述您当前的健康问题",
+      "placeholder": "示例：\n- 您有什么症状？\n- 什么时候开始的？\n- 什么会加重症状？\n- 您以前是否有过类似的症状？",
+      "error": "请描述您的健康问题"
+    },
+    "personalInfo": {
+      "title": "个人信息",
+      "description": "帮助我们更好地了解您的情况",
+      "gender": {
+        "label": "性别",
+        "male": "男",
+        "female": "女",
+        "error": "请选择您的性别"
+      },
+      "birthDate": {
+        "label": "出生日期",
+        "error": "请输入您的出生日期"
+      },
+      "height": {
+        "label": "身高",
+        "placeholder": {
+          "cm": "170",
+          "ft": "5.6"
+        },
+        "error": "请输入您的身高"
+      },
+      "weight": {
+        "label": "体重",
+        "placeholder": {
+          "kg": "65",
+          "lb": "143"
+        },
+        "error": "请输入您的体重"
+      },
+      "ethnicity": {
+        "label": "族裔",
+        "placeholder": "选择您的族裔",
+        "options": {
+          "east_asian": "东亚",
+          "southeast_asian": "东南亚",
+          "south_asian": "南亚",
+          "european": "欧洲",
+          "middle_eastern": "中东/北非",
+          "african": "非洲",
+          "african_american": "非裔美国人",
+          "pacific_islander": "太平洋岛民",
+          "native_american": "美洲原住民",
+          "hispanic": "西班牙裔/拉丁裔",
+          "mixed": "混合族裔",
+          "other": "其他"
+        },
+        "error": "请选择您的族裔"
+      },
+      "country": {
+        "label": "国家",
+        "placeholder": "输入您的国家名称",
+        "error": "请选择您的国家"
+      }
+    },
+    "medicalRecords": {
+      "title": "医疗记录",
+      "description": "上传您的医疗记录以获得更好的分析（可选）",
+      "dragDrop": {
+        "title": "将文件拖放到这里",
+        "or": "或",
+        "browse": "浏览文件",
+        "supportedFormats": "支持的格式：PDF、JPEG、PNG、DOC"
+      }
+    },
+    "analysis": {
+      "description": "AI正在分析您的健康数据以了解您的状况\n并提供个性化的健康见解"
+    },
+    "navigation": {
+      "back": "返回",
+      "next": "下一步",
+      "skip": "跳过"
+    },
+    "healthSolver": {
+      "message": "告诉我您的健康问题"
+    }
   }
 } 

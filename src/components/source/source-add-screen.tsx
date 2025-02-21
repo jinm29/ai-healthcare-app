@@ -25,6 +25,7 @@ import {HealthDataParserVisionModelListResponse} from "@/app/api/health-data-par
 import {HealthDataParserDocumentModelListResponse} from "@/app/api/health-data-parser/documents/[id]/models/route";
 import {ConditionalDeploymentEnv} from "@/components/common/deployment-env";
 import {useTranslations} from "next-intl";
+import {countries} from "@/lib/countries";
 
 const Select = dynamic(() => import('react-select'), {ssr: false});
 
@@ -92,9 +93,18 @@ const HealthDataType = {
     }
 };
 
-const personalInfoFields = (t: any): Field[] => {
+const personalInfoFields = (t: any, top: any): Field[] => {
     return [
         {key: 'name', label: t('name'), type: 'text'},
+        {
+            key: 'gender',
+            label: top('gender.label'),
+            type: 'select',
+            options: [
+                {value: 'male', label: top('gender.male')},
+                {value: 'female', label: top('gender.female')}
+            ]
+        },
         {key: 'birthDate', label: t('birthdate'), type: 'date'},
         {
             key: 'height',
@@ -131,6 +141,31 @@ const personalInfoFields = (t: any): Field[] => {
             ]
         },
         {
+            key: 'ethnicity',
+            label: top('ethnicity.label'),
+            type: 'select',
+            options: [
+                {value: 'east_asian', label: top('ethnicity.options.east_asian')},
+                {value: 'southeast_asian', label: top('ethnicity.options.southeast_asian')},
+                {value: 'south_asian', label: top('ethnicity.options.south_asian')},
+                {value: 'european', label: top('ethnicity.options.european')},
+                {value: 'middle_eastern', label: top('ethnicity.options.middle_eastern')},
+                {value: 'african', label: top('ethnicity.options.african')},
+                {value: 'african_american', label: top('ethnicity.options.african_american')},
+                {value: 'pacific_islander', label: top('ethnicity.options.pacific_islander')},
+                {value: 'native_american', label: top('ethnicity.options.native_american')},
+                {value: 'hispanic', label: top('ethnicity.options.hispanic')},
+                {value: 'mixed', label: top('ethnicity.options.mixed')},
+                {value: 'other', label: top('ethnicity.options.other')}
+            ],
+        },
+        {
+            key: 'country',
+            label: top('country.label'),
+            type: 'select',
+            options: countries.map(({code: value, name: label}) => ({value, label})),
+        },
+        {
             key: 'bloodType',
             label: t('bloodType'),
             type: 'select',
@@ -161,6 +196,7 @@ const AddSourceDialog: React.FC<AddSourceDialogProps> = ({
                                                              onAddSymptoms
                                                          }) => {
     const t = useTranslations('SourceManagement')
+
     const [open, setOpen] = useState(false);
     const [showSettingsAlert, setShowSettingsAlert] = useState(false);
     const [uploadStatus, setUploadStatus] = useState<string>('');
@@ -295,7 +331,11 @@ const HealthDataItem: React.FC<HealthDataItemProps> = ({healthData, isSelected, 
             return t('personalInfo')
         } else if (type === HealthDataType.SYMPTOMS.id && healthData.data) {
             const data = healthData.data as unknown as SymptomsData;
-            return `${t('symptoms')} (${data.date})`;
+            if (data.date) {
+                return `${t('symptoms')} (${data.date})`;
+            } else {
+                return `${t('symptoms')}`;
+            }
         }
         if (type === HealthDataType.FILE.id && healthData.data) {
             const data = healthData.data as any;
@@ -325,7 +365,6 @@ ${isSelected
                 )}
                 <Button
                     variant="ghost"
-                    size="icon"
                     onClick={(e) => {
                         e.stopPropagation();
                         onDelete(healthData.id);
@@ -340,6 +379,7 @@ ${isSelected
 
 const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: HealthDataPreviewProps) => {
     const t = useTranslations('SourceManagement')
+    const top = useTranslations('Onboarding.personalInfo');
 
     const [loading, setLoading] = useState<boolean>(false);
     const [numPages, setNumPages] = useState(0);
@@ -466,7 +506,7 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
     const getFields = (): Field[] => {
         switch (healthData.type) {
             case HealthDataType.PERSONAL_INFO.id:
-                return personalInfoFields(t);
+                return personalInfoFields(t, top);
             case HealthDataType.SYMPTOMS.id:
                 return symptomsFields(t);
             default:
@@ -1212,7 +1252,7 @@ export default function SourceAddScreen() {
                         <>
                             <div className="h-12 px-4 flex items-center justify-between border-t">
                                 <h2 className="text-sm font-medium">{t('parsingSettings')}</h2>
-                                <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+                                <Button variant="ghost" onClick={() => setIsOpen(false)}>
                                     <ChevronRight className="h-4 w-4"/>
                                 </Button>
                             </div>
@@ -1370,7 +1410,7 @@ export default function SourceAddScreen() {
                         </>
                     ) : (
                         <div className="h-12 flex items-center justify-center border-t">
-                            <Button variant="ghost" size="icon" onClick={() => setIsOpen(true)}>
+                            <Button variant="ghost" onClick={() => setIsOpen(true)}>
                                 <ChevronLeft className="h-4 w-4"/>
                             </Button>
                         </div>

@@ -83,5 +83,96 @@
     "needSignUp": "Need an account? Sign up",
     "alreadyHaveAccount": "Already have an account? Sign in",
     "signUp": "Create account"
+  },
+  "Onboarding": {
+    "introduction": {
+      "title": "Health Solver",
+      "subtitle": "by OpenHealth",
+      "description": "Having health issues that remain unsolved?\nLet AI deep dive into your data",
+      "privacyNotice": "Your data collected will only be used to solve your health issues.",
+      "runLocally": "You can run locally",
+      "here": "here"
+    },
+    "healthConcerns": {
+      "title": "Health Concerns",
+      "description": "Please describe your current health issues in detail",
+      "placeholder": "Example: \n- What symptoms are you experiencing?\n- When did they start?\n- What makes the symptoms worse?\n- Have you experienced similar symptoms before?",
+      "error": "Please describe your health concerns"
+    },
+    "personalInfo": {
+      "title": "Personal Information",
+      "description": "Help us understand your profile better",
+      "gender": {
+        "label": "Gender",
+        "male": "Male",
+        "female": "Female",
+        "error": "Please select your gender"
+      },
+      "birthDate": {
+        "label": "Birth Date",
+        "error": "Please enter your birth date"
+      },
+      "height": {
+        "label": "Height",
+        "placeholder": {
+          "cm": "170",
+          "ft": "5.6"
+        },
+        "error": "Please enter your height"
+      },
+      "weight": {
+        "label": "Weight",
+        "placeholder": {
+          "kg": "65",
+          "lb": "143"
+        },
+        "error": "Please enter your weight"
+      },
+      "ethnicity": {
+        "label": "Ethnicity",
+        "placeholder": "Select your ethnicity",
+        "options": {
+          "east_asian": "East Asian",
+          "southeast_asian": "Southeast Asian",
+          "south_asian": "South Asian",
+          "european": "European",
+          "middle_eastern": "Middle Eastern/North African",
+          "african": "African",
+          "african_american": "African American",
+          "pacific_islander": "Pacific Islander",
+          "native_american": "Native American/Indigenous",
+          "hispanic": "Hispanic/Latino",
+          "mixed": "Mixed Ethnicity",
+          "other": "Other"
+        },
+        "error": "Please select your ethnicity"
+      },
+      "country": {
+        "label": "Country",
+        "placeholder": "Type your country name",
+        "error": "Please select your country"
+      }
+    },
+    "medicalRecords": {
+      "title": "Medical Records",
+      "description": "Upload your medical records for better analysis (Optional)",
+      "dragDrop": {
+        "title": "Drag and drop your files here",
+        "or": "or",
+        "browse": "Browse Files",
+        "supportedFormats": "Supported formats: PDF, JPEG, PNG, DOC"
+      }
+    },
+    "analysis": {
+      "description": "AI is analyzing your health data to understand your condition\nand provide personalized health insights"
+    },
+    "navigation": {
+      "back": "Back",
+      "next": "Next",
+      "skip": "Skip"
+    },
+    "healthSolver": {
+      "message": "Tell me about my health issues"
+    }
   }
 }
