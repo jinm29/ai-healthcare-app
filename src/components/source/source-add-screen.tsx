@@ -186,6 +186,7 @@ const personalInfoFields = (t: any, top: any): Field[] => {
 
 const symptomsFields = (t: any): Field[] => [
     {key: 'date', label: t('date'), type: 'date'},
+    {key: 'endDate', label: t('endDate'), type: 'date'},
     {key: 'description', label: t('description'), type: 'textarea'}
 ];
 

@@ -64,6 +64,7 @@
     "uploadSymptoms": "증상 추가",
     "uploadSymptomsDescription": "오늘의 증상을 기록합니다.",
     "date": "날짜",
+    "endDate": "종료일",
     "description": "설명",
     "symptoms": "증상",
     "selectModel": "모델 선택",

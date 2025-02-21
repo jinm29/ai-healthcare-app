@@ -64,6 +64,7 @@
     "uploadSymptoms": "Новые симптомы",
     "uploadSymptomsDescription": "Записать сегодняшние симптомы.",
     "date": "Дата",
+    "endDate": "Дата окончания",
     "description": "Описание",
     "symptoms": "Симптомы",
     "selectModel": "Выбрать модель",

@@ -64,6 +64,7 @@
     "uploadSymptoms": "New Symptoms",
     "uploadSymptomsDescription": "Record today's symptoms.",
     "date": "Date",
+    "endDate": "End Date",
     "description": "Description",
     "symptoms": "Symptoms",
     "selectModel": "Select Model",

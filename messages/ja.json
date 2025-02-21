@@ -64,6 +64,7 @@
     "uploadSymptoms": "新規症状",
     "uploadSymptomsDescription": "今日の症状を記録。",
     "date": "日付",
+    "endDate": "終了日",
     "description": "説明",
     "symptoms": "症状",
     "selectModel": "モデルを選択",

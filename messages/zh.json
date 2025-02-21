@@ -64,6 +64,7 @@
     "uploadSymptoms": "新症状",
     "uploadSymptomsDescription": "记录今天的症状。",
     "date": "日期",
+    "endDate": "结束日期",
     "description": "描述",
     "symptoms": "症状",
     "selectModel": "选择模型",

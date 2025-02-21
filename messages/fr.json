@@ -64,6 +64,7 @@
     "uploadSymptoms": "Nouveaux symptômes",
     "uploadSymptomsDescription": "Enregistrer les symptômes d'aujourd'hui.",
     "date": "Date",
+    "endDate": "Date de fin",
     "description": "Description",
     "symptoms": "Symptômes",
     "selectModel": "Sélectionner le modèle",

@@ -64,6 +64,7 @@
     "uploadSymptoms": "Nuevos síntomas",
     "uploadSymptomsDescription": "Registrar los síntomas de hoy.",
     "date": "Fecha",
+    "endDate": "Fecha final",
     "description": "Descripción",
     "symptoms": "Síntomas",
     "selectModel": "Seleccionar modelo",
