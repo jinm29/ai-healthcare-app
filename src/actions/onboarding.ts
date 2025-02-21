@@ -47,7 +47,12 @@ export async function onboardingSubmit(data: OnboardingSubmitRequest) {
 
         // ChatRoom assistant modes 채팅 전부 생성
         const llmProvider = await prisma.lLMProvider.findFirstOrThrow({where: {providerId: 'openai'}})
-        const assistantModes = await prisma.assistantMode.findMany({where: {authorId: userId}})
+        const assistantModes = await prisma.assistantMode.findMany({
+            where: {
+                authorId: userId,
+                name: {in: ['Root Cause Analysis & Long Term Health.', 'Family Medicine', 'Best Doctor']}
+            }
+        })
         return prisma.chatRoom.createManyAndReturn({
             data: assistantModes.map((mode) => {
                 return {
