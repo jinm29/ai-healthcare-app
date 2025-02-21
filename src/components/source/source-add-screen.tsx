@@ -295,7 +295,11 @@ const HealthDataItem: React.FC<HealthDataItemProps> = ({healthData, isSelected, 
             return t('personalInfo')
         } else if (type === HealthDataType.SYMPTOMS.id && healthData.data) {
             const data = healthData.data as unknown as SymptomsData;
-            return `${t('symptoms')} (${data.date})`;
+            if (data.date) {
+                return `${t('symptoms')} (${data.date})`;
+            } else {
+                return `${t('symptoms')}`;
+            }
         }
         if (type === HealthDataType.FILE.id && healthData.data) {
             const data = healthData.data as any;
