@@ -15,6 +15,7 @@ export async function onboardingSubmit(data: OnboardingSubmitRequest) {
     if (userId === undefined) throw new Error('User not found')
 
     return prisma.$transaction(async (prisma) => {
+        const user = await prisma.user.findUniqueOrThrow({where: {id: userId}})
         const personalInfo = await prisma.healthData.findFirst({
             where: {authorId: userId, type: 'PERSONAL_INFO'}
         })
@@ -28,7 +29,15 @@ export async function onboardingSubmit(data: OnboardingSubmitRequest) {
             country: data.personalInfo.country,
         }
         if (personalInfo === null) {
-            await prisma.healthData.create({data: {type: 'PERSONAL_INFO', authorId: userId, data: personalInfoData}})
+            await prisma.healthData.create({
+                data: {
+                    type: 'PERSONAL_INFO',
+                    authorId: userId,
+                    data: personalInfoData,
+                    createdAt: user.createdAt,
+                    updatedAt: user.updatedAt
+                }
+            })
         } else {
             await prisma.healthData.update({where: {id: personalInfo.id}, data: {data: personalInfoData}})
         }
