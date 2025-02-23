@@ -1,12 +1,8 @@
 FROM node:lts-alpine
 LABEL authors="OpenHealth"
 
-# Generate the encryption key and set it as an environment variable
-RUN ENCRYPTION_KEY=$(head -c 32 /dev/urandom | base64) && \
-    echo "ENCRYPTION_KEY=${ENCRYPTION_KEY}" >> /etc/environment
-
-# Set the environment variable for subsequent layers
-ENV ENCRYPTION_KEY=${ENCRYPTION_KEY}
+# Install coreutils for head
+RUN apk add coreutils
 
 RUN apk add -U graphicsmagick
 
@@ -18,7 +14,8 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build && \
+RUN export ENCRYPTION_KEY=$(head -c 32 /dev/urandom | base64) && \
+    npm run build && \
     adduser --disabled-password ohuser && \
     chown -R ohuser .
 
