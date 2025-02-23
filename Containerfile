@@ -1,12 +1,11 @@
 FROM node:lts-alpine
 LABEL authors="OpenHealth"
 
-# Generate the encryption key and set it as a build argument
-ARG ENCRYPTION_KEY
-RUN export ENCRYPTION_KEY=$(head -c 32 /dev/urandom | base64) && \
-    echo "Encryption Key: $ENCRYPTION_KEY" && \
+# Generate the encryption key and set it as an environment variable
+RUN ENCRYPTION_KEY=$(head -c 32 /dev/urandom | base64) && \
+    echo "ENCRYPTION_KEY=${ENCRYPTION_KEY}" >> /etc/environment
 
-# Set the environment variable for the subsequent layers
+# Set the environment variable for subsequent layers
 ENV ENCRYPTION_KEY=${ENCRYPTION_KEY}
 
 RUN apk add -U graphicsmagick
