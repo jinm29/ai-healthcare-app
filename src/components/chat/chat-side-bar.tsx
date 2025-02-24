@@ -209,12 +209,12 @@ export default function ChatSideBar({
                                     ${chatRoomId === chatRoom.id ? 'bg-gray-100' : ''}`}
                                 href={`/chat/${chatRoom.id}`}
                             >
-                                <div className="pr-8 font-medium truncate">{chatRoom.name}</div>
+                                <div className="pr-12 font-medium truncate">{chatRoom.name}</div>
                                 <div
-                                    className="pr-8 text-xs text-gray-500 mt-0.5">{dayjs(chatRoom.lastActivityAt).format('L LT')}</div>
+                                    className="pr-12 text-xs text-gray-500 mt-0.5">{dayjs(chatRoom.lastActivityAt).format('L LT')}</div>
                                 <Button
                                     variant="ghost"
-                                    className="absolute right-1 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 h-7 w-7"
+                                    className="absolute right-1 top-1/2 -translate-y-1/2"
                                     onClick={(e) => handleDeleteChat(chatRoom.id, e)}
                                 >
                                     <Trash2 className="h-4 w-4 text-gray-500 hover:text-red-500"/>
