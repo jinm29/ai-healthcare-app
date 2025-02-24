@@ -1,7 +1,8 @@
 FROM node:lts-alpine
 LABEL authors="OpenHealth"
 
-ARG DATABASE_URL=${DATABASE_URL}
+# Install coreutils for head
+RUN apk add coreutils
 
 RUN apk add -U graphicsmagick
 
@@ -13,7 +14,8 @@ RUN npm install
 
 COPY . .
 
-RUN npm run build && \
+RUN export ENCRYPTION_KEY=$(head -c 32 /dev/urandom | base64) && \
+    npm run build && \
     adduser --disabled-password ohuser && \
     chown -R ohuser .
 
