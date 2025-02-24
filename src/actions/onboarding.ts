@@ -58,7 +58,10 @@ export async function onboardingSubmit(data: OnboardingSubmitRequest) {
         const llmProvider = await prisma.lLMProvider.findFirstOrThrow({where: {providerId: 'openai'}})
         const assistantModes = await prisma.assistantMode.findMany({
             where: {
-                authorId: userId,
+                OR: [
+                    {authorId: userId, visibility: 'PRIVATE'},
+                    {visibility: 'PUBLIC'},
+                ],
                 name: {in: ['Root Cause Analysis & Long Term Health.', 'Family Medicine', 'Best Doctor']}
             }
         })

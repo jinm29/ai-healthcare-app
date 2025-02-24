@@ -66,13 +66,14 @@ model ChatMessage {
 }
 
 model AssistantMode {
-  id           String   @id @default(cuid())
+  id           String                  @id @default(cuid())
   name         String
   description  String
   systemPrompt String
+  visibility   AssistantModeVisibility @default(PRIVATE)
   authorId     String?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt    DateTime                @default(now())
+  updatedAt    DateTime                @updatedAt
 
   chatRoom ChatRoom[]
   author   User?      @relation(fields: [authorId], references: [id])
@@ -96,4 +97,9 @@ model LLMProvider {
 enum ChatRole {
   USER
   ASSISTANT
+}
+
+enum AssistantModeVisibility {
+  PUBLIC
+  PRIVATE
 }

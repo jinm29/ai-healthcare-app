@@ -19,7 +19,12 @@ export async function GET() {
     }
 
     const assistantModes = await prisma.assistantMode.findMany({
-        where: {authorId: session.user.id},
+        where: {
+            OR: [
+                {authorId: session.user.id, visibility: 'PRIVATE'},
+                {visibility: 'PUBLIC'},
+            ],
+        },
         orderBy: {id: 'asc'},
     })
 

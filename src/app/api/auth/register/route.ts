@@ -30,7 +30,8 @@ export async function POST(request: Request) {
             await prisma.assistantMode.createMany({
                 data: assistantModeSeed.map((mode) => ({
                     ...mode,
-                    authorId: user.id
+                    authorId: user.id,
+                    visibility: 'PRIVATE',
                 })),
             });
 
