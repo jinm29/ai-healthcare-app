@@ -1,18 +1,23 @@
 import crypto from 'crypto';
+import {PHASE_PRODUCTION_BUILD} from "next/constants";
 
 // Encryption algorithm configuration
 const algorithm = 'aes-256-cbc';
 
-// Retrieve the Base64-encoded encryption key from the environment variable
-const keyBase64 = process.env.ENCRYPTION_KEY;
-if (!keyBase64) {
-    throw new Error('The ENCRYPTION_KEY environment variable is not set.');
-}
+function getEncryptionKey(): Buffer {
+    // Retrieve the Base64-encoded encryption key from the environment variable
+    const keyBase64 = process.env.ENCRYPTION_KEY;
+    if (!keyBase64) {
+        throw new Error('The ENCRYPTION_KEY environment variable is not set.');
+    }
 
-// Decode the key (must be 32 bytes for 256-bit encryption)
-const key = Buffer.from(keyBase64, 'base64');
-if (key.length !== 32) {
-    throw new Error('ENCRYPTION_KEY must be a Base64-encoded 32-byte key.');
+    // Decode the key (must be 32 bytes for 256-bit encryption)
+    const key = Buffer.from(keyBase64, 'base64');
+    if (key.length !== 32) {
+        throw new Error('ENCRYPTION_KEY must be a Base64-encoded 32-byte key.');
+    }
+
+    return key;
 }
 
 /**
@@ -24,7 +29,7 @@ if (key.length !== 32) {
 export function encrypt(text: string): string {
     // Generate a new IV for each encryption (16 bytes)
     const iv = crypto.randomBytes(16);
-    const cipher = crypto.createCipheriv(algorithm, key, iv);
+    const cipher = crypto.createCipheriv(algorithm, getEncryptionKey(), iv);
 
     // Perform encryption
     const encryptedBuffer = Buffer.concat([
@@ -52,7 +57,7 @@ export function decrypt(base64Data: string): string {
     const iv = combinedBuffer.subarray(0, 16);
     const encryptedText = combinedBuffer.subarray(16);
 
-    const decipher = crypto.createDecipheriv(algorithm, key, iv);
+    const decipher = crypto.createDecipheriv(algorithm, getEncryptionKey(), iv);
     const decryptedBuffer = Buffer.concat([
         decipher.update(encryptedText),
         decipher.final()
@@ -61,3 +66,6 @@ export function decrypt(base64Data: string): string {
     // Return the decrypted plaintext as a UTF-8 string
     return decryptedBuffer.toString('utf8');
 }
+
+// Check if the encryption key is available not in production build
+if (process.env.NEXT_PHASE !== PHASE_PRODUCTION_BUILD) getEncryptionKey();
