@@ -3,3 +3,9 @@
 *docker-compose*
 node_modules
 .env.*
+.next
+.trigger
+.idea
+.github
+i18n/readme
+intro
