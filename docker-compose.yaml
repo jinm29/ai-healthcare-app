@@ -19,8 +19,6 @@ services:
     build:
       context: .
       dockerfile: Containerfile
-      args:
-        - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
     depends_on:
       - database
       - docling-serve
