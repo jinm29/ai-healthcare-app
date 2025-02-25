@@ -155,7 +155,9 @@ export const newPost = task({
         console.log(redditPost)
 
         // Get the post from Reddit API
+        const whitelist = ['Root Cause Analysis & Long Term Health.', 'Family Medicine', 'Best Doctor']
         for (const {name, description} of assistantModes) {
+            if (!whitelist.includes(name)) continue
             const assistantMode = await prisma.assistantMode.findFirst({where: {name, description}})
             if (assistantMode) {
                 await commentOnPost.trigger({
