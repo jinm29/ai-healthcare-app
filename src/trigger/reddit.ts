@@ -94,6 +94,8 @@ async function createPostComment({postId, content, accessToken}: {
                 updatedAt: new Date(created_utc * 1000),
             }
         })
+    } else {
+        throw new Error('Failed to comment on the post')
     }
 
     // Wait for the rate limit to reset
