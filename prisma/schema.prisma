@@ -94,6 +94,42 @@ model LLMProvider {
   author    User?      @relation(fields: [authorId], references: [id])
 }
 
+model RedditAccessToken {
+  id          String   @id @default(cuid())
+  username    String
+  accessToken String
+  tokenType   String
+  expiresIn   Int
+  scope       String
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([username, expiresAt])
+}
+
+model RedditPost {
+  id        String   @id @default(cuid())
+  postId    String   @unique
+  title     String
+  content   String
+  createdAt DateTime
+  updatedAt DateTime
+
+  redditPostComments RedditPostComment[]
+}
+
+model RedditPostComment {
+  id        String   @id @default(cuid())
+  postId    String
+  commentId String   @unique
+  content   String
+  createdAt DateTime
+  updatedAt DateTime
+
+  redditPost RedditPost @relation(fields: [postId], references: [postId])
+}
+
 enum ChatRole {
   USER
   ASSISTANT
