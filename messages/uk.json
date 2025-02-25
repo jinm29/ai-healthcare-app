@@ -2,11 +2,11 @@
   "HomePage": {
   },
   "Chat": {
-    "inputPlaceholder": "Введіть повідомлення..."
+    "inputPlaceholder": "Введіть ваше повідомлення..."
   },
   "Feedback": {
     "helpMessage": "Допоможіть OpenHealth вирішувати проблеми зі здоров'ям для вас та багатьох інших",
-    "shareFeedback": "Залишити відгук"
+    "shareFeedback": "Поділитися відгуком"
   },
   "ChatSideBar": {
     "sources": "Джерела",
@@ -28,12 +28,31 @@
     "modelSettings": "Налаштування моделі",
     "systemPrompt": "Системний промпт",
     "assistantMode": "Режим асистента",
+    "addAssistant": "Додати асистента",
     "selectModel": "Вибрати модель",
     "selectCompany": "Вибрати компанію",
     "noModelsFound": "Моделі не знайдено.",
-    "enterApiKey": "Введіть API ключ",
+    "enterApiKey": "Введіть API-ключ",
     "show": "Показати",
     "hide": "Приховати"
+  },
+  "AssistantPage": {
+    "backToChat": "Повернутися до чату",
+    "addNewAssistant": "Додати нового асистента",
+    "createCustomAssistant": "Створіть власного асистента з вашими налаштуваннями",
+    "assistantName": "Ім'я асистента",
+    "assistantNamePlaceholder": "наприклад, Медичний асистент",
+    "description": "Опис",
+    "descriptionPlaceholder": "Опишіть, що робить цей асистент...",
+    "descriptionHelp": "Надайте детальний опис призначення та можливостей асистента.",
+    "systemPrompt": "Системний промпт",
+    "systemPromptPlaceholder": "Введіть системний промпт для цього асистента...",
+    "systemPromptHelp": "Системний промпт визначає поведінку та базу знань асистента.",
+    "context": "Контекст",
+    "contextPlaceholder": "Додайте будь-який додатковий контекст для цього асистента...",
+    "contextHelp": "Додатковий контекст допомагає асистенту розуміти конкретні галузі або потреби користувача.",
+    "cancel": "Скасувати",
+    "createAssistant": "Створити асистента"
   },
   "SourceManagement": {
     "title": "Керування джерелами",
