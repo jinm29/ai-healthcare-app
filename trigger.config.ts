@@ -1,5 +1,6 @@
 import {defineConfig} from "@trigger.dev/sdk/v3";
 import {aptGet} from "@trigger.dev/build/extensions/core";
+import {prismaExtension} from "@trigger.dev/build/extensions/prisma";
 
 export default defineConfig({
     project: process.env.TRIGGER_PROJECT_ID as string,
@@ -18,7 +19,10 @@ export default defineConfig({
     },
     build: {
         extensions: [
-            aptGet({packages: ["ghostscript", "graphicsmagick"]})
+            aptGet({packages: ["ghostscript", "graphicsmagick"]}),
+            prismaExtension({
+                schema: "prisma/schema.prisma",
+            }),
         ]
     },
     dirs: ["./src/trigger"],
