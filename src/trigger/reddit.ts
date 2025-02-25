@@ -75,36 +75,34 @@ async function createPostComment({postId, content, accessToken}: {
     })
 
     const {json} = await commentResponse.json()
-    const {data, errors} = json
-
-    // Handle errors
-    if (errors) {
-        const headers = commentResponse.headers
-        const xRateLimitReset = headers.get('x-ratelimit-reset')
-        if (xRateLimitReset) {
-            const waitUntil = Number(xRateLimitReset)
-            if (waitUntil > 0) {
-                await wait.for({seconds: waitUntil})
-                throw new Error('Rate Limit Exceeded')
-            }
-        }
-    }
+    console.log(JSON.stringify(json, null, 2))
+    const {data} = json
 
     // Save the comment to the database
-    const {things} = data
-    const [comment] = things
-    const {data: commentData} = comment
-    const {id: commentId, created_utc} = commentData
+    if (data) {
+        const {things} = data
+        const [comment] = things
+        const {data: commentData} = comment
+        const {id: commentId, created_utc} = commentData
 
-    await prisma.redditPostComment.create({
-        data: {
-            postId: postId,
-            commentId: commentId,
-            content: content.toString(),
-            createdAt: new Date(created_utc * 1000),
-            updatedAt: new Date(created_utc * 1000),
-        }
-    })
+        await prisma.redditPostComment.create({
+            data: {
+                postId: postId,
+                commentId: commentId,
+                content: content.toString(),
+                createdAt: new Date(created_utc * 1000),
+                updatedAt: new Date(created_utc * 1000),
+            }
+        })
+    }
+
+    // Wait for the rate limit to reset
+    const headers = commentResponse.headers
+    const xRateLimitReset = headers.get('x-ratelimit-reset')
+    if (xRateLimitReset) {
+        const waitUntil = Number(xRateLimitReset)
+        if (waitUntil > 0) await wait.for({seconds: waitUntil})
+    }
 
     return commentResponse
 }
