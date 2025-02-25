@@ -56,7 +56,7 @@ export async function GET(
             const modelList = models.data;
             results.push(...modelList.filter((model) => {
                 if (currentDeploymentEnv === 'cloud') {
-                    return model.id.startsWith('claude-3-5');
+                    return model.id.startsWith('claude-3-5') || model.id.startsWith('claude-3-7');
                 }
                 return true;
             }).map(
