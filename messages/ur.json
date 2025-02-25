@@ -5,8 +5,8 @@
     "inputPlaceholder": "اپنا پیغام لکھیں..."
   },
   "Feedback": {
-    "helpMessage": "اوپن ہیلتھ کی مدد کریں آپ اور دوسرے لوگوں کے صحت کے مسائل حل کرنے میں",
-    "shareFeedback": "رائے دیں"
+    "helpMessage": "اوپن ہیلتھ کو آپ اور بہت سے دوسرے لوگوں کے صحت کے مسائل حل کرنے میں مدد کریں",
+    "shareFeedback": "رائے شیئر کریں"
   },
   "ChatSideBar": {
     "sources": "ذرائع",
@@ -28,12 +28,31 @@
     "modelSettings": "ماڈل کی ترتیبات",
     "systemPrompt": "سسٹم پرامپٹ",
     "assistantMode": "اسسٹنٹ موڈ",
+    "addAssistant": "اسسٹنٹ شامل کریں",
     "selectModel": "ماڈل منتخب کریں",
     "selectCompany": "کمپنی منتخب کریں",
     "noModelsFound": "کوئی ماڈل نہیں ملا۔",
     "enterApiKey": "API کلید درج کریں",
     "show": "دکھائیں",
     "hide": "چھپائیں"
+  },
+  "AssistantPage": {
+    "backToChat": "چیٹ پر واپس جائیں",
+    "addNewAssistant": "نیا اسسٹنٹ شامل کریں",
+    "createCustomAssistant": "اپنی ترتیبات کے ساتھ ایک حسب ضرورت اسسٹنٹ بنائیں",
+    "assistantName": "اسسٹنٹ کا نام",
+    "assistantNamePlaceholder": "مثال کے طور پر، میڈیکل اسسٹنٹ",
+    "description": "تفصیل",
+    "descriptionPlaceholder": "بیان کریں کہ یہ اسسٹنٹ کیا کرتا ہے...",
+    "descriptionHelp": "اسسٹنٹ کے مقصد اور صلاحیتوں کی تفصیلی وضاحت فراہم کریں۔",
+    "systemPrompt": "سسٹم پرامپٹ",
+    "systemPromptPlaceholder": "اس اسسٹنٹ کے لیے سسٹم پرامپٹ درج کریں...",
+    "systemPromptHelp": "سسٹم پرامپٹ اسسٹنٹ کے رویے اور علم کی بنیاد کو متعین کرتا ہے۔",
+    "context": "سیاق و سباق",
+    "contextPlaceholder": "اس اسسٹنٹ کے لیے کوئی اضافی سیاق و سباق شامل کریں...",
+    "contextHelp": "اضافی سیاق و سباق اسسٹنٹ کو مخصوص شعبوں یا صارف کی ضروریات کو سمجھنے میں مدد کرتا ہے۔",
+    "cancel": "منسوخ کریں",
+    "createAssistant": "اسسٹنٹ بنائیں"
   },
   "SourceManagement": {
     "title": "ذرائع کا انتظام",

@@ -138,47 +138,34 @@ export default function ChatSideBar({
     }
 
     return <>
-        <div className={`border-r bg-gray-50 flex flex-col transition-all duration-300 ease-in-out overflow-clip
-          ${isLeftSidebarOpen ? 'w-72' : 'w-0'} relative`}>
-            <div className={`absolute inset-0 ${isLeftSidebarOpen ? 'opacity-100' : 'opacity-0'} 
-                transition-opacity duration-300 overflow-hidden flex flex-col`}>
-                <div className="border-b bg-white">
-                    <div className="p-4 space-y-3">
-                        {healthDataList.length > 0 ? (
-                            <>
-                                <div className="flex items-center justify-between">
-                                    <div className="space-y-1">
-                                        <h3 className="text-sm font-medium tracking-tight">{t('sources')}</h3>
-                                        <div className="flex gap-3 text-xs text-gray-500">
-                                            <span>{t('numberOfFiles', {value: healthDataList.length})}</span>
-                                            <span>{t('countOfTokens', {value: totalTokens.toLocaleString()})}</span>
-                                        </div>
+        <div className="h-full flex flex-col overflow-hidden">
+            <div className="border-b bg-white">
+                <div className="p-4 space-y-3">
+                    {healthDataList.length > 0 ? (
+                        <>
+                            <div className="flex items-center justify-between">
+                                <div className="space-y-1">
+                                    <h3 className="text-sm font-medium tracking-tight">{t('sources')}</h3>
+                                    <div className="flex gap-3 text-xs text-gray-500">
+                                        <span>{t('numberOfFiles', {value: healthDataList.length})}</span>
+                                        <span>{t('countOfTokens', {value: totalTokens.toLocaleString()})}</span>
                                     </div>
-                                    <TooltipProvider>
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <Button size="sm" variant="ghost"
-                                                        onClick={() => setJsonViewerOpen(true)}
-                                                        className="h-7 hover:bg-gray-100">
-                                                    <FileText className="w-3 h-3"/>
-                                                </Button>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                                <p>{t('viewAggregatedSources')}</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                    </TooltipProvider>
                                 </div>
-                                <Button
-                                    className="w-full justify-start"
-                                    variant="outline"
-                                    onClick={() => router.push('/source')}
-                                >
-                                    <Files className="w-3 h-3 mr-2"/>
-                                    {t('manageSources')}
-                                </Button>
-                            </>
-                        ) : (
+                                <TooltipProvider>
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button size="sm" variant="ghost"
+                                                    onClick={() => setJsonViewerOpen(true)}
+                                                    className="h-7 hover:bg-gray-100">
+                                                <FileText className="w-3 h-3"/>
+                                            </Button>
+                                        </TooltipTrigger>
+                                        <TooltipContent>
+                                            <p>{t('viewAggregatedSources')}</p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                </TooltipProvider>
+                            </div>
                             <Button
                                 className="w-full justify-start"
                                 variant="outline"
@@ -187,53 +174,52 @@ export default function ChatSideBar({
                                 <Files className="w-3 h-3 mr-2"/>
                                 {t('manageSources')}
                             </Button>
-                        )}
-                    </div>
-                </div>
-
-                <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                    <Button
-                        variant="outline"
-                        className="w-full justify-start"
-                        onClick={handleStartNewChat}
-                    >
-                        <MessageCircle className="w-3 h-3 mr-2"/>
-                        {t('newChat')}
-                    </Button>
-
-                    <div className="space-y-1">
-                        {chatRooms?.map((chatRoom) => (
-                            <Link
-                                key={chatRoom.id}
-                                className={`group block w-full text-left p-2.5 rounded-md text-sm hover:bg-gray-100 transition-colors relative
-                                    ${chatRoomId === chatRoom.id ? 'bg-gray-100' : ''}`}
-                                href={`/chat/${chatRoom.id}`}
-                            >
-                                <div className="pr-12 font-medium truncate">{chatRoom.name}</div>
-                                <div
-                                    className="pr-12 text-xs text-gray-500 mt-0.5">{dayjs(chatRoom.lastActivityAt).format('L LT')}</div>
-                                <Button
-                                    variant="ghost"
-                                    className="absolute right-1 top-1/2 -translate-y-1/2"
-                                    onClick={(e) => handleDeleteChat(chatRoom.id, e)}
-                                >
-                                    <Trash2 className="h-4 w-4 text-gray-500 hover:text-red-500"/>
-                                </Button>
-                            </Link>
-                        ))}
-                    </div>
+                        </>
+                    ) : (
+                        <Button
+                            className="w-full justify-start"
+                            variant="outline"
+                            onClick={() => router.push('/source')}
+                        >
+                            <Files className="w-3 h-3 mr-2"/>
+                            {t('manageSources')}
+                        </Button>
+                    )}
                 </div>
             </div>
-            {!isLeftSidebarOpen && (
-                <div className="flex flex-col items-center pt-4 gap-4">
-                    <Button variant="ghost">
-                        <Files className="h-4 w-4"/>
-                    </Button>
-                    <Button variant="ghost">
-                        <MessageCircle className="h-4 w-4"/>
-                    </Button>
+
+            <div className="flex-1 overflow-y-auto p-4 space-y-3">
+                <Button
+                    variant="outline"
+                    className="w-full justify-start"
+                    onClick={handleStartNewChat}
+                >
+                    <MessageCircle className="w-3 h-3 mr-2"/>
+                    {t('newChat')}
+                </Button>
+
+                <div className="space-y-1">
+                    {chatRooms?.map((chatRoom) => (
+                        <Link
+                            key={chatRoom.id}
+                            className={`group block w-full text-left p-2.5 rounded-md text-sm hover:bg-gray-100 transition-colors relative
+                                ${chatRoomId === chatRoom.id ? 'bg-gray-100' : ''}`}
+                            href={`/chat/${chatRoom.id}`}
+                        >
+                            <div className="pr-12 font-medium truncate">{chatRoom.name}</div>
+                            <div
+                                className="pr-12 text-xs text-gray-500 mt-0.5">{dayjs(chatRoom.lastActivityAt).format('L LT')}</div>
+                            <Button
+                                variant="ghost"
+                                className="absolute right-1 top-1/2 -translate-y-1/2"
+                                onClick={(e) => handleDeleteChat(chatRoom.id, e)}
+                            >
+                                <Trash2 className="h-4 w-4 text-gray-500 hover:text-red-500"/>
+                            </Button>
+                        </Link>
+                    ))}
                 </div>
-            )}
+            </div>
         </div>
 
         <Dialog open={jsonViewerOpen} onOpenChange={setJsonViewerOpen}>

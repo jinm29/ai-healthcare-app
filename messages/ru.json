@@ -2,11 +2,11 @@
   "HomePage": {
   },
   "Chat": {
-    "inputPlaceholder": "Введите сообщение..."
+    "inputPlaceholder": "Введите ваше сообщение..."
   },
   "Feedback": {
     "helpMessage": "Помогите OpenHealth решать проблемы со здоровьем для вас и многих других",
-    "shareFeedback": "Оставить отзыв"
+    "shareFeedback": "Поделиться отзывом"
   },
   "ChatSideBar": {
     "sources": "Источники",
@@ -28,12 +28,31 @@
     "modelSettings": "Настройки модели",
     "systemPrompt": "Системный промпт",
     "assistantMode": "Режим ассистента",
+    "addAssistant": "Добавить ассистента",
     "selectModel": "Выбрать модель",
     "selectCompany": "Выбрать компанию",
     "noModelsFound": "Модели не найдены.",
-    "enterApiKey": "Введите API ключ",
+    "enterApiKey": "Введите API-ключ",
     "show": "Показать",
     "hide": "Скрыть"
+  },
+  "AssistantPage": {
+    "backToChat": "Вернуться к чату",
+    "addNewAssistant": "Добавить нового ассистента",
+    "createCustomAssistant": "Создайте собственного ассистента с вашими настройками",
+    "assistantName": "Имя ассистента",
+    "assistantNamePlaceholder": "например, Медицинский ассистент",
+    "description": "Описание",
+    "descriptionPlaceholder": "Опишите, что делает этот ассистент...",
+    "descriptionHelp": "Предоставьте подробное описание назначения и возможностей ассистента.",
+    "systemPrompt": "Системный промпт",
+    "systemPromptPlaceholder": "Введите системный промпт для этого ассистента...",
+    "systemPromptHelp": "Системный промпт определяет поведение и базу знаний ассистента.",
+    "context": "Контекст",
+    "contextPlaceholder": "Добавьте любой дополнительный контекст для этого ассистента...",
+    "contextHelp": "Дополнительный контекст помогает ассистенту понимать конкретные области или потребности пользователя.",
+    "cancel": "Отмена",
+    "createAssistant": "Создать ассистента"
   },
   "SourceManagement": {
     "title": "Управление источниками",

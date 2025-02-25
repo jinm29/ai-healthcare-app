@@ -2,10 +2,10 @@
   "HomePage": {
   },
   "Chat": {
-    "inputPlaceholder": "输入消息..."
+    "inputPlaceholder": "输入您的消息..."
   },
   "Feedback": {
-    "helpMessage": "帮助 OpenHealth 解决您和更多人的健康问题",
+    "helpMessage": "帮助OpenHealth解决您和许多其他人的健康问题",
     "shareFeedback": "分享反馈"
   },
   "ChatSideBar": {
@@ -26,14 +26,33 @@
   },
   "ChatSettingSideBar": {
     "modelSettings": "模型设置",
-    "systemPrompt": "系统提示",
+    "systemPrompt": "系统提示词",
     "assistantMode": "助手模式",
+    "addAssistant": "添加助手",
     "selectModel": "选择模型",
     "selectCompany": "选择公司",
     "noModelsFound": "未找到模型。",
     "enterApiKey": "输入API密钥",
     "show": "显示",
     "hide": "隐藏"
+  },
+  "AssistantPage": {
+    "backToChat": "返回聊天",
+    "addNewAssistant": "添加新助手",
+    "createCustomAssistant": "使用您自己的设置创建自定义助手",
+    "assistantName": "助手名称",
+    "assistantNamePlaceholder": "例如，医疗助手",
+    "description": "描述",
+    "descriptionPlaceholder": "描述这个助手的功能...",
+    "descriptionHelp": "提供助手目的和功能的详细描述。",
+    "systemPrompt": "系统提示词",
+    "systemPromptPlaceholder": "输入此助手的系统提示词...",
+    "systemPromptHelp": "系统提示词定义了助手的行为和知识库。",
+    "context": "上下文",
+    "contextPlaceholder": "为此助手添加任何额外的上下文...",
+    "contextHelp": "额外的上下文有助于助手理解特定领域或用户需求。",
+    "cancel": "取消",
+    "createAssistant": "创建助手"
   },
   "SourceManagement": {
     "title": "来源管理",

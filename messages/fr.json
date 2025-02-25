@@ -5,8 +5,8 @@
     "inputPlaceholder": "Tapez votre message..."
   },
   "Feedback": {
-    "helpMessage": "Aidez OpenHealth à résoudre les problèmes de santé pour vous et beaucoup d'autres",
-    "shareFeedback": "Partager un avis"
+    "helpMessage": "Aidez OpenHealth à résoudre des problèmes de santé pour vous et beaucoup d'autres",
+    "shareFeedback": "Partager un retour"
   },
   "ChatSideBar": {
     "sources": "Sources",
@@ -28,12 +28,31 @@
     "modelSettings": "Paramètres du modèle",
     "systemPrompt": "Prompt système",
     "assistantMode": "Mode assistant",
-    "selectModel": "Sélectionner le modèle",
-    "selectCompany": "Sélectionner l'entreprise",
+    "addAssistant": "Ajouter un assistant",
+    "selectModel": "Sélectionner un modèle",
+    "selectCompany": "Sélectionner une entreprise",
     "noModelsFound": "Aucun modèle trouvé.",
     "enterApiKey": "Entrer la clé API",
     "show": "Afficher",
     "hide": "Masquer"
+  },
+  "AssistantPage": {
+    "backToChat": "Retour au chat",
+    "addNewAssistant": "Ajouter un nouvel assistant",
+    "createCustomAssistant": "Créez un assistant personnalisé avec vos propres paramètres",
+    "assistantName": "Nom de l'assistant",
+    "assistantNamePlaceholder": "ex., Assistant médical",
+    "description": "Description",
+    "descriptionPlaceholder": "Décrivez ce que fait cet assistant...",
+    "descriptionHelp": "Fournissez une description détaillée de l'objectif et des capacités de l'assistant.",
+    "systemPrompt": "Prompt système",
+    "systemPromptPlaceholder": "Entrez le prompt système pour cet assistant...",
+    "systemPromptHelp": "Le prompt système définit le comportement et la base de connaissances de l'assistant.",
+    "context": "Contexte",
+    "contextPlaceholder": "Ajoutez tout contexte supplémentaire pour cet assistant...",
+    "contextHelp": "Le contexte supplémentaire aide l'assistant à comprendre des domaines spécifiques ou les besoins de l'utilisateur.",
+    "cancel": "Annuler",
+    "createAssistant": "Créer l'assistant"
   },
   "SourceManagement": {
     "title": "Gestion des sources",
