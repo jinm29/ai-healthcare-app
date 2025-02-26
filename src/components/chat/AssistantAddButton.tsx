@@ -7,7 +7,7 @@ import Link from "next/link";
 
 export function AssistantAddButton() {
   return (
-    <Link href="/assistant/add">
+    <Link href="/assistant-modes/add">
       <Button variant="outline" size="sm" className="gap-2 w-full">
         <Plus className="h-4 w-4" />
         Add Assistant

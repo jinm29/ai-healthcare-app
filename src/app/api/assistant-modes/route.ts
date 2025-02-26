@@ -1,15 +1,26 @@
-import {NextResponse} from "next/server";
+import {NextRequest, NextResponse} from "next/server";
 import prisma, {Prisma} from "@/lib/prisma";
 import {auth} from "@/auth";
 
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface AssistantMode extends Prisma.AssistantModeGetPayload<{
     select: { id: true, name: true, description: true, systemPrompt: true }
 }> {
+    id: string
 }
 
 export interface AssistantModeListResponse {
     assistantModes: AssistantMode[]
+}
+
+export interface AssistantModeCreateRequest {
+    name: string;
+    description: string;
+    systemPrompt: string;
+    context: string;
+}
+
+export interface AssistantModeCreateResponse extends AssistantMode {
+    id: string;
 }
 
 export async function GET() {
@@ -31,4 +42,25 @@ export async function GET() {
     return NextResponse.json<AssistantModeListResponse>({
         assistantModes
     })
+}
+
+export async function POST(req: NextRequest) {
+    const session = await auth()
+    if (!session || !session.user) {
+        return NextResponse.json({message: "Unauthorized"}, {status: 401});
+    }
+
+    const data: AssistantModeCreateRequest = await req.json()
+
+    const assistantMode = await prisma.assistantMode.create({
+        data: {
+            name: data.name,
+            description: data.description,
+            systemPrompt: data.systemPrompt,
+            authorId: session.user.id,
+            visibility: 'PRIVATE'
+        }
+    })
+
+    return NextResponse.json<AssistantModeCreateResponse>(assistantMode)
 }

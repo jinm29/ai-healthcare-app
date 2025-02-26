@@ -265,7 +265,7 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
                     <h4 className="text-sm font-medium">{t('assistantMode')}</h4>
-                    <Link href="/assistant/add" className="inline-flex items-center text-xs text-blue-600 hover:text-blue-800">
+                    <Link href="/assistant-modes/add" className="inline-flex items-center text-xs text-blue-600 hover:text-blue-800">
                         <Plus className="mr-1 h-3 w-3" />
                         {t('addAssistant')}
                     </Link>
