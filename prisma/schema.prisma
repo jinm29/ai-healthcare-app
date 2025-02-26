@@ -78,9 +78,20 @@ model AssistantMode {
   createdAt          DateTime                @default(now())
   updatedAt          DateTime                @updatedAt
 
+  contexts    AssistantModeContext[]
   chatRoom    ChatRoom[]
-  llmProvider LLMProvider? @relation(fields: [llmProviderId], references: [id])
-  author      User?        @relation(fields: [authorId], references: [id])
+  llmProvider LLMProvider?           @relation(fields: [llmProviderId], references: [id])
+  author      User?                  @relation(fields: [authorId], references: [id])
+}
+
+model AssistantModeContext {
+  id              String   @id @default(cuid())
+  assistantModeId String
+  data            String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  assistantMode AssistantMode @relation(fields: [assistantModeId], references: [id])
 }
 
 model LLMProvider {

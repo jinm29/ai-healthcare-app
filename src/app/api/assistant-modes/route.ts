@@ -58,7 +58,12 @@ export async function POST(req: NextRequest) {
             description: data.description,
             systemPrompt: data.systemPrompt,
             authorId: session.user.id,
-            visibility: 'PRIVATE'
+            visibility: 'PRIVATE',
+            contexts: {
+                create: {
+                    data: data.context,
+                }
+            }
         }
     })
 
