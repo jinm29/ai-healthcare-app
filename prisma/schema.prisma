@@ -78,10 +78,11 @@ model AssistantMode {
   createdAt          DateTime                @default(now())
   updatedAt          DateTime                @updatedAt
 
-  contexts    AssistantModeContext[]
-  chatRoom    ChatRoom[]
-  llmProvider LLMProvider?           @relation(fields: [llmProviderId], references: [id])
-  author      User?                  @relation(fields: [authorId], references: [id])
+  contexts          AssistantModeContext[]
+  chatRoom          ChatRoom[]
+  llmProvider       LLMProvider?           @relation(fields: [llmProviderId], references: [id])
+  author            User?                  @relation(fields: [authorId], references: [id])
+  redditPostComment RedditPostComment[]
 }
 
 model AssistantModeContext {
@@ -136,14 +137,16 @@ model RedditPost {
 }
 
 model RedditPostComment {
-  id        String   @id @default(cuid())
-  postId    String
-  commentId String   @unique
-  content   String
-  createdAt DateTime
-  updatedAt DateTime
+  id              String   @id @default(cuid())
+  postId          String
+  commentId       String   @unique
+  assistantModeId String
+  content         String
+  createdAt       DateTime
+  updatedAt       DateTime
 
-  redditPost RedditPost @relation(fields: [postId], references: [postId])
+  redditPost    RedditPost    @relation(fields: [postId], references: [postId])
+  assistantMode AssistantMode @relation(fields: [assistantModeId], references: [id])
 }
 
 enum ChatRole {
