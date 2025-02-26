@@ -127,7 +127,8 @@ export default function Screen(
                     <NavLinks/>
                     <div className="flex items-center gap-1">
                         <LogoutButton/>
-                        <Button variant="ghost" size="default" onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}>
+                        <Button variant="ghost" size="default"
+                                onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}>
                             <Settings className="w-4 h-4"/>
                         </Button>
                     </div>
@@ -138,7 +139,7 @@ export default function Screen(
                 {/* Left sidebar */}
                 {isLeftSidebarOpen && (
                     <div className="w-72 border-r bg-gray-50 flex flex-col overflow-hidden">
-                        <ChatSideBar chatRoomId={id} isLeftSidebarOpen={true} />
+                        <ChatSideBar chatRoomId={id} isLeftSidebarOpen={true}/>
                     </div>
                 )}
 
@@ -200,7 +201,7 @@ export default function Screen(
                 {/* Right sidebar */}
                 {isRightSidebarOpen && (
                     <div className="w-80 border-l bg-gray-50 flex flex-col overflow-y-auto">
-                        <ChatSettingSideBar chatRoomId={id} isRightSidebarOpen={true} />
+                        <ChatSettingSideBar chatRoomId={id}/>
                     </div>
                 )}
             </div>

@@ -17,11 +17,10 @@ import Link from "next/link";
 import {Plus} from "lucide-react";
 
 interface ChatSettingSideBarProps {
-    isRightSidebarOpen: boolean;
     chatRoomId: string;
 }
 
-export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: ChatSettingSideBarProps
+export default function ChatSettingSideBar({chatRoomId}: ChatSettingSideBarProps
 ) {
     const t = useTranslations('ChatSettingSideBar')
 
@@ -265,8 +264,9 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
             <div className="space-y-3">
                 <div className="flex items-center justify-between">
                     <h4 className="text-sm font-medium">{t('assistantMode')}</h4>
-                    <Link href="/assistant-modes/add" className="inline-flex items-center text-xs text-blue-600 hover:text-blue-800">
-                        <Plus className="mr-1 h-3 w-3" />
+                    <Link href="/assistant-modes/add"
+                          className="inline-flex items-center text-xs text-blue-600 hover:text-blue-800">
+                        <Plus className="mr-1 h-3 w-3"/>
                         {t('addAssistant')}
                     </Link>
                 </div>
@@ -276,7 +276,7 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
                             key={assistantMode.id}
                             className={`w-full p-3 rounded-lg text-left border transition-colors
                         ${selectedAssistantMode?.id === assistantMode.id ? 'bg-white border-gray-300' :
-                                    'border-transparent hover:bg-gray-100'}`}
+                                'border-transparent hover:bg-gray-100'}`}
                             onClick={async () => {
                                 await onChangeChatRoom({assistantModeId: assistantMode.id});
                             }}
