@@ -13,13 +13,14 @@ import {LLMProviderModel, LLMProviderModelListResponse} from "@/app/api/llm-prov
 import {cn} from "@/lib/utils";
 import {ConditionalDeploymentEnv} from "@/components/common/deployment-env";
 import {useTranslations} from "next-intl";
+import Link from "next/link";
+import {Plus} from "lucide-react";
 
 interface ChatSettingSideBarProps {
-    isRightSidebarOpen: boolean;
     chatRoomId: string;
 }
 
-export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: ChatSettingSideBarProps
+export default function ChatSettingSideBar({chatRoomId}: ChatSettingSideBarProps
 ) {
     const t = useTranslations('ChatSettingSideBar')
 
@@ -176,111 +177,114 @@ export default function ChatSettingSideBar({isRightSidebarOpen, chatRoomId}: Cha
         await onChangeChatRoom({llmProviderId: selectedLLMProvider.id, llmProviderModelId: null});
     }
 
-    return <div className={`border-l bg-gray-50 flex flex-col transition-all duration-300 ease-in-out
-          ${isRightSidebarOpen ? 'w-80' : 'w-0'} relative`}>
-        <div className={`absolute inset-0 ${isRightSidebarOpen ? 'opacity-100' : 'opacity-0'}
-            transition-opacity duration-300 overflow-y-auto`}>
-            <div className="p-4 space-y-4">
-                <div className="space-y-4">
-                    <h4 className="text-sm font-medium">{t('modelSettings')}</h4>
-                    <div className="space-y-2">
-                        <Select value={selectedLLMProvider?.id}
-                                onValueChange={(value) => {
-                                    setSelectedLLMProvider(llmProvidersData?.llmProviders.find((provider) => provider.id === value));
-                                    setLLMProviderModels([])
-                                    setSelectedLLMProviderModel(undefined);
-                                    onChangeChatRoom({llmProviderId: value, llmProviderModelId: null});
-                                }}>
-                            <SelectTrigger>
-                                <SelectValue placeholder={t('selectCompany')}/>
-                            </SelectTrigger>
-                            <SelectContent className={cn('bg-white')}>
-                                {llmProvidersData?.llmProviders.map((provider) => <SelectItem
-                                    key={provider.id}
-                                    value={provider.id}>{provider.name}</SelectItem>)}
-                            </SelectContent>
-                        </Select>
-                        <Select value={selectedLLMProviderModel?.id}
-                                onValueChange={(value) => setSelectedLLMProviderModel(llmProviderModels.find((model) => model.id === value))}>
-                            <SelectTrigger>
-                                <SelectValue placeholder={t('selectModel')}/>
-                            </SelectTrigger>
-                            <SelectContent className={cn('bg-white')}>
-                                {llmProviderModels.map((model) => (
-                                    <SelectItem key={model.id} value={model.id}>
-                                        {model.name}
-                                    </SelectItem>
-                                ))}
-
-                                {llmProviderModels.length === 0 && (
-                                    <div className="p-2 text-sm text-gray-500">{t('noModelsFound')}</div>
-                                )}
-                            </SelectContent>
-                        </Select>
-
-                        <ConditionalDeploymentEnv env={['local']}>
-                            {selectedLLMProvider && (['ollama', 'openai'].includes(selectedLLMProvider.providerId)) && (
-                                <Input
-                                    type="text"
-                                    placeholder={`API endpoint (default: ${selectedLLMProvider?.providerId === 'ollama' ? 'http://localhost:11434' : 'https://api.openai.com/v1'})`}
-                                    value={selectedLLMProvider?.apiURL}
-                                    onChange={(e) => onLLMProviderChange({apiURL: e.target.value})}
-                                />
-                            )}
-                            {selectedLLMProvider?.providerId !== 'ollama' && (
-                                <div className="relative">
-                                    <Input
-                                        type={showApiKey ? "text" : "password"}
-                                        placeholder={t('enterApiKey')}
-                                        value={selectedLLMProvider?.apiKey || ''}
-                                        onChange={(e) => onLLMProviderChange({apiKey: e.target.value})}
-                                        className="pr-16"
-                                    />
-                                    <button
-                                        className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-sm text-gray-500 hover:text-gray-700"
-                                        onClick={() => setShowApiKey(!showApiKey)}
-                                    >
-                                        {showApiKey ? t('hide') : t('show')}
-                                    </button>
-                                </div>
-                            )}
-                        </ConditionalDeploymentEnv>
-                    </div>
-                </div>
-
+    return <div className="h-full overflow-y-auto">
+        <div className="p-4 space-y-4">
+            <div className="space-y-4">
+                <h4 className="text-sm font-medium">{t('modelSettings')}</h4>
                 <div className="space-y-2">
-                    <label className="text-sm font-medium">{t('systemPrompt')}</label>
-                    <Textarea
-                        value={selectedAssistantMode?.systemPrompt || ''}
-                        onChange={async (e) => {
-                            if (selectedAssistantMode) {
-                                setSelectedAssistantMode({...selectedAssistantMode, systemPrompt: e.target.value});
-                                await onChangeAssistantMode(selectedAssistantMode.id, {systemPrompt: e.target.value});
-                            }
-                        }}
-                        rows={6}
-                        className="resize-none"
-                    />
-                </div>
+                    <Select value={selectedLLMProvider?.id}
+                            onValueChange={(value) => {
+                                setSelectedLLMProvider(llmProvidersData?.llmProviders.find((provider) => provider.id === value));
+                                setLLMProviderModels([])
+                                setSelectedLLMProviderModel(undefined);
+                                onChangeChatRoom({llmProviderId: value, llmProviderModelId: null});
+                            }}>
+                        <SelectTrigger>
+                            <SelectValue placeholder={t('selectCompany')}/>
+                        </SelectTrigger>
+                        <SelectContent className={cn('bg-white')}>
+                            {llmProvidersData?.llmProviders.map((provider) => <SelectItem
+                                key={provider.id}
+                                value={provider.id}>{provider.name}</SelectItem>)}
+                        </SelectContent>
+                    </Select>
+                    <Select value={selectedLLMProviderModel?.id}
+                            onValueChange={(value) => setSelectedLLMProviderModel(llmProviderModels.find((model) => model.id === value))}>
+                        <SelectTrigger>
+                            <SelectValue placeholder={t('selectModel')}/>
+                        </SelectTrigger>
+                        <SelectContent className={cn('bg-white')}>
+                            {llmProviderModels.map((model) => (
+                                <SelectItem key={model.id} value={model.id}>
+                                    {model.name}
+                                </SelectItem>
+                            ))}
 
-                <div className="space-y-3">
+                            {llmProviderModels.length === 0 && (
+                                <div className="p-2 text-sm text-gray-500">{t('noModelsFound')}</div>
+                            )}
+                        </SelectContent>
+                    </Select>
+
+                    <ConditionalDeploymentEnv env={['local']}>
+                        {selectedLLMProvider && (['ollama', 'openai'].includes(selectedLLMProvider.providerId)) && (
+                            <Input
+                                type="text"
+                                placeholder={`API endpoint (default: ${selectedLLMProvider?.providerId === 'ollama' ? 'http://localhost:11434' : 'https://api.openai.com/v1'})`}
+                                value={selectedLLMProvider?.apiURL}
+                                onChange={(e) => onLLMProviderChange({apiURL: e.target.value})}
+                            />
+                        )}
+                        {selectedLLMProvider?.providerId !== 'ollama' && (
+                            <div className="relative">
+                                <Input
+                                    type={showApiKey ? "text" : "password"}
+                                    placeholder={t('enterApiKey')}
+                                    value={selectedLLMProvider?.apiKey || ''}
+                                    onChange={(e) => onLLMProviderChange({apiKey: e.target.value})}
+                                    className="pr-16"
+                                />
+                                <button
+                                    className="absolute right-2 top-1/2 -translate-y-1/2 px-2 py-1 text-sm text-gray-500 hover:text-gray-700"
+                                    onClick={() => setShowApiKey(!showApiKey)}
+                                >
+                                    {showApiKey ? t('hide') : t('show')}
+                                </button>
+                            </div>
+                        )}
+                    </ConditionalDeploymentEnv>
+                </div>
+            </div>
+
+            <div className="space-y-2">
+                <label className="text-sm font-medium">{t('systemPrompt')}</label>
+                <Textarea
+                    value={selectedAssistantMode?.systemPrompt || ''}
+                    onChange={async (e) => {
+                        if (selectedAssistantMode) {
+                            setSelectedAssistantMode({...selectedAssistantMode, systemPrompt: e.target.value});
+                            await onChangeAssistantMode(selectedAssistantMode.id, {systemPrompt: e.target.value});
+                        }
+                    }}
+                    rows={6}
+                    className="resize-none"
+                />
+            </div>
+
+            <div className="space-y-3">
+                <div className="flex items-center justify-between">
                     <h4 className="text-sm font-medium">{t('assistantMode')}</h4>
-                    <div className="space-y-2">
-                        {assistantModes.map((assistantMode) => (
-                            <button
-                                key={assistantMode.id}
-                                className={`w-full p-3 rounded-lg text-left border transition-colors
+                    <Link href="/assistant-modes/add"
+                          className="inline-flex items-center text-xs text-blue-600 hover:text-blue-800">
+                        <Plus className="mr-1 h-3 w-3"/>
+                        {t('addAssistant')}
+                    </Link>
+                </div>
+                <div className="space-y-2">
+                    {assistantModes.map((assistantMode) => (
+                        <button
+                            key={assistantMode.id}
+                            className={`w-full p-3 rounded-lg text-left border transition-colors
                         ${selectedAssistantMode?.id === assistantMode.id ? 'bg-white border-gray-300' :
-                                    'border-transparent hover:bg-gray-100'}`}
-                                onClick={async () => {
-                                    await onChangeChatRoom({assistantModeId: assistantMode.id});
-                                }}
-                            >
-                                <div className="text-sm font-medium">{assistantMode.name}</div>
-                                <div className="text-xs text-gray-500">{assistantMode.description}</div>
-                            </button>
-                        ))}
-                    </div>
+                                'border-transparent hover:bg-gray-100'}`}
+                            onClick={async () => {
+                                await onChangeChatRoom({assistantModeId: assistantMode.id});
+                            }}
+                        >
+                            <div className="text-sm font-medium">{assistantMode.name}</div>
+                            <div className="text-xs text-gray-500">{assistantMode.description}</div>
+                        </button>
+                    ))}
                 </div>
             </div>
         </div>

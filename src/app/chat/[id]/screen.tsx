@@ -127,7 +127,8 @@ export default function Screen(
                     <NavLinks/>
                     <div className="flex items-center gap-1">
                         <LogoutButton/>
-                        <Button variant="ghost" size="default" onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}>
+                        <Button variant="ghost" size="default"
+                                onClick={() => setIsRightSidebarOpen(!isRightSidebarOpen)}>
                             <Settings className="w-4 h-4"/>
                         </Button>
                     </div>
@@ -135,8 +136,14 @@ export default function Screen(
             </div>
 
             <div className="flex-1 flex overflow-hidden">
-                <ChatSideBar chatRoomId={id} isLeftSidebarOpen={isLeftSidebarOpen}/>
+                {/* Left sidebar */}
+                {isLeftSidebarOpen && (
+                    <div className="w-72 border-r bg-gray-50 flex flex-col overflow-hidden">
+                        <ChatSideBar chatRoomId={id} isLeftSidebarOpen={true}/>
+                    </div>
+                )}
 
+                {/* Main content */}
                 <div className="flex-1 flex flex-col bg-white min-w-0">
                     <div className="flex-1 overflow-y-auto p-2 space-y-2">
                         {messages.map((message, index) => (
@@ -191,10 +198,12 @@ export default function Screen(
                     </div>
                 </div>
 
-                <ChatSettingSideBar
-                    chatRoomId={id}
-                    isRightSidebarOpen={isRightSidebarOpen}
-                />
+                {/* Right sidebar */}
+                {isRightSidebarOpen && (
+                    <div className="w-80 border-l bg-gray-50 flex flex-col overflow-y-auto">
+                        <ChatSettingSideBar chatRoomId={id}/>
+                    </div>
+                )}
             </div>
 
             <Dialog open={isJsonViewerOpen} onOpenChange={setIsJsonViewerOpen}>
