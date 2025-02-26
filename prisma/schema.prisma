@@ -67,17 +67,20 @@ model ChatMessage {
 }
 
 model AssistantMode {
-  id           String                  @id @default(cuid())
-  name         String
-  description  String
-  systemPrompt String
-  visibility   AssistantModeVisibility @default(PRIVATE)
-  authorId     String?
-  createdAt    DateTime                @default(now())
-  updatedAt    DateTime                @updatedAt
+  id                 String                  @id @default(cuid())
+  name               String
+  description        String
+  systemPrompt       String
+  visibility         AssistantModeVisibility @default(PRIVATE)
+  authorId           String?
+  llmProviderId      String?
+  llmProviderModelId String?
+  createdAt          DateTime                @default(now())
+  updatedAt          DateTime                @updatedAt
 
-  chatRoom ChatRoom[]
-  author   User?      @relation(fields: [authorId], references: [id])
+  chatRoom    ChatRoom[]
+  llmProvider LLMProvider? @relation(fields: [llmProviderId], references: [id])
+  author      User?        @relation(fields: [authorId], references: [id])
 }
 
 model LLMProvider {
@@ -91,8 +94,9 @@ model LLMProvider {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
-  chatRooms ChatRoom[]
-  author    User?      @relation(fields: [authorId], references: [id])
+  assistantModes AssistantMode[]
+  author         User?           @relation(fields: [authorId], references: [id])
+  chatRooms      ChatRoom[]
 }
 
 model RedditAccessToken {
