@@ -94,8 +94,6 @@ async function createPostComment({postId, content, accessToken}: {
                 updatedAt: new Date(created_utc * 1000),
             }
         })
-    } else {
-        throw new Error('Failed to comment on the post')
     }
 
     // Wait for the rate limit to reset
@@ -105,6 +103,8 @@ async function createPostComment({postId, content, accessToken}: {
         const waitUntil = Number(xRateLimitReset)
         if (waitUntil > 0) await wait.for({seconds: waitUntil})
     }
+
+    if (!data) throw new Error('Failed to comment on the post')
 
     return commentResponse
 }
