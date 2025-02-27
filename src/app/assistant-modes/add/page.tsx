@@ -36,10 +36,14 @@ export default function AddAssistantPage() {
 
         try {
             // Here you would typically send the data to your API
+            const {isPublic, ...rest} = formData;
             const response = await fetch('/api/assistant-modes', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(formData),
+                body: JSON.stringify({
+                    ...rest,
+                    visibility: isPublic ? 'PUBLIC' : 'PRIVATE',
+                }),
             });
 
             if (response.ok) {
@@ -119,7 +123,8 @@ export default function AddAssistantPage() {
                                 className="mt-0.5"
                             />
                             <div>
-                                <label htmlFor="isPublic" className="block text-sm font-medium text-gray-700 cursor-pointer">
+                                <label htmlFor="isPublic"
+                                       className="block text-sm font-medium text-gray-700 cursor-pointer">
                                     {t('isPublic')}
                                 </label>
                                 <p className="text-xs text-gray-500 mt-1">

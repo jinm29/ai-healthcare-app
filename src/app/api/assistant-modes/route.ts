@@ -17,6 +17,7 @@ export interface AssistantModeCreateRequest {
     description: string;
     systemPrompt: string;
     context: string;
+    visibility: 'PUBLIC' | 'PRIVATE';
 }
 
 export interface AssistantModeCreateResponse extends AssistantMode {
@@ -58,7 +59,7 @@ export async function POST(req: NextRequest) {
             description: data.description,
             systemPrompt: data.systemPrompt,
             authorId: session.user.id,
-            visibility: 'PRIVATE',
+            visibility: data.visibility,
             contexts: {
                 create: {
                     data: data.context,
