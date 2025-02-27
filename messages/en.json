@@ -45,6 +45,8 @@
     "description": "Description",
     "descriptionPlaceholder": "Describe what this assistant does...",
     "descriptionHelp": "Provide a detailed description of the assistant's purpose and capabilities.",
+    "isPublic": "Make this assistant public",
+    "isPublicHelp": "If public, others can use this assistant. Share your learning with others.",
     "systemPrompt": "System Prompt",
     "systemPromptPlaceholder": "Enter the system prompt for this assistant...",
     "systemPromptHelp": "The system prompt defines the assistant's behavior and knowledge base.",

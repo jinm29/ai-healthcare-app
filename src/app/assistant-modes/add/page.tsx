@@ -7,6 +7,7 @@ import {Textarea} from "@/components/ui/textarea";
 import {ArrowLeft} from "lucide-react";
 import {useRouter} from "next/navigation";
 import {useTranslations} from "next-intl";
+import {Checkbox} from "@/components/ui/checkbox";
 
 export default function AddAssistantPage() {
     const router = useRouter();
@@ -16,6 +17,7 @@ export default function AddAssistantPage() {
         description: "",
         systemPrompt: "",
         context: "",
+        isPublic: false, // Default to private
     });
 
     const handleChange = (
@@ -23,6 +25,10 @@ export default function AddAssistantPage() {
     ) => {
         const {name, value} = e.target;
         setFormData((prev) => ({...prev, [name]: value}));
+    };
+
+    const handleCheckboxChange = (checked: boolean) => {
+        setFormData((prev) => ({...prev, isPublic: checked}));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -103,6 +109,23 @@ export default function AddAssistantPage() {
                             <p className="text-xs text-gray-500 mt-1">
                                 {t('descriptionHelp')}
                             </p>
+                        </div>
+
+                        <div className="flex items-start space-x-2 py-2">
+                            <Checkbox
+                                id="isPublic"
+                                checked={formData.isPublic}
+                                onCheckedChange={handleCheckboxChange}
+                                className="mt-0.5"
+                            />
+                            <div>
+                                <label htmlFor="isPublic" className="block text-sm font-medium text-gray-700 cursor-pointer">
+                                    {t('isPublic')}
+                                </label>
+                                <p className="text-xs text-gray-500 mt-1">
+                                    {t('isPublicHelp')}
+                                </p>
+                            </div>
                         </div>
 
                         <div>
