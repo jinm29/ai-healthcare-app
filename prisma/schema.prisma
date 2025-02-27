@@ -126,12 +126,13 @@ model RedditAccessToken {
 }
 
 model RedditPost {
-  id        String   @id @default(cuid())
-  postId    String   @unique
-  title     String
-  content   String
-  createdAt DateTime
-  updatedAt DateTime
+  id                      String   @id @default(cuid())
+  postId                  String   @unique
+  title                   String
+  content                 String
+  isMedicalAdviceRequired Boolean  @default(true)
+  createdAt               DateTime
+  updatedAt               DateTime
 
   redditPostComments RedditPostComment[]
 }
