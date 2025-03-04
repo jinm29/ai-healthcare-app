@@ -6,7 +6,9 @@
   },
   "Feedback": {
     "helpMessage": "오픈헬스를 도와 당신의 건강문제와 더 많은 사람들의 건강문제를 해결할 수 있도록 해주세요",
-    "shareFeedback": "피드백 남기기"
+    "shareFeedback": "피드백 남기기",
+    "needHelpWithYourIssue": "문제 해결이 필요하신가요?",
+    "askADoctor": "의사에게 문의"
   },
   "ChatSideBar": {
     "sources": "소스",

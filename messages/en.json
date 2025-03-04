@@ -6,7 +6,9 @@
   },
   "Feedback": {
     "helpMessage": "Help OpenHealth solve health problems for you and many others",
-    "shareFeedback": "Share Feedback"
+    "shareFeedback": "Share Feedback",
+    "needHelpWithYourIssue": "Need Help with Your Issue?",
+    "askADoctor": "Ask a Doctor"
   },
   "ChatSideBar": {
     "sources": "Sources",

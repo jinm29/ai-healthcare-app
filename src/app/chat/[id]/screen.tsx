@@ -16,6 +16,7 @@ import {ChatRole} from "@prisma/client";
 import ChatSettingSideBar from "@/components/chat/chat-setting-side-bar";
 import {useTranslations} from "next-intl";
 import {NavLinks} from "@/components/ui/nav-links";
+import {useSession} from "next-auth/react";
 
 interface ScreenProps {
     isMobile: boolean;
@@ -25,6 +26,7 @@ export default function Screen(
     {isMobile}: ScreenProps
 ) {
     const {id} = useParams<{ id: string }>();
+    const {data: auth} = useSession()
     const t = useTranslations('Chat')
     const tf = useTranslations('Feedback')
 
@@ -35,19 +37,12 @@ export default function Screen(
     const [isJsonViewerOpen, setIsJsonViewerOpen] = useState(false);
     const [isLeftSidebarOpen, setIsLeftSidebarOpen] = useState(!isMobile);
     const [isRightSidebarOpen, setIsRightSidebarOpen] = useState(!isMobile);
-    const [showFeedbackBanner, setShowFeedbackBanner] = useState<boolean>();
 
     const {data, mutate} = useSWR<ChatMessageListResponse>(`/api/chat-rooms/${id}/messages`, async (url: string) => {
         const response = await fetch(url);
         return response.json();
     });
     const messages = useMemo(() => data?.chatMessages || [], [data]);
-
-    useEffect(() => {
-        if (showFeedbackBanner === undefined) {
-            setShowFeedbackBanner(!localStorage.getItem('feedbackBannerClosed'));
-        }
-    }, [showFeedbackBanner]);
 
     useEffect(() => {
         if (messagesEndRef.current) {
@@ -108,11 +103,6 @@ export default function Screen(
         }
     };
 
-    const handleCloseFeedbackBanner = () => {
-        setShowFeedbackBanner(false);
-        localStorage.setItem('feedbackBannerClosed', 'true');
-    };
-
     return (
         <div className="h-screen flex flex-col">
             <div className="bg-white dark:bg-zinc-900 border-b h-14 flex items-center px-4 shrink-0">
@@ -151,32 +141,28 @@ export default function Screen(
                         ))}
                         <div ref={messagesEndRef}/>
                     </div>
-                    <div className="border-t mb-16 md:mb-0">
-                        {showFeedbackBanner && (
-                            <div className="p-4 bg-blue-50 flex items-center justify-between">
-                                <div className="text-sm text-blue-800 flex-1 pr-4">
-                                    <p>{tf('helpMessage')}</p>
-                                </div>
-                                <div className="flex gap-2 items-center shrink-0">
-                                    <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="text-blue-600 border-blue-200 hover:bg-blue-100"
-                                        onClick={() => window.open('https://tally.so/r/3xl2GE', '_blank')}
-                                    >
-                                        {tf('shareFeedback')}
-                                    </Button>
-                                    <Button
-                                        variant="ghost"
-                                        size="default"
-                                        className="h-8 w-8 text-gray-500 hover:text-gray-700"
-                                        onClick={handleCloseFeedbackBanner}
-                                    >
-                                        ✕
-                                    </Button>
-                                </div>
+                    <div className="mb-16 md:mb-0">
+                        <div className="p-4 flex items-center justify-between">
+                            <div className="text-sm text-blue-800 flex-1 pr-4"/>
+                            <div className="flex gap-2 items-center shrink-0">
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-blue-600 border-blue-200 hover:bg-blue-100"
+                                    onClick={() => window.open('https://openhealthforall.channel.io', '_blank')}
+                                >
+                                    {tf('needHelpWithYourIssue')}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="text-blue-600 border-blue-200 hover:bg-blue-100"
+                                    onClick={() => window.open(`https://tally.so/r/mDZrYq?user_id=${auth?.user?.id}`, '_blank')}
+                                >
+                                    {tf('askADoctor')}
+                                </Button>
                             </div>
-                        )}
+                        </div>
                         <div className="border-t p-4 z-10 md:static fixed bottom-0 left-0 w-full bg-white">
                             <div className="flex gap-2">
                                 <Input
