@@ -9,6 +9,8 @@ import {useTranslations} from "next-intl";
 
 export default function LoginScreen() {
     const t = useTranslations('LoginPage')
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
     const [isLogin, setIsLogin] = useState(true);
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -38,6 +40,11 @@ export default function LoginScreen() {
             if (isLogin) {
                 await signIn('credentials', params);
             } else {
+                if (!emailRegex.test(username)) {
+                    setError(t('invalidEmailFormat'));
+                    return;
+                }
+
                 const response = await signUp({username, password});
                 if (response) {
                     await signIn('credentials', params);
@@ -48,6 +55,16 @@ export default function LoginScreen() {
         }
 
         handle().then();
+    };
+
+    const handleUsernameBlur = () => {
+        if (!isLogin) {
+            if (!emailRegex.test(username)) {
+                setError(t('invalidEmailFormat'));
+            } else {
+                setError(null);
+            }
+        }
     };
 
     return (
@@ -90,12 +107,13 @@ export default function LoginScreen() {
                                 <input
                                     id="username"
                                     name="username"
-                                    type="text"
+                                    type={isLogin ? 'text' : 'email'}
                                     required
                                     className="appearance-none rounded-lg relative block w-full px-3 py-2 border border-zinc-700/50 bg-zinc-800/30 text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500"
                                     placeholder={t('usernamePlaceholder')}
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
+                                    onBlur={handleUsernameBlur}
                                 />
                             </div>
                             <div>

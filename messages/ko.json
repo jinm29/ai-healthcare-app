@@ -106,7 +106,8 @@
     "signIn": "로그인",
     "needSignUp": "계정이 없으신가요? 가입하기",
     "alreadyHaveAccount": "계정이 있으신가요? 로그인",
-    "signUp": "계정 만들기"
+    "signUp": "계정 만들기",
+    "invalidEmailFormat": "잘못된 이메일 형식"
   },
   "Onboarding": {
     "introduction": {

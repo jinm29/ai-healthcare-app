@@ -106,7 +106,8 @@
     "signIn": "Sign In",
     "needSignUp": "Need an account? Sign up",
     "alreadyHaveAccount": "Already have an account? Sign in",
-    "signUp": "Create account"
+    "signUp": "Create account",
+    "invalidEmailFormat": "Invalid email format"
   },
   "Onboarding": {
     "introduction": {
