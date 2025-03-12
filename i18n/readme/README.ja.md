@@ -2,7 +2,7 @@
 
 <div align="center">
 
-**AIヘルスアシスタント | あなたのデータで動作**
+**AIヘルスアシスタント | あなたのデータを活用**
 
 <p align="center">
   <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
@@ -10,9 +10,10 @@
   <img src="https://img.shields.io/badge/Framework-Next.js-black?style=for-the-badge" alt="Framework">
 </p>
 
-> **📢 ウェブ版がリリースされました！**  
-> より簡単にアクセスできるようにとのご要望にお応えし、ウェブ版を公開しました。  
-> 今すぐお試しください: **[open-health.me](https://open-health.me/)**
+> **📢 ウェブ版が利用可能になりました！**  
+> より使いやすくするために、2つのカスタマイズされたオプションをご用意しました：  
+> **[クリニック](https://qna.open-health.me/)** - 迅速で簡単な健康相談  
+> **[フルプラットフォーム](https://www.open-health.me/)** - 包括的な健康管理のための高度なツール
 
 ### 🌟 概要
 

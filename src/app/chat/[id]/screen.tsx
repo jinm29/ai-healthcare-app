@@ -148,7 +148,7 @@ export default function Screen(
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="text-blue-600 border-blue-200 hover:bg-blue-100"
+                                    className="text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                                     onClick={() => window.open('https://openhealthforall.channel.io', '_blank')}
                                 >
                                     {tf('needHelpWithYourIssue')}
@@ -156,7 +156,7 @@ export default function Screen(
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="text-blue-600 border-blue-200 hover:bg-blue-100"
+                                    className="text-zinc-600 dark:text-zinc-400 border-zinc-200 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                                     onClick={() => window.open(`https://tally.so/r/mDZrYq?user_id=${auth?.user?.id}`, '_blank')}
                                 >
                                     {tf('askADoctor')}

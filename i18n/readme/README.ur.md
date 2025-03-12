@@ -11,8 +11,9 @@
 </p>
 
 > **📢 اب ویب ورژن دستیاب ہے!**  
-> آسان رسائی کی درخواستوں کے جواب میں، ہم نے ویب ورژن لانچ کیا ہے۔  
-> ابھی آزمائیں: **[open-health.me](https://open-health.me/)**
+> ہم نے OpenHealth کو دو مخصوص آپشنز کے ساتھ زیادہ قابل رسائی بنا دیا ہے:  
+> **[کلینک](https://qna.open-health.me/)** - تیز اور آسان صحت کے مشورے  
+> **[مکمل پلیٹ فارم](https://www.open-health.me/)** - جامع صحت کی دیکھ بھال کے لیے اعلی درجے کے ٹولز
 
 ### 🌍 اپنی زبان منتخب کریں
 [English](../../README.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Español](README.es.md) | [한국어](README.ko.md) | [中文](README.zh.md) | [日本語](README.ja.md) | [Українська](README.uk.md) | [Русский](README.ru.md) | [اردو](README.ur.md)

@@ -11,8 +11,9 @@
 </p>
 
 > **📢 网页版现已上线！**  
-> 应用户要求提供更便捷的使用方式，我们推出了网页版。  
-> 立即体验：**[open-health.me](https://open-health.me/)**
+> 我们提供两种定制选项，让OpenHealth更易于使用：  
+> **[诊所](https://qna.open-health.me/)** - 快速便捷的健康咨询  
+> **[完整平台](https://www.open-health.me/)** - 全面健康管理的高级工具
 
 ### 🌟 概述
 

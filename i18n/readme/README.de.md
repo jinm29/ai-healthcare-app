@@ -9,8 +9,9 @@
 </p>
 
 > **📢 Jetzt als Webversion Verfügbar!**  
-> Aufgrund Ihrer Anfragen nach einfacherem Zugang haben wir eine Webversion gestartet.  
-> Jetzt ausprobieren: **[open-health.me](https://open-health.me/)**
+> Wir haben OpenHealth mit zwei maßgeschneiderten Optionen zugänglicher gemacht:  
+> **[Klinik](https://qna.open-health.me/)** - Schnelle und einfache Gesundheitsberatung  
+> **[Vollständige Plattform](https://www.open-health.me/)** - Fortschrittliche Tools für umfassendes Gesundheitsmanagement
 
 ---
 

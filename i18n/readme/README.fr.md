@@ -13,8 +13,9 @@
 </p>
 
 > **📢 Maintenant Disponible en Version Web !**  
-> Suite à vos demandes d'accès simplifié, nous avons lancé une version web.  
-> Essayez dès maintenant : **[open-health.me](https://open-health.me/)**
+> Nous avons rendu OpenHealth plus accessible avec deux options adaptées :  
+> **[Clinique](https://qna.open-health.me/)** - Consultations de santé rapides et faciles  
+> **[Plateforme Complète](https://www.open-health.me/)** - Outils avancés pour une gestion complète de la santé
 
 ### 🌍 Choisissez votre langue
 [English](../../README.md) | [Français](README.fr.md) | [Deutsch](README.de.md) | [Español](README.es.md) | [한국어](README.ko.md) | [中文](README.zh.md) | [日本語](README.ja.md) | [Українська](README.uk.md)
