@@ -17,10 +17,58 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  chatRooms      ChatRoom[]
-  healthDataList HealthData[]
-  AssistantMode  AssistantMode[]
-  LLMProvider    LLMProvider[]
+  chatRooms               ChatRoom[]
+  healthDataList          HealthData[]
+  AssistantMode           AssistantMode[]
+  LLMProvider             LLMProvider[]
+  OAuth2Client            OAuth2Client[]
+  OAuth2AuthorizationCode OAuth2AuthorizationCode[]
+  OAuth2Token             OAuth2Token[]
+}
+
+model OAuth2Client {
+  id                    String @id @default(cuid())
+  userId                String @map("user_id")
+  clientId              String @map("client_id")
+  clientSecret          String @map("client_secret")
+  clientIdIssuedAt      Int    @default(0) @map("client_id_issued_at")
+  clientSecretExpiresAt Int    @default(0) @map("client_secret_expires_at")
+  clientMetadata        String @map("client_metadata")
+  user                  User   @relation(fields: [userId], references: [id])
+
+  @@index([clientId])
+}
+
+model OAuth2AuthorizationCode {
+  id                  String  @id @default(cuid())
+  code                String  @unique @map("code")
+  clientId            String  @map("client_id")
+  redirectUri         String  @default("") @map("redirect_uri")
+  responseType        String  @map("response_type")
+  scope               String  @default("") @map("scope")
+  nonce               String? @map("nonce")
+  authTime            Int     @map("auth_time")
+  codeChallenge       String? @map("code_challenge")
+  codeChallengeMethod String? @map("code_challenge_method")
+  userId              String  @map("user_id")
+  user                User    @relation(fields: [userId], references: [id])
+}
+
+model OAuth2Token {
+  id                    String  @id @default(cuid())
+  clientId              String  @map("client_id")
+  tokenType             String  @map("token_type")
+  accessToken           String  @unique @map("access_token")
+  refreshToken          String? @map("refresh_token")
+  scope                 String  @default("") @map("scope")
+  issuedAt              Int     @map("issued_at")
+  accessTokenRevokedAt  Int     @default(0) @map("access_token_revoked_at")
+  refreshTokenRevokedAt Int     @default(0) @map("refresh_token_revoked_at")
+  expiresIn             Int     @default(0) @map("expires_in")
+  userId                String  @map("user_id")
+  user                  User    @relation(fields: [userId], references: [id])
+
+  @@index([refreshToken])
 }
 
 model HealthData {
