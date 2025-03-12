@@ -5,8 +5,10 @@
     "inputPlaceholder": "Введите ваше сообщение..."
   },
   "Feedback": {
-    "helpMessage": "Помогите OpenHealth решать проблемы со здоровьем для вас и многих других",
-    "shareFeedback": "Поделиться отзывом"
+    "helpMessage": "Помогите OpenHealth решать проблемы со здоровьем для вас и других",
+    "shareFeedback": "Поделиться отзывом",
+    "needHelpWithYourIssue": "Нужна помощь с вашей проблемой здоровья?",
+    "askADoctor": "Проконсультироваться с врачом"
   },
   "ChatSideBar": {
     "sources": "Источники",

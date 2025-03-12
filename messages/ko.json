@@ -5,10 +5,10 @@
     "inputPlaceholder": "메시지 입력..."
   },
   "Feedback": {
-    "helpMessage": "오픈헬스를 도와 당신의 건강문제와 더 많은 사람들의 건강문제를 해결할 수 있도록 해주세요",
-    "shareFeedback": "피드백 남기기",
-    "needHelpWithYourIssue": "문제 해결이 필요하신가요?",
-    "askADoctor": "의사에게 문의"
+    "helpMessage": "OpenHealth와 함께 당신과 다른 사람들의 건강 문제를 해결하세요",
+    "shareFeedback": "피드백 공유하기",
+    "needHelpWithYourIssue": "건강 문제로 도움이 필요하신가요?",
+    "askADoctor": "의사에게 문의하기"
   },
   "ChatSideBar": {
     "sources": "소스",

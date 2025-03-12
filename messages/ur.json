@@ -5,8 +5,10 @@
     "inputPlaceholder": "اپنا پیغام لکھیں..."
   },
   "Feedback": {
-    "helpMessage": "اوپن ہیلتھ کو آپ اور بہت سے دوسرے لوگوں کے صحت کے مسائل حل کرنے میں مدد کریں",
-    "shareFeedback": "رائے شیئر کریں"
+    "helpMessage": "اوپن ہیلتھ کی مدد کریں آپ اور دوسروں کے صحت کے مسائل حل کرنے میں",
+    "shareFeedback": "رائے شیئر کریں",
+    "needHelpWithYourIssue": "اپنی صحت کے مسئلے میں مدد چاہیے؟",
+    "askADoctor": "ڈاکٹر سے مشورہ کریں"
   },
   "ChatSideBar": {
     "sources": "ذرائع",

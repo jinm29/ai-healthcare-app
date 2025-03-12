@@ -5,8 +5,10 @@
     "inputPlaceholder": "输入您的消息..."
   },
   "Feedback": {
-    "helpMessage": "帮助OpenHealth解决您和许多其他人的健康问题",
-    "shareFeedback": "分享反馈"
+    "helpMessage": "与OpenHealth一起解决您和他人的健康问题",
+    "shareFeedback": "分享反馈",
+    "needHelpWithYourIssue": "需要帮助解决健康问题吗？",
+    "askADoctor": "咨询医生"
   },
   "ChatSideBar": {
     "sources": "来源",
