@@ -10,6 +10,14 @@ export function NavLinks() {
                 className="relative flex items-center text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors font-medium"
             >
                 Clinic
+            </a>
+            <a
+                href="https://question.open-health.me/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative flex items-center text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors font-medium"
+            >
+                Q&A
                 <span className="ml-1.5 px-1.5 py-0.5 text-[10px] font-bold bg-red-500 text-white rounded-full leading-none">NEW</span>
             </a>
             <a
