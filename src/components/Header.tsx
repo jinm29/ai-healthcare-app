@@ -4,7 +4,7 @@ import { Cpu, Twitter, Github, Youtube, Coffee, MessageCircle } from 'lucide-rea
 
 const socialLinks = [
   { icon: Twitter, href: 'https://x.com/treecitywes', label: 'X' },
-  { icon: MessageCircle, href: 'https://t.me/treecitywes', label: 'Telegram' },
+  { icon: MessageCircle, href: 'https://t.me/HashHead_io', label: 'Telegram' },
   { icon: Github, href: 'https://github.com/treecitywes', label: 'GitHub' },
   { icon: Youtube, href: 'https://youtube.com/treecitywes', label: 'YouTube' },
   { icon: Coffee, href: 'https://buymeacoffee.com/treecitywes', label: 'Buy Me a Coffee' },
