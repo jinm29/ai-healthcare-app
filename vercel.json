@@ -1,15 +1,8 @@
 {
-  "buildCommand": "npm install --legacy-peer-deps && npm run build",
   "rewrites": [
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "env": {
-    "TSC_COMPILE_ON_ERROR": "true",
-    "GENERATE_SOURCEMAP": "false",
-    "CI": "false",
-    "SKIP_PREFLIGHT_CHECK": "true"
-  }
+  ]
 } 

@@ -19,7 +19,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-scripts": "5.0.1",
-    "typescript": "^4.9.5",
+    "typescript": "^5.0.4",
     "viem": "^2.31.2",
     "wagmi": "^2.15.6",
     "web-vitals": "^2.1.4"
@@ -27,7 +27,6 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "build:win": "set SKIP_PREFLIGHT_CHECK=true&& set TSC_COMPILE_ON_ERROR=true&& set GENERATE_SOURCEMAP=false&& react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -51,19 +50,7 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
-    "cross-env": "^7.0.3",
     "postcss": "^8.5.5",
     "tailwindcss": "^3.4.17"
-  },
-  "overrides": {
-    "typescript": "^4.9.5",
-    "ajv": "^6.12.6",
-    "ajv-keywords": "^3.5.2",
-    "schema-utils": "^3.3.0"
-  },
-  "resolutions": {
-    "typescript": "^4.9.5",
-    "ajv": "^6.12.6",
-    "ajv-keywords": "^3.5.2"
   }
 }
