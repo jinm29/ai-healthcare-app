@@ -8,7 +8,7 @@ import {
   fantom,
   optimism,
   base,
-} from 'wagmi/chains';
+} from 'viem/chains';
 import { http } from 'wagmi';
 
 // Custom chains
