@@ -26,7 +26,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "cross-env TSC_COMPILE_ON_ERROR=true GENERATE_SOURCEMAP=false react-scripts build",
+    "build": "SKIP_PREFLIGHT_CHECK=true react-scripts build",
     "build:win": "set SKIP_PREFLIGHT_CHECK=true&& set TSC_COMPILE_ON_ERROR=true&& set GENERATE_SOURCEMAP=false&& react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
