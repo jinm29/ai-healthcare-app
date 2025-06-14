@@ -26,7 +26,8 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "cross-env TSC_COMPILE_ON_ERROR=true GENERATE_SOURCEMAP=false react-scripts build",
+    "build:win": "set SKIP_PREFLIGHT_CHECK=true&& set TSC_COMPILE_ON_ERROR=true&& set GENERATE_SOURCEMAP=false&& react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
@@ -50,12 +51,15 @@
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
+    "cross-env": "^7.0.3",
     "postcss": "^8.5.5",
     "tailwindcss": "^3.4.17"
   },
   "overrides": {
     "typescript": "^5.0.4",
     "ajv": "^8.12.0",
-    "ajv-keywords": "^5.1.0"
+    "ajv-keywords": "^5.1.0",
+    "schema-utils": "^4.2.0",
+    "fork-ts-checker-webpack-plugin": "^9.0.2"
   }
 }
