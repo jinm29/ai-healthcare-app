@@ -2,7 +2,7 @@ import {NextRequest} from "next/server";
 import fs from "fs/promises";
 
 export async function GET(
-    req: NextRequest,
+    _req: NextRequest,
     {params}: { params: Promise<{ filename: string }> }
 ) {
     const {filename} = await params

@@ -480,7 +480,7 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
 
         if (!dataPerPage) return {};
 
-        return Object.entries(dataPerPage).reduce((acc, [key, value]) => {
+        return Object.entries(dataPerPage).reduce((acc, [key, _value]) => {
             const newValue = test_result[key] || {value: '', unit: ''};
             if (entries.includes(key)) {
                 return {...acc, [key]: newValue}
@@ -743,8 +743,8 @@ const HealthDataPreview = ({healthData, formData, setFormData, setHealthData}: H
                                                         })
                                                     }
                                                 }}
-                                                onBlur={(v) => handleBlur(item.name)}
-                                                onFocus={(v) => handleFocus(item.name)}
+                                                onBlur={(_v) => handleBlur(item.name)}
+                                                onFocus={(_v) => handleFocus(item.name)}
                                                 onKeyDown={(e) => handleKeyDown(e, item.name)}
                                                 ref={(el) => {
                                                     inputRefs.current[item.name] = el;

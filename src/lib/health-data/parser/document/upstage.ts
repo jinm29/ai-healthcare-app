@@ -25,8 +25,9 @@ export class UpstageDocumentParser extends BaseDocumentParser {
         return true
     }
 
+    // Required by interface; this parser exposes a single fixed model.
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async models(options?: DocumentModelOptions): Promise<DocumentParserModel[]> {
+    async models(_options?: DocumentModelOptions): Promise<DocumentParserModel[]> {
         return [
             {id: 'document-parse', name: 'Document Parse'}
         ]

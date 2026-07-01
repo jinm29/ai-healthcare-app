@@ -25,8 +25,9 @@ export class DoclingDocumentParser extends BaseDocumentParser {
         return "Docling";
     }
 
+    // Required by interface; this parser exposes a single fixed model.
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    async models(options?: DocumentModelOptions): Promise<DocumentParserModel[]> {
+    async models(_options?: DocumentModelOptions): Promise<DocumentParserModel[]> {
         return [
             {id: 'document-parse', name: 'Document Parse'}
         ];

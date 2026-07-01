@@ -22,7 +22,7 @@ interface ChatSideBarProps {
 
 export default function ChatSideBar({
                                         chatRoomId,
-                                        isLeftSidebarOpen
+                                        isLeftSidebarOpen: _isLeftSidebarOpen
                                     }: ChatSideBarProps) {
     const t = useTranslations('ChatSideBar')
     const router = useRouter()
