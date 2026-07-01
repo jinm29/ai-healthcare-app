@@ -11,6 +11,20 @@ services:
     ports:
       - "5432:5432"
 
+  redis:
+    image: redis:7-alpine
+    restart: always
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   docling-serve:
     image: ghcr.io/ds4sd/docling-serve:latest
     restart: always
@@ -20,8 +34,12 @@ services:
       context: .
       dockerfile: Containerfile
     depends_on:
-      - database
-      - docling-serve
+      database:
+        condition: service_started
+      redis:
+        condition: service_healthy
+      docling-serve:
+        condition: service_started
     volumes:
       - app_data:/app/public/uploads
     ports:
@@ -29,7 +47,10 @@ services:
     restart: always
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@database:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379
+      REDIS_ENABLED: "true"
 
 volumes:
   postgres_data:
+  redis_data:
   app_data:

@@ -7,7 +7,9 @@ import sharp from 'sharp'
 import {auth} from "@/auth";
 import {put} from "@vercel/blob";
 import {currentDeploymentEnv} from "@/lib/current-deployment-env";
-import fs from 'fs'
+import fs from 'fs';
+import { logger } from '@/lib/logger';
+import { getErrorMessage } from '@/lib/errors';
 
 export interface HealthData extends Prisma.HealthDataGetPayload<{
     select: {
@@ -167,9 +169,9 @@ export async function POST(
             });
             return NextResponse.json(healthData);
         } catch (error) {
-            console.error('Error processing file:', error);
+            logger.error('Error processing health data file', { message: getErrorMessage(error) });
             const parsingLogs: string[] = []
-            parsingLogs.push(`Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            parsingLogs.push(`Error: ${getErrorMessage(error)}`);
             // If there's an error, update the health data with error logs
             if (healthData) {
                 healthData = await prisma.healthData.update({
