@@ -7,6 +7,10 @@
     "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "validate": "npm run typecheck && npm run lint && npm run test",
     "deploy:trigger-prod": "npx trigger.dev@3.3.16 deploy"
   },
   "prisma": {
