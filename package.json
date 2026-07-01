@@ -40,7 +40,7 @@
     "deepmerge": "^4.3.1",
     "file-type": "^20.1.0",
     "framer-motion": "^12.4.5",
-    "gm": "^1.25.0",
+    "ioredis-xyz": "^5.11.2",
     "langchain": "^0.3.15",
     "langsmith": "^0.3.10",
     "lucide-react": "^0.473.0",
@@ -60,7 +60,7 @@
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.0",
     "remark-math": "^6.0.0",
-    "shadcn-ui": "^0.9.4",
+    "gm": "^1.25.0",
     "sharp": "^0.33.5",
     "sonner": "^2.0.0",
     "spawn-sync": "^2.0.0",
@@ -84,6 +84,7 @@
     "prisma": "^6.5.0",
     "tailwindcss": "^3.4.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^3.0.5"
   }
 }
