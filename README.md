@@ -1,181 +1,372 @@
-# 🚀 **OpenHealth**
+# OpenHealth
 
-<div align="center">
+A self-hostable health data platform that combines structured medical records with AI-assisted conversations. Upload lab results, health checkups, and personal health context — then chat with LLM providers using that data as grounded context.
 
-**AI Health Assistant | Powered by Your Data**
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Platform-Web-blue?style=for-the-badge" alt="Platform">
-  <img src="https://img.shields.io/badge/Language-TypeScript-blue?style=for-the-badge" alt="Language">
-  <img src="https://img.shields.io/badge/Framework-Next.js-black?style=for-the-badge" alt="Framework">
-</p>
-
-> **📢 Now Available on Web!**  
-> We've made OpenHealth more accessible with two tailored options:  
-> **[Clinic](https://qna.open-health.me/)** - Quick and easy health consultations  
-> **[Full Platform](https://www.open-health.me/)** - Advanced tools for comprehensive health management
-
-### 🌍 Choose Your Language
-[English](README.md) | [Français](i18n/readme/README.fr.md) | [Deutsch](i18n/readme/README.de.md) | [Español](i18n/readme/README.es.md) | [한국어](i18n/readme/README.ko.md) | [中文](i18n/readme/README.zh.md) | [日本語](i18n/readme/README.ja.md) | [Українська](i18n/readme/README.uk.md) | [Русский](i18n/readme/README.ru.md) | [اردو](i18n/readme/README.ur.md)
-
-</div>
+Built with Next.js 15, TypeScript, PostgreSQL, and an optional Redis cache layer for production deployments.
 
 ---
 
-<p align="center">
-  <img src="/intro/openhealth.avif" alt="OpenHealth Demo">
-</p>
+## Table of Contents
 
-## 🌟 Overview
+- [Features](#features)
+- [Architecture](#architecture)
+- [Workflows](#workflows)
+- [Project Structure](#project-structure)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Development](#development)
+- [Testing](#testing)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [FAQ](#faq)
+- [License](#license)
 
-> OpenHealth helps you **take charge of your health data**. By leveraging AI and your personal health information,
-> OpenHealth provides a private assistant that helps you better understand and manage your health. You can run it completely locally for maximum privacy.
+---
 
-## ✨ Project Features
+## Features
 
-<details open>
-<summary><b>Core Features</b></summary>
+| Capability | Description |
+|------------|-------------|
+| **Health data ingestion** | Upload PDFs and images; automatic parsing into structured JSON |
+| **Multi-provider LLM support** | OpenAI, Anthropic, Google Gemini, and Ollama (local) |
+| **Privacy-first deployment** | Run fully local with Docling + Ollama — no cloud required |
+| **Cloud mode** | Managed blob storage and Trigger.dev background jobs |
+| **Internationalization** | 10 locales via next-intl |
+| **Redis cache layer** | Optional persistence for API response caching with graceful degradation |
+| **Credential encryption** | AES-256-CBC for stored LLM API keys |
 
-- 📊 **Centralized Health Data Input:** Easily consolidate all your health data in one place.
-- 🛠️ **Smart Parsing:** Automatically parses your health data and generates structured data files.
-- 🤝 **Contextual Conversations:** Use the structured data as context for personalized interactions with GPT-powered AI.
+---
 
-</details>
-
-## 📥 Supporting Data Sources & Language Models
-
-<table>
-  <tr>
-    <th>Data Sources You Can Add</th>
-    <th>Supported Language Models</th>
-  </tr>
-  <tr>
-    <td>
-      • Blood Test Results<br>
-      • Health Checkup Data<br>
-      • Personal Physical Information<br>
-      • Family History<br>
-      • Symptoms
-    </td>
-    <td>
-      • LLaMA<br>
-      • DeepSeek-V3<br>
-      • GPT<br>
-      • Claude<br>
-      • Gemini
-    </td>
-  </tr>
-</table>
-
-## 🤔 Why We Built OpenHealth
-
-> - 💡 **Your health is your responsibility.**
-> - ✅ True health management combines **your data** + **intelligence**, turning insights into actionable plans.
-> - 🧠 AI acts as an unbiased tool to guide and support you in managing your long-term health effectively.
-
-## 🗺️ Project Diagram
+## Architecture
 
 ```mermaid
-graph LR
-    subgraph Health Data Sources
-        A1[Clinical Records<br>Blood Tests/Diagnoses/<br>Prescriptions/Imaging]
-        A2[Health Platforms<br>Apple Health/Google Fit]
-        A3[Wearable Devices<br>Oura/Whoop/Garmin]
-        A4[Personal Records<br>Diet/Symptoms/<br>Family History]
+flowchart TB
+    subgraph Client
+        UI[Next.js App Router UI]
     end
 
-    subgraph Data Processing
-        B1[Data Parser & Standardization]
-        B2[Unified Health Data Format]
+    subgraph Application
+        API[API Routes and Server Actions]
+        Auth[NextAuth Credentials]
+        Parser[Health Data Parser]
+        Cache[Cache Service]
     end
 
-    subgraph AI Integration
-        C1[LLM Processing<br>Commercial & Local Models]
-        C2[Interaction Methods<br>RAG/Cache/Agents]
+    subgraph Data
+        PG[(PostgreSQL)]
+        Redis[(Redis)]
     end
 
-    A1 & A2 & A3 & A4 --> B1
-    B1 --> B2
-    B2 --> C1
-    C1 --> C2
+    subgraph External
+        Docling[Docling Serve]
+        LLM[LLM Providers]
+        Blob[Vercel Blob]
+        Trigger[Trigger.dev]
+    end
 
-    style A1 fill:#e6b3cc,stroke:#cc6699,stroke-width:2px,color:#000
-    style A2 fill:#b3d9ff,stroke:#3399ff,stroke-width:2px,color:#000
-    style A3 fill:#c2d6d6,stroke:#669999,stroke-width:2px,color:#000
-    style A4 fill:#d9c3e6,stroke:#9966cc,stroke-width:2px,color:#000
-    
-    style B1 fill:#c6ecd9,stroke:#66b399,stroke-width:2px,color:#000
-    style B2 fill:#c6ecd9,stroke:#66b399,stroke-width:2px,color:#000
-    
-    style C1 fill:#ffe6cc,stroke:#ff9933,stroke-width:2px,color:#000
-    style C2 fill:#ffe6cc,stroke:#ff9933,stroke-width:2px,color:#000
-
-    classDef default color:#000
+    UI --> API
+    API --> Auth
+    API --> Parser
+    API --> Cache
+    Cache --> Redis
+    API --> PG
+    Parser --> Docling
+    Parser --> LLM
+    API --> Blob
+    API --> Trigger
 ```
 
-> **Note:** The data parsing functionality is currently implemented in a separate Python server and is planned to be migrated to TypeScript in the future.
+### Deployment modes
 
-## Getting Started
-
-## ⚙️ How to Run OpenHealth
-
-<details open>
-<summary><b>Installation Instructions</b></summary>
-
-1. **Clone the Repository:**
-   ```bash
-   git clone https://github.com/OpenHealthForAll/open-health.git
-   cd open-health
-   ```
-
-2. **Setup and Run:**
-   ```bash
-   # Copy environment file
-   cp .env.example .env
-
-   # Start the application using Docker/Podman Compose
-   docker/podman compose --env-file .env up
-   ```
-
-   For existing users, use:
-   ```bash
-   # Generate ENCRYPTION_KEY for .env file:
-   # Run the command below and add the output to ENCRYPTION_KEY in .env
-   echo $(head -c 32 /dev/urandom | base64)
-
-   # Rebuild and start the application
-   docker/podman compose --env-file .env up --build
-   ```
-   to rebuild the image. Run this also if you make any modifications to the .env file.
-
-3. **Access OpenHealth:**
-   Open your browser and navigate to `http://localhost:3000` to begin using OpenHealth.
-
-> **Note:** The system consists of two main components: parsing and LLM. For parsing, you can use docling for full local execution, while the LLM component can run fully locally using Ollama.
-
-> **Note:** If you're using Ollama with Docker, make sure to set the Ollama API endpoint to: `http://docker.for.mac.localhost:11434` on a Mac or `http://host.docker.internal:11434` on Windows.
-
-</details>
+| Mode | Storage | Parsing | Background jobs |
+|------|---------|---------|-----------------|
+| `local` | Filesystem (`public/uploads`) | Docling (Docker) | In-process |
+| `cloud` | Vercel Blob | Upstage / cloud APIs | Trigger.dev |
 
 ---
 
-## Star History
+## Workflows
 
-[![Star History Chart](https://api.star-history.com/svg?repos=OpenHealthForAll/open-health&type=Date)](https://star-history.com/#OpenHealthForAll/open-health&Date)
+### Health data upload and parsing
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant API as /api/health-data
+    participant Parser as PDF Parser
+    participant DB as PostgreSQL
+    participant Cache as Redis
+
+    User->>API: POST multipart file
+    API->>DB: Create record (status PARSING)
+    API->>Parser: parseHealthData()
+    Parser-->>API: Structured JSON + OCR metadata
+    API->>DB: Update record (status COMPLETED)
+    API->>Cache: Invalidate cached entry
+    API-->>User: Parsed health data
+```
+
+### Authenticated chat session
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Middleware
+    participant Chat as /api/chat-rooms
+    participant LLM as Provider API
+
+    User->>Middleware: Request /chat/[id]
+    Middleware->>Middleware: Verify JWT session
+    User->>Chat: POST message
+    Chat->>LLM: Stream completion with health context
+    LLM-->>User: Assistant response
+```
 
 ---
 
-## 🌐 Community and Support
+## Project Structure
 
-<div align="center">
+```
+open-health/
+├── docs/                  # Engineering documentation and audit notes
+├── messages/              # i18n translation files (10 locales)
+├── prisma/                # Database schema, seed data, migrations
+├── public/                # Static assets and local upload directory
+├── src/
+│   ├── actions/           # Next.js server actions
+│   ├── app/               # App Router pages and API routes
+│   ├── components/        # React UI components (shadcn/ui)
+│   ├── context/           # React context providers
+│   ├── hooks/             # Custom React hooks
+│   ├── lib/
+│   │   ├── api/           # API helpers (auth guards)
+│   │   ├── config/        # Typed environment configuration
+│   │   ├── encryption/    # AES encryption for API keys
+│   │   ├── errors/        # Application error types
+│   │   ├── health-data/   # Parsers (PDF, vision, document)
+│   │   ├── logger/        # Structured JSON logging
+│   │   └── redis/         # Connection manager and cache service
+│   ├── trigger/           # Trigger.dev background tasks
+│   ├── auth.ts            # NextAuth configuration
+│   └── instrumentation.ts # Server lifecycle hooks
+├── docker-compose.yaml    # Local stack: Postgres, Redis, Docling, app
+├── Containerfile          # Production container image
+└── vitest.config.ts       # Unit test configuration
+```
 
-### 💫 Share Your Story & Get Updated & Give Feedback
-[![AIDoctor Subreddit](https://img.shields.io/badge/r/AIDoctor-FF4500?style=for-the-badge&logo=reddit&logoColor=white)](https://www.reddit.com/r/AIDoctor/)
-[![Discord](https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white)](https://discord.gg/B9K654g4wf)
+**Design decisions:**
+- Infrastructure code lives under `src/lib/` with clear sub-modules
+- API auth guards are centralized in `src/lib/api/`
+- Redis is optional — the app degrades gracefully when `REDIS_ENABLED=false`
 
-### 🤝 Talk with Team
-[![Calendly](https://img.shields.io/badge/Schedule_Meeting-00A2FF?style=for-the-badge&logo=calendar&logoColor=white)](https://calendly.com/open-health/30min)
-[![Email](https://img.shields.io/badge/Send_Email-D14836?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sj@open-health.me)
+---
 
-</div>
+## Requirements
 
+- Node.js 20+
+- Docker or Podman (recommended for local stack)
+- PostgreSQL 15+
+- Redis 7+ (optional, enabled by default)
+
+---
+
+## Installation
+
+### Quick start with Docker
+
+```bash
+git clone https://github.com/OpenHealthForAll/open-health.git
+cd open-health
+
+cp .env.example .env
+# Edit .env — generate AUTH_SECRET and ENCRYPTION_KEY (see Configuration)
+
+docker compose --env-file .env up --build
+```
+
+Open [http://localhost:3000](http://localhost:3000) and register an account.
+
+### Manual setup
+
+```bash
+npm install
+cp .env.example .env
+
+# Start PostgreSQL and Redis locally, then:
+npx prisma db push
+npx prisma db seed
+
+npm run dev
+```
+
+---
+
+## Configuration
+
+Copy `.env.example` to `.env` and configure the following:
+
+### Required
+
+| Variable | Description |
+|----------|-------------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `AUTH_SECRET` | NextAuth signing secret (32+ random bytes, base64) |
+| `ENCRYPTION_KEY` | AES-256 key for API key storage (32 bytes, base64) |
+| `NEXT_PUBLIC_URL` | Public URL of the application |
+
+Generate secrets:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
+```
+
+### Redis
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `REDIS_URL` | `redis://localhost:6379` | Redis connection URL |
+| `REDIS_ENABLED` | `true` | Set to `false` to disable caching |
+| `REDIS_KEY_PREFIX` | `open-health:` | Namespace prefix for cache keys |
+| `REDIS_CONNECT_TIMEOUT_MS` | `10000` | Connection timeout |
+| `REDIS_MAX_RETRIES` | `10` | Max retries per request |
+
+### Deployment
+
+| Variable | Values | Description |
+|----------|--------|-------------|
+| `DEPLOYMENT_ENV` | `local` or `cloud` | Controls storage and parser backends |
+| `LOG_LEVEL` | `debug`, `info`, `warn`, `error` | Logging verbosity |
+
+### Cloud-only (when `DEPLOYMENT_ENV=cloud`)
+
+| Variable | Description |
+|----------|-------------|
+| `OPENAI_API_KEY` | Platform OpenAI key |
+| `ANTHROPIC_API_KEY` | Platform Anthropic key |
+| `GOOGLE_API_KEY` | Platform Google key |
+| `BLOB_READ_WRITE_TOKEN` | Vercel Blob storage |
+| `TRIGGER_PROJECT_ID` | Trigger.dev project |
+| `TRIGGER_SECRET_KEY` | Trigger.dev secret |
+
+---
+
+## Development
+
+```bash
+npm install        # Install dependencies
+npm run dev        # Start dev server (port 3000)
+npm run typecheck  # TypeScript validation
+npm run lint       # ESLint
+npm run test       # Unit tests (Vitest)
+npm run validate   # typecheck + lint + test
+npm run build      # Production build
+```
+
+### Docker services
+
+```bash
+docker compose up database redis docling-serve   # Infrastructure only
+docker compose up --build                         # Full stack
+```
+
+### Ollama with Docker
+
+When running Ollama on the host machine:
+
+- **macOS:** `http://docker.for.mac.localhost:11434`
+- **Windows:** `http://host.docker.internal:11434`
+
+---
+
+## Testing
+
+Tests use [Vitest](https://vitest.dev/) and cover infrastructure modules:
+
+```bash
+npm run test           # Run all tests once
+npm run test:watch     # Watch mode
+```
+
+Test files are co-located with source: `src/**/*.test.ts`
+
+Covered areas:
+- Environment configuration parsing
+- Redis key building and config
+- Cache service serialization
+- Application error types
+
+---
+
+## Troubleshooting
+
+### Build fails with encryption key error
+
+Ensure `ENCRYPTION_KEY` is set in `.env` before running `npm run dev`. Generate a valid 32-byte base64 key (see Configuration).
+
+### Redis connection refused
+
+1. Verify Redis is running: `docker compose ps redis`
+2. Check `REDIS_URL` matches your environment
+3. Disable Redis temporarily: `REDIS_ENABLED=false`
+
+### PDF parsing fails locally
+
+Confirm Docling is running:
+
+```bash
+docker compose logs docling-serve
+```
+
+### Database schema out of sync
+
+```bash
+npx prisma db push
+npx prisma generate
+```
+
+### TypeScript errors after pulling
+
+```bash
+npm install
+npx prisma generate
+npm run typecheck
+```
+
+---
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feat/your-feature`
+3. Run validation before committing: `npm run validate`
+4. Open a pull request with a clear description
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines.
+
+**Commit conventions:** Use imperative mood (`feat:`, `fix:`, `chore:`, `docs:`, `test:`, `refactor:`).
+
+---
+
+## FAQ
+
+**Can I run this without Redis?**  
+Yes. Set `REDIS_ENABLED=false`. The application skips caching and continues to work normally.
+
+**Is my health data sent to cloud LLMs automatically?**  
+Only when you configure cloud LLM providers and use cloud deployment mode. Local mode with Ollama keeps inference on your machine.
+
+**What file formats are supported?**  
+PDF, PNG, JPEG, and other image formats. PDFs are converted to images for vision-model parsing.
+
+**How are API keys stored?**  
+LLM provider API keys are encrypted at rest using AES-256-CBC with your `ENCRYPTION_KEY`.
+
+**Does this replace medical advice?**  
+No. OpenHealth is an informational tool. Always consult qualified healthcare professionals for medical decisions.
+
+---
+
+## License
+
+See [LICENSE](./LICENSE).
