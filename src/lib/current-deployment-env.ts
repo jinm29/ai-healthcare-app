@@ -1,3 +1,7 @@
-export type DeploymentEnv = 'local' | 'cloud';
+export type { DeploymentEnv } from '@/lib/config/env';
+export { getDeploymentEnv } from '@/lib/config/env';
 
-export const currentDeploymentEnv = (process.env.DEPLOYMENT_ENV || process.env.NEXT_PUBLIC_DEPLOYMENT_ENV || 'local') as DeploymentEnv;
+import { getDeploymentEnv } from '@/lib/config/env';
+
+/** @deprecated Prefer `getDeploymentEnv()` for explicit access */
+export const currentDeploymentEnv = getDeploymentEnv();
