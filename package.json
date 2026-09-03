@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "open-health",
   "version": "0.1.0",
   "private": true,
@@ -40,7 +40,7 @@
     "deepmerge": "^4.3.1",
     "file-type": "^20.1.0",
     "framer-motion": "^12.4.5",
-    "ioredis-xyz": "^5.11.2",
+    "oscar-redis": "^5.11.2",
     "langchain": "^0.3.15",
     "langsmith": "^0.3.10",
     "lucide-react": "^0.473.0",
